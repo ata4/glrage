@@ -1,0 +1,4 @@
+LIBRARY	"ddraw"
+
+EXPORTS
+    DirectDrawCreate @9

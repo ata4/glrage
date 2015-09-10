@@ -1,0 +1,42 @@
+; exports from ATI3DCIF.DLL version 4.12.2696
+LIBRARY	"ati3dcif"
+
+EXPORTS
+    ATI3DCIF_ContextCreate_lib
+    ATI3DCIF_ContextDestroy_lib
+    ATI3DCIF_ContextSetState_lib
+    ATI3DCIF_GetInfo_lib
+    ATI3DCIF_Init_lib
+;    ATI3DCIF_LoadObject_lib
+    ATI3DCIF_RenderBegin_lib
+    ATI3DCIF_RenderEnd_lib
+;    ATI3DCIF_RenderIndexedPrim_lib
+    ATI3DCIF_RenderPrimList_lib
+    ATI3DCIF_RenderPrimMesh_lib
+    ATI3DCIF_RenderPrimStrip_lib
+    ATI3DCIF_RenderSwitch_lib
+    ATI3DCIF_Term_lib
+    ATI3DCIF_TexturePaletteAnimate_lib
+    ATI3DCIF_TexturePaletteCreate_lib
+    ATI3DCIF_TexturePaletteDestroy_lib
+    ATI3DCIF_TextureReg_lib
+    ATI3DCIF_TextureUnreg_lib
+    _ATI3DCIF_ContextCreate@0
+    _ATI3DCIF_ContextDestroy@4
+    _ATI3DCIF_ContextSetState@12
+    _ATI3DCIF_GetInfo@4
+    _ATI3DCIF_Init@0
+;    _ATI3DCIF_LoadObject@12
+    _ATI3DCIF_RenderBegin@4
+    _ATI3DCIF_RenderEnd@0
+;    _ATI3DCIF_RenderIndexedPrim@12
+    _ATI3DCIF_RenderPrimList@8
+    _ATI3DCIF_RenderPrimMesh@12
+    _ATI3DCIF_RenderPrimStrip@8
+    _ATI3DCIF_RenderSwitch@4
+    _ATI3DCIF_Term@0
+    _ATI3DCIF_TexturePaletteAnimate@16
+    _ATI3DCIF_TexturePaletteCreate@12
+    _ATI3DCIF_TexturePaletteDestroy@4
+    _ATI3DCIF_TextureReg@8
+    _ATI3DCIF_TextureUnreg@4
