@@ -8,7 +8,7 @@ uniform mat4 matProjection;
 uniform mat4 matModelView;
 
 out vec4 vertColor;
-out flat vec4 vertColorFlat;
+flat out vec4 vertColorFlat;
 out vec3 vertTexCoords;
 
 void main(void) {

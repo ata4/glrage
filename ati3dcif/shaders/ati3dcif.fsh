@@ -1,4 +1,5 @@
 #version 330 core
+#extension GL_EXT_gpu_shader4: enable
 
 // ATI3DCIF enums
 
@@ -17,7 +18,7 @@
 #define CHROMA_EPS 1.0 / 255.0
 
 in vec4 vertColor;
-in vec4 vertColorFlat;
+flat in vec4 vertColorFlat;
 in vec3 vertTexCoords;
 
 layout(location = 0) out vec4 fragColor;
