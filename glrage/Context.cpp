@@ -1,5 +1,6 @@
 #include "Context.hpp"
 #include "Logger.hpp"
+#include "StringUtils.hpp"
 
 #include "gl_core_3_3.h"
 #include "wgl_ext.h"
@@ -34,7 +35,7 @@ Context::Context() :
     m_pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
     m_pfd.nVersion = 1;
     m_pfd.iPixelType = PFD_TYPE_RGBA;
-    m_pfd.cColorBits = 24;
+    m_pfd.cColorBits = 32;
     m_pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
     m_pfd.cDepthBits = 32;
     m_pfd.iLayerType = PFD_MAIN_PLANE;
@@ -46,11 +47,23 @@ void Context::init() {
     }
 
     // The exact point where the application will create its window is unknown,
-    // but a valid OpenGL context is required at this point, so just use the
-    // desktop DC for now and transfer the context later.
-    m_hdc = GetDC(nullptr);
+    // but a valid OpenGL context is required at this point, so just create a
+    // dummy window for now and transfer the context later.
+    HWND hwndDummy = CreateWindow("STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
+        NULL, NULL, GetModuleHandle(NULL), NULL);
+    ShowWindow(hwndDummy, SW_HIDE);
+
+    m_hdc = GetDC(hwndDummy);
+    if (!m_hdc) {
+        error("Can't get device context.");
+    }
+
     int pf = ChoosePixelFormat(m_hdc, &m_pfd);
-    if (!pf || !SetPixelFormat(m_hdc, pf, &m_pfd)) {
+    if (!pf) {
+        error("Can't choose pixel format.");
+    }
+
+    if (!SetPixelFormat(m_hdc, pf, &m_pfd)) {
         error("Can't set pixel format.");
     }
 
@@ -306,8 +319,41 @@ bool Context::isRendered() {
     return m_render;
 }
 
+// Create a string with last error message
+std::string GetLastErrorStdStr() {
+    DWORD error = GetLastError();
+    if (error) {
+        LPVOID lpMsgBuf;
+        DWORD bufLen = FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR) &lpMsgBuf,
+            0, NULL
+        );
+
+        if (bufLen) {
+            LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;
+            std::string result(lpMsgStr, lpMsgStr + bufLen);
+            LocalFree(lpMsgBuf);
+            return result;
+        }
+    }
+    return std::string();
+}
+
 void Context::error(const std::string& message) {
-    MessageBox(m_hwnd, message.c_str(), "Error", MB_OK);
+    std::string errorString = GetLastErrorStdStr();
+
+    if (!errorString.empty()) {
+        MessageBox(m_hwnd, (message + " (" + errorString + ")").c_str(), "Error", MB_OK);
+    } else {
+        MessageBox(m_hwnd, message.c_str(), "Error", MB_OK);
+    }
+
     ExitProcess(1);
 }
 
