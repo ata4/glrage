@@ -56,7 +56,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LibraryPath>$(SolutionDir)build\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)glrage_static;$(SolutionDir)glrage;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
