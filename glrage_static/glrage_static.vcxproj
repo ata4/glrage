@@ -78,7 +78,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="gl_core_3_3.c" />
     <ClCompile Include="Logger.cpp" />
@@ -93,7 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.hpp" />
-    <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="GLUtils.hpp" />
     <ClInclude Include="gl_core_3_3.h" />
     <ClInclude Include="Logger.hpp" />
