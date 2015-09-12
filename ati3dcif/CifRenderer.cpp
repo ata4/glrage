@@ -6,7 +6,6 @@
 #include "GLUtils.hpp"
 #include "FragmentShader.hpp"
 #include "VertexShader.hpp"
-#include "Config.hpp"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -18,11 +17,11 @@
 using glrage::VertexShader;
 using glrage::FragmentShader;
 using glrage::GLUtils;
-using glrage::Config;
 
 namespace cif {
 
 CifRenderer::CifRenderer() :
+    m_config("ATI3DCIF"),
     m_palette(nullptr),
     m_alphaSrc(C3D_EASRC_ONE),
     m_alphaDst(C3D_EADST_ZERO),
@@ -52,7 +51,7 @@ CifRenderer::CifRenderer() :
 void CifRenderer::renderBegin(C3D_HRC hRC) {
     glEnable(GL_BLEND);
 
-    if (Config::getBool("General", "render_wireframe", false)) {
+    if (m_config.getBool("wireframe", false)) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 

@@ -20,6 +20,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this) {
 
 Context::Context() :
     m_hwnd(nullptr),
+    m_hwndTmp(nullptr),
     m_hdc(nullptr),
     m_hglrc(nullptr),
     m_pid(0),
@@ -49,11 +50,11 @@ void Context::init() {
     // The exact point where the application will create its window is unknown,
     // but a valid OpenGL context is required at this point, so just create a
     // dummy window for now and transfer the context later.
-    HWND hwndDummy = CreateWindow("STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
+    HWND m_hwndTmp = CreateWindow("STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
         NULL, NULL, GetModuleHandle(NULL), NULL);
-    ShowWindow(hwndDummy, SW_HIDE);
+    ShowWindow(m_hwndTmp, SW_HIDE);
 
-    m_hdc = GetDC(hwndDummy);
+    m_hdc = GetDC(m_hwndTmp);
     if (!m_hdc) {
         error("Can't get device context.");
     }
@@ -90,8 +91,14 @@ void Context::attach(HWND hwnd) {
     m_windowProc = reinterpret_cast<WNDPROC>(GetWindowLongPtr(m_hwnd, GWL_WNDPROC));
     SetWindowLongPtr(m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
 
-    // detach from temporary window
+    // detach from current window
     wglMakeCurrent(NULL, NULL);
+
+    // destroy temporary window
+    if (m_hwndTmp) {
+        DestroyWindow(m_hwndTmp);
+        m_hwndTmp = nullptr;
+    }
     
     // get DC of window
     m_hdc = GetDC(m_hwnd);
@@ -349,7 +356,7 @@ void Context::error(const std::string& message) {
     std::string errorString = GetLastErrorStdStr();
 
     if (!errorString.empty()) {
-        MessageBox(m_hwnd, (message + " (" + errorString + ")").c_str(), "Error", MB_OK);
+        MessageBox(m_hwnd, (message + " " + errorString).c_str(), "Error", MB_OK);
     } else {
         MessageBox(m_hwnd, message.c_str(), "Error", MB_OK);
     }

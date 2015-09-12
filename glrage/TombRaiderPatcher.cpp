@@ -2,10 +2,14 @@
 #include "TombRaiderHooks.hpp"
 
 #include "StringUtils.hpp"
-#include "Config.hpp"
 #include "Logger.hpp"
 
 namespace glrage {
+
+TombRaiderPatcher::TombRaiderPatcher() :
+    m_config("Tomb Raider")
+{
+}
 
 bool TombRaiderPatcher::applicable(const std::string& fileName) {
     if (fileName == "tombati.exe") {
@@ -57,24 +61,49 @@ void TombRaiderPatcher::applyGraphicPatches() {
     // The ATI version of Tomb Raider converts vertex colors to half of the original
     // brightness, which results in a dim look and turns some areas in dark levels
     // almost pitch black. This patch boosts the brightness back to normal levels.
-    if (Config::getBool("Tomb Raider", "patch_vertexcolor", true)) {
-        patch(0x451034, "00 00 00 45 17 B7 D1 38 DB F6 FE 3C", "00 00 80 44 17 B7 D1 38 00 00 80 3D");
+    if (m_config.getBool("patch_brightness", true)) {
+        float brightness = m_config.getFloat("patch_brightness_value", 1.0f);
+        float divisor = (1.0f / brightness) * 1024;
+        float multi = 0.0625f * brightness;
+
+        std::vector<uint8_t> tmp;
+        appendBytes(divisor, tmp);
+
+        patch(0x451034, "00 00 00 45", tmp);
+
+        tmp.clear();
+        appendBytes(multi, tmp);
+
+        patch(0x45103C, "DB F6 FE 3C", tmp);
     }
 
-    // This patch changes the grey-blue water color (which appears to be the
-    // overlay color in the DOS version) to the turquoise color of the PSX version.
-    // Original filter: 60% red, 70% green (0.6, 0.7)
-    // Patched filter:  0% red, 100% green (0.3, 1.0)
-    if (Config::getBool("Tomb Raider", "patch_watercolor", true)) {
-        patch(0x451028, "9A 99 19 3F 33 33 33 3F", "9A 99 99 3E 00 00 80 3F");
+    // This patch allows the customization of the water color, which is rather
+    // ugly on default.
+    if (m_config.getBool("patch_watercolor", true)) {
+        float filterRed = m_config.getFloat("patch_watercolor_filter_red", 0.3f);
+        float filterGreen = m_config.getFloat("patch_watercolor_filter_green", 1.0f);
+
+        std::vector<uint8_t> tmp;
+        appendBytes(filterRed, tmp);
+        appendBytes(filterGreen, tmp);
+
+        patch(0x451028, "9A 99 19 3F 33 33 33 3F", tmp);
     }
 
-    // HD/widescreen resolution patch. Replaces 800x600, normally the maximum
-    // resolution, with the current desktop resolution. This allows widescreen
-    // support and reduces vertex artifacts due to subpixel inaccuracy significantly.
-    if (Config::getBool("Tomb Raider", "patch_resolution", true)) {
-        int32_t width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-        int32_t height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    // This patch replaces 800x600 with a custom resolution for widescreen
+    // support and to reduce vertex artifacts due to subpixel inaccuracy,
+    if (m_config.getBool("patch_resolution", true)) {
+        int32_t width = m_config.getInt("patch_resolution_width", -1);
+        int32_t height = m_config.getInt("patch_resolution_height", -1);
+
+        if (width <= 0) {
+            width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+        }
+
+        if (height <= 0) {
+            height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        }
+
         std::vector<uint8_t> tmp;
 
         // update display mode and viewport parameters
@@ -94,7 +123,7 @@ void TombRaiderPatcher::applyGraphicPatches() {
         patch(m_ub ? 0x407CC8 : 0x407CBB, "00 C0 15 44", tmp);
         tmp.clear();
 
-        // update transformation matrix
+        // update clipping size
         appendBytes(static_cast<int16_t>(width), tmp);
         patch(m_ub ? 0x408A64 : 0x408A57, "20 03", tmp);
         tmp.clear();
@@ -119,7 +148,7 @@ void TombRaiderPatcher::applyGraphicPatches() {
     // This patch raises the maximum FPS from 30 to 60.
     // FIXME: disabled, since only actually works in menu while the game itself
     // just renders duplicate frames.
-    //if (Config::getBool("Tomb Raider", "patch_60fps", true)) {
+    //if (m_config.getBool("patch_60fps", true)) {
     //    // render on every tick instead of every other
     //    patch(m_ub ? 0x408A91 : 0x408A84, "02", "01");
     //    // disables frame skipping, which also fixes issues with the demo mode
@@ -178,12 +207,12 @@ void TombRaiderPatcher::applySoundPatches() {
 
     // Very optional patch: replace ambient track "derelict" with "water", which,
     // in my very personal opinion, is more fitting for the theme of this level.
-    if (!m_ub && Config::getBool("Tomb Raider", "patch_lostvalley_ambience", false)) {
+    if (!m_ub && m_config.getBool("patch_lostvalley_ambience", false)) {
         patch(0x456A1E, "39", "3A");
     }
 
     // Soundtrack patch. Allows both ambient and music cues to be played via MCI.
-    if (!m_ub && Config::getBool("Tomb Raider", "patch_soundtrack", false)) {
+    if (!m_ub && m_config.getBool("patch_soundtrack", false)) {
         TombRaiderHooks::m_tombCDStop = reinterpret_cast<TombRaiderCDStop*>(0x437F80);
         TombRaiderHooks::m_tombCDPlay = reinterpret_cast<TombRaiderCDPlay*>(0x437FB0);
         TombRaiderHooks::m_tombTrackID = reinterpret_cast<int32_t*>(0x4534DC);
@@ -237,7 +266,7 @@ void TombRaiderPatcher::applyLogicPatches() {
 
     // No-CD patch. Allows the game to load game files and movies from the local
     // directory instead from the CD.
-    if (Config::getBool("Tomb Raider", "patch_nocd", false)) {
+    if (m_config.getBool("patch_nocd", false)) {
         // disable CD check call
         if (m_ub) {
             patch(0x41DE7F, "E8 CC E0 FF FF", "90 90 90 90 90");

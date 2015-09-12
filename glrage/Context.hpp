@@ -49,6 +49,7 @@ private:
 
     // window handle
     HWND m_hwnd;
+    HWND m_hwndTmp;
 
     // GDI device context
     HDC m_hdc;

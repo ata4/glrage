@@ -6,11 +6,13 @@
 #include "Shader.hpp"
 #include "ShaderProgram.hpp"
 #include "Sampler.hpp"
+#include "Config.hpp"
 
 #include <map>
 
 using glrage::ShaderProgram;
 using glrage::Sampler;
+using glrage::Config;
 
 namespace cif {
 
@@ -137,6 +139,7 @@ public:
     // state functions end
 
 private:
+    Config m_config;
     TextureMap m_textures;
     C3D_PPALETTENTRY m_palette;
 

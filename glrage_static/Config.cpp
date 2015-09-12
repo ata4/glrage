@@ -4,21 +4,29 @@
 
 namespace glrage {
 
-std::string Config::configPath = ".\\glrage.ini";
+std::string Config::m_configPath = ".\\glrage.ini";
 
-std::string Config::getString(const std::string& section, const std::string& name, const std::string& defaultValue) {
+Config::Config(const std::string& section) {
+    m_section = section;
+}
+
+std::string Config::getString(const std::string& name, const std::string& defaultValue) {
     static TCHAR value[1024];
-    GetPrivateProfileString(section.c_str(), name.c_str(), defaultValue.c_str(),
-        value, sizeof(value) / sizeof(value[0]), configPath.c_str());
+    GetPrivateProfileString(m_section.c_str(), name.c_str(), defaultValue.c_str(),
+        value, sizeof(value) / sizeof(value[0]), m_configPath.c_str());
     return std::string(value);
 }
 
-int32_t Config::getInt(const std::string& section, const std::string& name, const int32_t defaultValue) {
-    return GetPrivateProfileInt(section.c_str(), name.c_str(), defaultValue, configPath.c_str());
+int32_t Config::getInt(const std::string& name, const int32_t defaultValue) {
+    return std::stoi(getString(name, std::to_string(defaultValue)));
 }
 
-bool Config::getBool(const std::string& section, const std::string& name, const bool defaultValue) {
-    return getString(section, name, defaultValue ? "true" : "false") == "true";
+float Config::getFloat(const std::string& name, const float defaultValue) {
+    return std::stof(getString(name, std::to_string(defaultValue)));
+}
+
+bool Config::getBool(const std::string& name, const bool defaultValue) {
+    return getString(name, defaultValue ? "true" : "false") == "true";
 }
 
 }
