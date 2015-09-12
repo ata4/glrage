@@ -140,6 +140,7 @@ public:
 
 private:
     Config m_config;
+    bool m_wireframe;
     TextureMap m_textures;
     C3D_PPALETTENTRY m_palette;
 

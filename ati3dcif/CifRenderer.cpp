@@ -45,13 +45,17 @@ CifRenderer::CifRenderer() :
     glm::mat4 modelView = glm::scale(glm::mat4(), glm::vec3(1, 1, -1));
     m_program.uniformMatrix4fv("matModelView", 1, GL_FALSE, glm::value_ptr(modelView));
 
+    // cache frequently used config values
+    m_wireframe = m_config.getBool("wireframe", false);
+
     GLUtils::checkError("CifRenderer::CifRenderer");
 }
 
 void CifRenderer::renderBegin(C3D_HRC hRC) {
     glEnable(GL_BLEND);
 
-    if (m_config.getBool("wireframe", false)) {
+    // set wireframe mode if set
+    if (m_wireframe) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
@@ -72,6 +76,10 @@ void CifRenderer::renderBegin(C3D_HRC hRC) {
 }
 
 void CifRenderer::renderEnd() {
+    // restore polygon mode
+    if (m_wireframe) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 }
 
 void CifRenderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap) {
