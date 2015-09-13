@@ -145,6 +145,18 @@ void TombRaiderPatcher::applyGraphicPatches() {
         tmp.clear();
     }
 
+    // Not sure what exactly this value does, but setting it too low sometimes
+    // produces wrong vertex positions on the far left and right side of the
+    // screen, especially on high resolutions.
+    // Raising it from 10 to the maximum value of 127 fixes that.
+    std::string tmpExp = "0A";
+    std::string tmpRep = "7F";
+    patch(m_ub ? 0x4163E9 : 0x4164D9, tmpExp, tmpRep);
+    patch(m_ub ? 0x41657A : 0x41666A, tmpExp, tmpRep);
+    patch(m_ub ? 0x41666E : 0x41675E, tmpExp, tmpRep);
+    patch(m_ub ? 0x416801 : 0x4168F1, tmpExp, tmpRep);
+    patch(m_ub ? 0x4168FE : 0x4169EE, tmpExp, tmpRep);
+
     // This patch raises the maximum FPS from 30 to 60.
     // FIXME: disabled, since only actually works in menu while the game itself
     // just renders duplicate frames.
