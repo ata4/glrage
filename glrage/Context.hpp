@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Screenshot.hpp"
+#include "Config.hpp"
 
 #include <Windows.h>
 #include <cstdint>
@@ -46,6 +47,9 @@ private:
     // private methods
     void fixWindowRatio(WPARAM edge, LPRECT prect);
     void error(const std::string& message);
+
+    // config object
+    Config m_config;
 
     // window handle
     HWND m_hwnd;

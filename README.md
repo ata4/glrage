@@ -30,14 +30,13 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 * Added soundtrack patch, which unlocks the full soundtrack, combining PC ambient tracks with PSX music tracks. Requires a custom CD or WinMM wrapper with the additional tracks.
 
 ### Known problems
-
 * Occasionally, the movement keys may get stuck in a permanently pressed state until the game has been restarted.
 * Music volume control has no effect.
 * The menu is fully opaque when opened in-game.
 * Changing the key bindings in the options crashes the game.
-* Clipped vertices sometimes have incorrect positions on the far left and right side of the screen when using a widescreen resolution.
 * Savegame format is incompatible to DOS format.
 * Ambient tracks played from the CD won't loop properly in Windows Vista and later ([caused by a MCI emulation bug in Windows](https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/dfa22274-8122-4b92-a0bc-653f5749b1bd/audio-cd-playing-with-mci-mcinotifysuccessful-never-arrives?forum=windowspro-audiodevelopment)).
+* If the soundtrack patch is activated, music cues are played again when loading a savegame where they have been played already.
 
 ## Assault Rigs
 

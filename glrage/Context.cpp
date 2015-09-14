@@ -19,6 +19,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this) {
 }
 
 Context::Context() :
+    m_config("Context"),
     m_hwnd(nullptr),
     m_hwndTmp(nullptr),
     m_hdc(nullptr),
@@ -75,7 +76,10 @@ void Context::init() {
 
     glClearColor(0, 0, 0, 0);
     glClearDepth(1);
-    wglSwapIntervalEXT(1);
+
+    if (m_config.getBool("vsync", true)) {
+        wglSwapIntervalEXT(1);
+    }
 }
 
 void Context::attach(HWND hwnd) {

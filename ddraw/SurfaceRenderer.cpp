@@ -12,18 +12,30 @@ using glrage::GLUtils;
 namespace ddraw {
 
 SurfaceRenderer::SurfaceRenderer() :
+    m_config("DirectDraw"),
     m_surfaceTexture(GL_TEXTURE_2D),
     m_width(0),
     m_height(0)
 {
+    // configure buffer
     m_surfaceBuffer.bind();
     m_surfaceBuffer.data(0, nullptr, GL_STATIC_DRAW);
 
-    m_surfaceTexture.bind();
+    // configure sampler
+    std::string filterMethod = m_config.getString("filter_method", "linear");
+    GLint filterMethodEnum;
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    if (filterMethod == "nearest") {
+        filterMethodEnum = GL_NEAREST;
+    } else {
+        filterMethodEnum = GL_LINEAR;
+    }
 
+    m_sampler.bind(0);
+    m_sampler.parameteri(GL_TEXTURE_MAG_FILTER, filterMethodEnum);
+    m_sampler.parameteri(GL_TEXTURE_MIN_FILTER, filterMethodEnum);
+
+    // configure shaders
     m_program.attach(VertexShader().fromFile("shaders\\ddraw.vsh"));
     m_program.attach(FragmentShader().fromFile("shaders\\ddraw.fsh"));
     m_program.link();
@@ -55,6 +67,7 @@ void SurfaceRenderer::render() {
     m_surfaceBuffer.bind();
     m_surfaceFormat.bind();
     m_surfaceTexture.bind();
+    m_sampler.bind(0);
 
     GLboolean texture2d = glIsEnabled(GL_TEXTURE_2D);
     if (!texture2d) {

@@ -30,8 +30,11 @@ CifRenderer::CifRenderer() :
     // bind sampler
     m_sampler.bind(0);
 
-    // maximize texture filtering quality
-    m_sampler.parameterf(GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+    // improve texture filtering quality
+    float filterAniso = m_config.getFloat("filter_anisotropy", 16.0f);
+    if (filterAniso > 0) {
+        m_sampler.parameterf(GL_TEXTURE_MAX_ANISOTROPY_EXT, filterAniso);
+    }
 
     // compile and link shaders and configure program
     m_program.attach(VertexShader().fromFile("shaders\\ati3dcif.vsh"));
@@ -40,8 +43,9 @@ CifRenderer::CifRenderer() :
     m_program.fragmentData("fragColor");
     m_program.bind();
 
-    // negate Z axis so the model is rendered behind the viewport, which is better than having a negative
-    // zNear in the ortho matrix, which seems to mess up depth testing
+    // negate Z axis so the model is rendered behind the viewport, which is better
+    // than having a negative zNear in the ortho matrix, which seems to mess up
+    // depth testing
     glm::mat4 modelView = glm::scale(glm::mat4(), glm::vec3(1, 1, -1));
     m_program.uniformMatrix4fv("matModelView", 1, GL_FALSE, glm::value_ptr(modelView));
 
@@ -62,11 +66,13 @@ void CifRenderer::renderBegin(C3D_HRC hRC) {
     // bind objects
     m_program.bind();
     m_vertexStream.bind();
+    m_sampler.bind(0);
 
     // restore texture binding
     tmapSelect(m_tmap);
 
-    // CIF always uses an orthographic view, the application deals with the perspective when required
+    // CIF always uses an orthographic view, the application deals with the
+    // perspective when required
     float width = static_cast<float>(GLRageGetDisplayWidth());
     float height = static_cast<float>(GLRageGetDisplayHeight());
     glm::mat4 projection = glm::ortho<float>(0, width, height, 0, 0, 1e6);
