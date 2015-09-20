@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MemoryPatcher.hpp"
-#include "Config.hpp"
 
 namespace glrage {
 
@@ -16,7 +15,6 @@ private:
     void applySoundPatches();
     void applyLogicPatches();
 
-    Config m_config;
     bool m_ub;
 };
 

@@ -29,13 +29,23 @@ template void MemoryPatcher::appendBytes<int32_t>(int32_t, std::vector<uint8_t>&
 template void MemoryPatcher::appendBytes<int16_t>(int16_t, std::vector<uint8_t>&);
 template void MemoryPatcher::appendBytes<float_t>(float_t, std::vector<uint8_t>&);
 
+MemoryPatcher::MemoryPatcher(const std::string& configName) :
+    m_config(configName) {
+}
+
 void MemoryPatcher::patch() {
     // get executable name
-    TCHAR modulePath[MAX_PATH] = {0};
+    TCHAR modulePath[MAX_PATH] = { 0 };
     GetModuleFileName(nullptr, modulePath, MAX_PATH);
 
     // extract file name from path
     std::string moduleFileName = std::string(PathFindFileName(modulePath));
+
+    // remove extension
+    int32_t extIndex = moduleFileName.find_last_of(".");
+    if (extIndex) {
+        moduleFileName = moduleFileName.substr(0, extIndex);
+    }
 
     // convert to lower case
     transform(moduleFileName.begin(), moduleFileName.end(), moduleFileName.begin(), ::tolower);

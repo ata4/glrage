@@ -7,17 +7,17 @@
 namespace glrage {
 
 TombRaiderPatcher::TombRaiderPatcher() :
-    m_config("Tomb Raider")
+    MemoryPatcher("Tomb Raider")
 {
 }
 
 bool TombRaiderPatcher::applicable(const std::string& fileName) {
-    if (fileName == "tombati.exe") {
+    if (fileName == m_config.getString("patch_exe", "tombati")) {
         m_ub = false;
         return true;
     }
 
-    if (fileName == "tombub.exe") {
+    if (fileName == m_config.getString("patch_exe_ub", "tombub")) {
         m_ub = true;
         return true;
     }

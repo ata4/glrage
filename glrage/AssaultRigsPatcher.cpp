@@ -7,12 +7,11 @@
 namespace glrage {
 
 AssaultRigsPatcher::AssaultRigsPatcher() :
-    m_config("Assault Rigs")
-{
+    MemoryPatcher("Assault Rigs") {
 }
 
 bool AssaultRigsPatcher::applicable(const std::string& fileName) {
-    return fileName == "arigs.exe";
+    return fileName == m_config.getString("patch_exe", "arigs");
 }
 
 void AssaultRigsPatcher::apply() {
