@@ -32,7 +32,7 @@ void Screenshot::schedule() {
 void Screenshot::captureScheduled() {
     if (m_schedule) {
         capture();
-        //m_schedule = false;
+        m_schedule = false;
     }
 }
 
