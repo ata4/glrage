@@ -197,24 +197,24 @@ void TombRaiderPatcher::applySoundPatches() {
     // panning issue.
     TombRaiderHooks::m_tombSoundInit = reinterpret_cast<TombRaiderSoundInit*>(m_ub ? 0x419DA0 : 0x419E90);
     TombRaiderHooks::m_tombSampleTable = reinterpret_cast<TombRaiderAudioSample***>(m_ub ? 0x45B314 : 0x45B954);
-    TombRaiderHooks::m_tombSoundInit1 = reinterpret_cast<int32_t*>(m_ub ? 0x459CF4 : 0x45A31C);
-    TombRaiderHooks::m_tombSoundInit2 = reinterpret_cast<int32_t*>(m_ub ? 0x459CF8 : 0x45A320);
+    TombRaiderHooks::m_tombSoundInit1 = reinterpret_cast<bool*>(m_ub ? 0x459CF4 : 0x45A31C);
+    TombRaiderHooks::m_tombSoundInit2 = reinterpret_cast<bool*>(m_ub ? 0x459CF8 : 0x45A320);
     TombRaiderHooks::m_tombDecibelLut = reinterpret_cast<int32_t*>(m_ub ? 0x45E9E0 : 0x45F1E0);
 
     if (m_ub) {
-        patchAddr(0x437B59, "E8 42 22 FE FF", &TombRaiderHooks::soundInit, 0xE8);
-        patchAddr(0x4386CA, "E8 01 18 FF FF", &TombRaiderHooks::setVolume, 0xE8);
-        patchAddr(0x4386EA, "E8 E1 17 FF FF", &TombRaiderHooks::setPan, 0xE8);
-        patchAddr(0x4385F2, "E8 29 F2 FF FF", &TombRaiderHooks::playOneShot, 0xE8);
-        patchAddr(0x438648, "E8 A3 F2 FF FF", &TombRaiderHooks::playLoop, 0xE8);
-        patchAddr(0x42EAF8, "E8 F3 8D 00 00", &TombRaiderHooks::playLoop, 0xE8);
+        patchAddr(0x437B59, "E8 42 22 FE FF", TombRaiderHooks::soundInit, 0xE8);
+        patchAddr(0x4386CA, "E8 01 18 FF FF", TombRaiderHooks::setVolume, 0xE8);
+        patchAddr(0x4386EA, "E8 E1 17 FF FF", TombRaiderHooks::setPan, 0xE8);
+        patchAddr(0x4385F2, "E8 29 F2 FF FF", TombRaiderHooks::playOneShot, 0xE8);
+        patchAddr(0x438648, "E8 A3 F2 FF FF", TombRaiderHooks::playLoop, 0xE8);
+        patchAddr(0x42EAF8, "E8 F3 8D 00 00", TombRaiderHooks::playLoop, 0xE8);
     } else {
-        patchAddr(0x438129, "E8 62 1D FE FF", &TombRaiderHooks::soundInit, 0xE8);
-        patchAddr(0x438D0A, "E8 21 F2 FF FF", &TombRaiderHooks::setVolume, 0xE8);
-        patchAddr(0x438D2A, "E8 01 F2 FF FF", &TombRaiderHooks::setPan, 0xE8);
-        patchAddr(0x438C32, "E8 D9 F1 FF FF", &TombRaiderHooks::playOneShot, 0xE8);
-        patchAddr(0x438C88, "E8 33 EF FF FF", &TombRaiderHooks::playLoop, 0xE8);
-        patchAddr(0x42EF35, "E8 86 8C 00 00", &TombRaiderHooks::playLoop, 0xE8);
+        patchAddr(0x438129, "E8 62 1D FE FF", TombRaiderHooks::soundInit, 0xE8);
+        patchAddr(0x438D0A, "E8 21 F2 FF FF", TombRaiderHooks::setVolume, 0xE8);
+        patchAddr(0x438D2A, "E8 01 F2 FF FF", TombRaiderHooks::setPan, 0xE8);
+        patchAddr(0x438C32, "E8 D9 F1 FF FF", TombRaiderHooks::playOneShot, 0xE8);
+        patchAddr(0x438C88, "E8 33 EF FF FF", TombRaiderHooks::playLoop, 0xE8);
+        patchAddr(0x42EF35, "E8 86 8C 00 00", TombRaiderHooks::playLoop, 0xE8);
     }
 
     // Very optional patch: replace ambient track "derelict" with "water", which,
@@ -225,18 +225,22 @@ void TombRaiderPatcher::applySoundPatches() {
 
     // Soundtrack patch. Allows both ambient and music cues to be played via MCI.
     if (!m_ub && m_config.getBool("patch_soundtrack", false)) {
-        TombRaiderHooks::m_tombCDStop = reinterpret_cast<TombRaiderCDStop*>(0x437F80);
-        TombRaiderHooks::m_tombCDPlay = reinterpret_cast<TombRaiderCDPlay*>(0x437FB0);
-        TombRaiderHooks::m_tombTrackID = reinterpret_cast<int32_t*>(0x4534DC);
-        TombRaiderHooks::m_tombTrackIDLoop = reinterpret_cast<int32_t*>(0x45B97C);
+        TombRaiderHooks::m_tombMciDeviceID = reinterpret_cast<MCIDEVICEID*>(0x45B994);
+        TombRaiderHooks::m_tombAuxDeviceID = reinterpret_cast<uint32_t*>(0x45B984);
+        TombRaiderHooks::m_tombHwnd = reinterpret_cast<HWND*>(0x463600);
+        TombRaiderHooks::m_tombCDTrackID = reinterpret_cast<int32_t*>(0x4534DC);
+        TombRaiderHooks::m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(0x45B97C);
+        TombRaiderHooks::m_tombCDLoop = reinterpret_cast<bool*>(0x45B94C);
+        TombRaiderHooks::m_tombCDVolume = reinterpret_cast<uint32_t*>(0x456334);
 
-        // level music
-        patchAddr(0x438D40, "66 83 3D 34 63", &TombRaiderHooks::playCDTrack, 0xE9);
-        // cutscene music (copy of the sub above)
-        patchAddr(0x439030, "66 83 3D 34 63", &TombRaiderHooks::playCDTrack, 0xE9);
-
-        // fix jump in CD stop sub that normally also handles NPC voice samples
-        patch(0x438E4F, "7C", "EB");
+        // hook play function (level music)
+        patchAddr(0x438D40, "66 83 3D 34 63", TombRaiderHooks::playCDRemap, 0xE9);
+        // hook play function (cutscene music)
+        patchAddr(0x439030, "66 83 3D 34 63", TombRaiderHooks::playCDRemap, 0xE9);
+        // hook stop function
+        patchAddr(0x438E40, "66 A1 DC 34 45", TombRaiderHooks::stopCD, 0xE9);
+        // hook function that is called when a track has finished
+        patchAddr(0x43DEFB, "E8 C0 A1 FF FF", TombRaiderHooks::playCDLoop, 0xE8);
 
         // also pass 0 to the CD play sub when loading a level so the background
         // track can be silenced correctly
@@ -256,7 +260,7 @@ void TombRaiderPatcher::applyLogicPatches() {
     if (!m_ub) {
         // hook key event subroutine
         TombRaiderHooks::m_tombKeyStates = reinterpret_cast<uint8_t**>(0x45B998);
-        patchAddr(0x43D904, "E8 67 A2 FF FF", &TombRaiderHooks::keyEvent, 0xE8);
+        patchAddr(0x43D904, "E8 67 A2 FF FF", TombRaiderHooks::keyEvent, 0xE8);
     }
 
     // Fix infinite loop before starting the credits.

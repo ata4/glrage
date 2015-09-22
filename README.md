@@ -20,6 +20,7 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 * Fixed an integer overflow that caused long voice samples to be missing or cut off.
 * Fixed bugged demo mode and credit screens.
 * Fixed missing looping sounds (rivers, waterfalls, lava, etc.).
+* Fixed music volume control having no effect (changes are applied when the next track is played).
 * Reduced stereo panning issues when sounds are played very closely to Lara's position.
 
 #### Optional patches
@@ -31,12 +32,13 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 
 ### Known problems
 * Occasionally, the movement keys may get stuck in a permanently pressed state until the game has been restarted.
-* Music volume control has no effect.
 * The menu is fully opaque when opened in-game.
 * Changing the key bindings in the options crashes the game.
 * Savegame format is incompatible to DOS format.
 * Ambient tracks played from the CD won't loop properly in Windows Vista and later ([caused by a MCI emulation bug in Windows](https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/dfa22274-8122-4b92-a0bc-653f5749b1bd/audio-cd-playing-with-mci-mcinotifysuccessful-never-arrives?forum=windowspro-audiodevelopment)).
 * If the soundtrack patch is activated, music cues are played again when loading a savegame where they have been played already.
+* If Lara is burning, the fire sounds are replayed every tick (60 times per second), causing nasty sound artifacts.
+* There's currently only one SFX channel, which means that only one sound effect can be played at a time.
 
 ## Assault Rigs
 

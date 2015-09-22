@@ -40,25 +40,31 @@ public:
     static void setPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
     static LPDIRECTSOUNDBUFFER playOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
     static LPDIRECTSOUNDBUFFER playLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
-    static int32_t playCDTrack(int16_t trackID);
+    static bool playCDRemap(int16_t trackID);
+    static bool playCDLoop();
+    static bool playCD(int16_t trackID);
+    static bool stopCD();
     static void keyEvent(int32_t extended, int32_t code, int32_t pressed);
 
     static const int32_t DECIBEL_LUT_SIZE = 512;
 
     // Tomb Raider subs
     static TombRaiderSoundInit* m_tombSoundInit;
-    static TombRaiderCDStop* m_tombCDStop;
-    static TombRaiderCDPlay* m_tombCDPlay;
     static TombRaiderKeyEvent* m_tombKeyEvent;
 
     // Tomb Raider vars
     static TombRaiderAudioSample*** m_tombSampleTable;
-    static int32_t* m_tombSoundInit1;
-    static int32_t* m_tombSoundInit2;
-    static int32_t* m_tombDecibelLut;
-    static int32_t* m_tombTrackID;
-    static int32_t* m_tombTrackIDLoop;
     static uint8_t** m_tombKeyStates;
+    static bool* m_tombSoundInit1;
+    static bool* m_tombSoundInit2;
+    static int32_t* m_tombDecibelLut;
+    static int32_t* m_tombCDTrackID;
+    static int32_t* m_tombCDTrackIDLoop;
+    static bool* m_tombCDLoop;
+    static uint32_t* m_tombCDVolume;
+    static MCIDEVICEID* m_tombMciDeviceID;
+    static uint32_t* m_tombAuxDeviceID;
+    static HWND* m_tombHwnd;
 
 private:
     static LPDIRECTSOUNDBUFFER playSample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop);

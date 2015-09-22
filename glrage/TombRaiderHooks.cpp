@@ -11,35 +11,43 @@ namespace glrage {
 // init sound system
 TombRaiderSoundInit* TombRaiderHooks::m_tombSoundInit = nullptr;
 
-// stop current CD track
-TombRaiderCDStop* TombRaiderHooks::m_tombCDStop = nullptr;
-
-// play CD track
-TombRaiderCDPlay* TombRaiderHooks::m_tombCDPlay = nullptr;
-
 /** Tomb Raider var pointers **/
 
-// CD track currently played
-int32_t* TombRaiderHooks::m_tombTrackID = nullptr;
+// MCI device ID.
+MCIDEVICEID* TombRaiderHooks::m_tombMciDeviceID = nullptr;
+
+// Auxiliary device ID.
+uint32_t* TombRaiderHooks::m_tombAuxDeviceID = nullptr;
+
+// Window handle.
+HWND* TombRaiderHooks::m_tombHwnd = nullptr;
+
+// CD track currently played.
+int32_t* TombRaiderHooks::m_tombCDTrackID = nullptr;
 
 // CD track to play after the current one has finished. Usually for ambiance tracks.
-int32_t* TombRaiderHooks::m_tombTrackIDLoop = nullptr;
+int32_t* TombRaiderHooks::m_tombCDTrackIDLoop = nullptr;
+
+bool* TombRaiderHooks::m_tombCDLoop = nullptr;
+
+// Current music volume, ranging from 0 to 10.
+uint32_t* TombRaiderHooks::m_tombCDVolume = nullptr;
 
 // Key state table, one byte per key.
 uint8_t** TombRaiderHooks::m_tombKeyStates = nullptr;
 
-// audio sample pointer table
+// Audio sample pointer table.
 TombRaiderAudioSample*** TombRaiderHooks::m_tombSampleTable = nullptr;
 
 // Sound init booleans. There are two for some reason and both are set to 1 at
 // the same location.
-int32_t* TombRaiderHooks::m_tombSoundInit1 = nullptr;
-int32_t* TombRaiderHooks::m_tombSoundInit2 = nullptr;
+bool* TombRaiderHooks::m_tombSoundInit1 = nullptr;
+bool* TombRaiderHooks::m_tombSoundInit2 = nullptr;
 
-// pointer to linear to log lookup table for decibel conversion
+// Pointer to linear to log lookup table for decibel conversion.
 int32_t* TombRaiderHooks::m_tombDecibelLut = nullptr;
 
-int32_t TombRaiderHooks::soundInit(){
+int32_t TombRaiderHooks::soundInit() {
     int32_t result = m_tombSoundInit();
 
     // Improves accuracy of the dB LUT, which is used to convert the volume to
@@ -150,76 +158,107 @@ void TombRaiderHooks::keyEvent(int32_t extended, int32_t code, int32_t pressed) 
     //}
 }
 
-int32_t TombRaiderHooks::playCDTrack(int16_t trackID) {
-    //////////////////////////////////////////////////////////////
-    ///////////////////// LEVEL TRACK ID LIST ////////////////////
-    //////////////////////////////////////////////////////////////
-    //
-    // Music tracks (PSX)
-    // 2    Main Title (also present on PC)                 [3:19]
-    // 3    Chorus 1                                        [1:06]
-    // 4    Main Title (short version)                      [2:06]
-    // 5    Cave Ambience (played in most levels on PSX)    [2:02]
-    // 6    Chase Theme 1                                   [1:19]
-    // 7    Discovery Theme 1                               [0:58]
-    // 8    Battle Theme 1                                  [1:10]
-    // 9    Discovery Theme 2                               [0:42]
-    // 10   Mystery Theme 1                                 [1:21]
-    // 11   Danger 1                                        [0:10]
-    // 12   Danger 2 (slowed)                               [0:17]
-    // 13   Secret Chime 1 (audio sample on PC)             [0:07]
-    // 14   Secret Chime 2 (slowed, unused)                 [0:14]
-    // 15   Chorus 2                                        [0:13]
-    // 16   Battle Theme 2                                  [0:41]
-    // 17   Chorus 3                                        [0:45]
-    // 18   Chorus 4                                        [0:27]
-    // 19   Chorus 5 (unused)                               [1:31]
-    // 20   Chase Theme 2                                   [0:56]
-    // 21   Mystery Theme 2                                 [0:43]
-    //
-    // Cutscene tracks
-    // 22 (PC: 7)  Lara and Natla in the Machine Room       [1:05]
-    // 23 (PC: 8)  Lara and Larson                          [1:00]
-    // 24 (PC: 9)  Natla activates the Pyramid              [0:17]
-    // 25 (PC: 10) Lara in the Tomb of Tihocan              [0:39]
-    //
-    // Ingame speech tracks (audio samples on PC)
-    // 26-50  Lara tutorial speech (Lara's Home)
-    // 51-56  NPC speech
-    //
-    // Ambience tracks (PC, names from TRLE)
-    // 57 (PC: 3)  DERELICT (same as 5 on PSX)              [2:02]
-    // 58 (PC: 4)  WATER                                    [3:05]
-    // 59 (PC: 5)  WIND                                     [3:11]
-    // 60 (PC: 6)  HEARTBT                                  [3:10]
-
-    LOGF("Playing CD track: %d (current: %d, loop: %d)", trackID, *m_tombTrackID, *m_tombTrackIDLoop);
-
+bool TombRaiderHooks::playCDRemap(int16_t trackID) {
+    LOGF("playCDRemap(%d)", trackID);
+    
     // stop CD play on track ID 0
     if (trackID == 0) {
-        m_tombCDStop();
-        *m_tombTrackIDLoop = 0;
-        return 0;
+        stopCD();
+        return false;
     }
 
-    // ignore redundant PSX ambience track
+    // ignore redundant PSX ambience track (replaced by 57)
     if (trackID == 5) {
-        return 0;
+        return false;
     }
 
-    // save loop track ID (overridden by tombCDPlay)
-    int32_t trackIDLoop = *m_tombTrackIDLoop;
-
-    // set and play new track ID
-    int32_t result = m_tombCDPlay(trackID);
-    *m_tombTrackID = trackID;
-
-    // restore loop track ID if the current track is not an ambience track
-    if (trackID < 57) {
-        *m_tombTrackIDLoop = trackIDLoop;
+    // set looping track ID for ambience tracks
+    if (trackID >= 57) {
+        *m_tombCDTrackIDLoop = trackID;
     }
 
-    return result;
+    // set current track ID
+    *m_tombCDTrackID = trackID;
+
+    return playCD(trackID);
+}
+
+bool TombRaiderHooks::playCDLoop() {
+    LOG("playCDLoop()");
+
+    // cancel if there's currently no looping track set
+    if (*m_tombCDLoop && *m_tombCDTrackIDLoop > 0) {
+        playCD(*m_tombCDTrackIDLoop);
+        return false;
+    }
+
+    return *m_tombCDLoop;
+}
+
+bool TombRaiderHooks::playCD(int16_t trackID) {
+    LOGF("playCD(%d)", trackID);
+
+    // don't play music tracks if volume is set to 0
+    if (!*m_tombCDVolume) {
+        return false;
+    }
+
+    // don't try to play data track
+    if (trackID < 2) {
+        return false;
+    }
+
+    *m_tombCDLoop = false;
+
+    // configure player
+    MCI_SET_PARMS setParms;
+    setParms.dwTimeFormat = MCI_FORMAT_TMSF;
+    if (mciSendCommand(*m_tombMciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT,
+        reinterpret_cast<DWORD_PTR>(&setParms))) {
+        return false;
+    }
+
+    // get length of track to determine dwTo
+    MCI_STATUS_PARMS statusParms;
+    statusParms.dwItem = MCI_STATUS_LENGTH;
+    statusParms.dwTrack = trackID;
+    if (mciSendCommand(*m_tombMciDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK,
+        reinterpret_cast<DWORD_PTR>(&statusParms))) {
+        return false;
+    }
+
+    // send play command
+    MCI_PLAY_PARMS openParms;
+    openParms.dwCallback = reinterpret_cast<DWORD_PTR>(*m_tombHwnd);
+    openParms.dwFrom = trackID;
+    openParms.dwTo = statusParms.dwReturn;
+    if (mciSendCommand(*m_tombMciDeviceID, MCI_PLAY, MCI_NOTIFY | MCI_FROM | MCI_TO,
+        reinterpret_cast<DWORD_PTR>(&openParms))) {
+        return false;
+    }
+
+    // Calculate volume from current volume setting. The original code used
+    // the hardcoded value 0x400400, which equals a volume of 25%.
+    uint32_t volume = *m_tombCDVolume * 0xffff / 10;
+    volume |= volume << 16;
+    auxSetVolume(*m_tombAuxDeviceID, volume);
+
+    return true;
+}
+
+bool TombRaiderHooks::stopCD() {
+    LOG("stopCD()");
+
+    *m_tombCDTrackID = 0;
+    *m_tombCDTrackIDLoop = 0;
+    *m_tombCDLoop = false;
+
+    // The original code used MCI_PAUSE, probably to reduce latency when switching
+    // tracks. But we'll use MCI_STOP here, since it's expected to use an MCI
+    // wrapper with nearly zero latency anyway.
+    MCI_GENERIC_PARMS genParms;
+    return !mciSendCommand(*m_tombMciDeviceID, MCI_STOP, MCI_WAIT,
+        reinterpret_cast<DWORD_PTR>(&genParms));
 }
 
 void TombRaiderHooks::setVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume) {
