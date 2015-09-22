@@ -29,8 +29,6 @@ struct TombRaiderAudioSample {
 
 // Tomb Raider sub types
 typedef int32_t TombRaiderSoundInit();
-typedef int32_t TombRaiderCDStop();
-typedef int32_t TombRaiderCDPlay(uint32_t);
 typedef void TombRaiderKeyEvent(int32_t, int32_t, int32_t);
 
 class TombRaiderHooks {
@@ -44,6 +42,7 @@ public:
     static bool playCDLoop();
     static bool playCD(int16_t trackID);
     static bool stopCD();
+    static bool updateCDVolume(int16_t volume);
     static void keyEvent(int32_t extended, int32_t code, int32_t pressed);
 
     static const int32_t DECIBEL_LUT_SIZE = 512;
@@ -53,6 +52,7 @@ public:
     static TombRaiderKeyEvent* m_tombKeyEvent;
 
     // Tomb Raider vars
+    static bool m_ub;
     static TombRaiderAudioSample*** m_tombSampleTable;
     static uint8_t** m_tombKeyStates;
     static bool* m_tombSoundInit1;

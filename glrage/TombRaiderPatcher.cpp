@@ -26,6 +26,8 @@ bool TombRaiderPatcher::applicable(const std::string& fileName) {
 }
 
 void TombRaiderPatcher::apply() {
+    TombRaiderHooks::m_ub = m_ub;
+
     // mandatory crash patches
     applyCrashPatches();
 
@@ -223,16 +225,26 @@ void TombRaiderPatcher::applySoundPatches() {
         patch(0x456A1E, "39", "3A");
     }
 
+    // CD audio patches.
+    TombRaiderHooks::m_tombMciDeviceID = reinterpret_cast<MCIDEVICEID*>(m_ub ? 0x45B344 : 0x45B994);
+    TombRaiderHooks::m_tombAuxDeviceID = reinterpret_cast<uint32_t*>(m_ub ? 0x45B338 : 0x45B984);
+    TombRaiderHooks::m_tombHwnd = reinterpret_cast<HWND*>(m_ub ? 0x462E00 : 0x463600);
+    TombRaiderHooks::m_tombCDTrackID = reinterpret_cast<int32_t*>(m_ub ? 0x4534F4 : 0x4534DC);
+    TombRaiderHooks::m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(m_ub ? 0x45B330 : 0x45B97C);
+    TombRaiderHooks::m_tombCDLoop = reinterpret_cast<bool*>(m_ub ? 0x45B30C : 0x45B94C);
+    TombRaiderHooks::m_tombCDVolume = reinterpret_cast<uint32_t*>(m_ub ? 0x455D3C : 0x456334);
+
+    // Patch bad mapping function in UB that remaps the music volume from 0-10 to
+    // 5-255 instead of 0-65536, which is the value range for auxSetVolume.
+    if (m_ub) {
+        patchAddr(0x438A70, "0F BF 44 24 04", TombRaiderHooks::updateCDVolume, 0xE9);
+    }
+
+    // Hook low-level CD play function to fix a volume bug.
+    patchAddr(m_ub ? 0x4379E0 : 0x437FB0, "83 EC 18 53 8B", TombRaiderHooks::playCD, 0xE9);
+
     // Soundtrack patch. Allows both ambient and music cues to be played via MCI.
     if (!m_ub && m_config.getBool("patch_soundtrack", false)) {
-        TombRaiderHooks::m_tombMciDeviceID = reinterpret_cast<MCIDEVICEID*>(0x45B994);
-        TombRaiderHooks::m_tombAuxDeviceID = reinterpret_cast<uint32_t*>(0x45B984);
-        TombRaiderHooks::m_tombHwnd = reinterpret_cast<HWND*>(0x463600);
-        TombRaiderHooks::m_tombCDTrackID = reinterpret_cast<int32_t*>(0x4534DC);
-        TombRaiderHooks::m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(0x45B97C);
-        TombRaiderHooks::m_tombCDLoop = reinterpret_cast<bool*>(0x45B94C);
-        TombRaiderHooks::m_tombCDVolume = reinterpret_cast<uint32_t*>(0x456334);
-
         // hook play function (level music)
         patchAddr(0x438D40, "66 83 3D 34 63", TombRaiderHooks::playCDRemap, 0xE9);
         // hook play function (cutscene music)
@@ -240,7 +252,7 @@ void TombRaiderPatcher::applySoundPatches() {
         // hook stop function
         patchAddr(0x438E40, "66 A1 DC 34 45", TombRaiderHooks::stopCD, 0xE9);
         // hook function that is called when a track has finished
-        patchAddr(0x43DEFB, "E8 C0 A1 FF FF", TombRaiderHooks::playCDLoop, 0xE8);
+        patchAddr(0x4380C0, "A1 4C B9 45 00", TombRaiderHooks::playCDLoop, 0xE9);
 
         // also pass 0 to the CD play sub when loading a level so the background
         // track can be silenced correctly
@@ -307,6 +319,15 @@ void TombRaiderPatcher::applyLogicPatches() {
             patch(0x41BFF9, "52 50", "50 52");
             patch(0x41AFE1, "52 50", "50 52");
         }
+    }
+
+    // Because the savegame format is incompatible to the DOS version or other
+    // patches, change savegame name format from "savegame.%d" to "saveati.%d"
+    // to prevent accidental savegame corruption if multiple tomb.exe versions
+    // share the same game folder.
+    // UB already uses "saveuba.%d", so it doesn't need to be patched.
+    if (!m_ub) {
+        patch(0x453CCC, "67 61 6D 65 2E 25 64 00", "61 74 69 2E 25 64 00 00");
     }
 
     // Random fun patches, discovered from various experiments.

@@ -6,6 +6,8 @@
 
 namespace glrage {
 
+bool TombRaiderHooks::m_ub = false;
+
 /** Tomb Raider sub pointers **/
 
 // init sound system
@@ -172,11 +174,6 @@ bool TombRaiderHooks::playCDRemap(int16_t trackID) {
         return false;
     }
 
-    // set looping track ID for ambience tracks
-    if (trackID >= 57) {
-        *m_tombCDTrackIDLoop = trackID;
-    }
-
     // set current track ID
     *m_tombCDTrackID = trackID;
 
@@ -208,7 +205,19 @@ bool TombRaiderHooks::playCD(int16_t trackID) {
         return false;
     }
 
+    // set looping track ID for ambience tracks
+    if (m_ub || trackID >= 57) {
+        *m_tombCDTrackIDLoop = trackID;
+    }
+
+    // this one will always be set back to true on the next tick
     *m_tombCDLoop = false;
+
+    // Calculate volume from current volume setting. The original code used
+    // the hardcoded value 0x400400, which equals a volume of 25%.
+    uint32_t volume = *m_tombCDVolume * 0xffff / 10;
+    volume |= volume << 16;
+    auxSetVolume(*m_tombAuxDeviceID, volume);
 
     // configure player
     MCI_SET_PARMS setParms;
@@ -237,12 +246,6 @@ bool TombRaiderHooks::playCD(int16_t trackID) {
         return false;
     }
 
-    // Calculate volume from current volume setting. The original code used
-    // the hardcoded value 0x400400, which equals a volume of 25%.
-    uint32_t volume = *m_tombCDVolume * 0xffff / 10;
-    volume |= volume << 16;
-    auxSetVolume(*m_tombAuxDeviceID, volume);
-
     return true;
 }
 
@@ -259,6 +262,16 @@ bool TombRaiderHooks::stopCD() {
     MCI_GENERIC_PARMS genParms;
     return !mciSendCommand(*m_tombMciDeviceID, MCI_STOP, MCI_WAIT,
         reinterpret_cast<DWORD_PTR>(&genParms));
+}
+
+bool TombRaiderHooks::updateCDVolume(int16_t volume) {
+    LOGF("updateCDVolume(%d)", volume);
+
+    uint32_t volumeAux = volume * 0xffff / 0xff;
+    volumeAux |= volumeAux << 16;
+    auxSetVolume(*m_tombAuxDeviceID, volumeAux);
+
+    return true;
 }
 
 void TombRaiderHooks::setVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume) {
