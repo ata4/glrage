@@ -264,5 +264,10 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
+### Project ###
+
+# Automatically generated files
+glrage_static/version.h
+
 # Other
 private/

@@ -30,6 +30,9 @@
     <None Include="shaders\ati3dcif.fsh" />
     <None Include="shaders\ati3dcif.vsh" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ati3dcif.rc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6270A061-3044-49EC-9043-92D395854D6E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
