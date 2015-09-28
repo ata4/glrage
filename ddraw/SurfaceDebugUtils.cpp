@@ -2,6 +2,7 @@
 
 #include "Logger.hpp"
 
+#include <vector>
 #include <fstream>
 #include <exception>
 #include <cstdint>
@@ -109,7 +110,7 @@ void SurfaceDebugUtils::dumpBuffer(DDSURFACEDESC& desc, void* buffer, const std:
     uint32_t headerSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
     uint16_t* src = reinterpret_cast<uint16_t*>(buffer);
-    uint8_t* dst = new uint8_t[dataSize];
+    std::vector<uint8_t> dst(dataSize);
 
     for (uint32_t i = 0; i < imageSize; i++) {
         dst[i * 3 + 0] = (src[i] >> 0 & 0x1f) * 0xff / 0x1f;
@@ -142,10 +143,8 @@ void SurfaceDebugUtils::dumpBuffer(DDSURFACEDESC& desc, void* buffer, const std:
         throw std::runtime_error("Can't open file " + path);
     }
 
-    file.write(reinterpret_cast<char*>(dst), dataSize);
+    file.write(reinterpret_cast<char*>(dst[0]), dataSize);
     file.close();
-
-    delete[] dst;
 }
 
 std::string SurfaceDebugUtils::getSurfaceName(DDSURFACEDESC& desc) {
