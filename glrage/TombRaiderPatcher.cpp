@@ -57,6 +57,18 @@ void TombRaiderPatcher::applyCrashPatches() {
     // I guess it influences the damage, since the parts now deal a lot more
     // damage to Lara, but that's still better than no explosions or even a crash.
     patch(m_ub ? 0x43C288 : 0x43C938, "F6 C3 1C 74", "90 90 90 EB");
+
+    // User keys are heavily bugged in the ATI patch and is the source of
+    // several crashes, possibly a result of the Windows port, so disable it
+    // entirely instead of creating hundreds of assembly patches to fix it somehow.
+    // One can still write a program to change the key bindings in the config file.
+
+    // Prevent selection of user keys in the options (changing them crashes the game).
+    patch(0x42EB7C, "0F 94 C0", "90 90 90");
+
+    // Crude fix for a crash when opening the control options while in-game.
+    // The "Inventory" label is broken for some reason, so it needs to be skipped.
+    patch(0x42F6D7, "7C", "78");
 }
 
 void TombRaiderPatcher::applyGraphicPatches() {
