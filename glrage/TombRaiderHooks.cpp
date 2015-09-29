@@ -15,6 +15,35 @@ TombRaiderSoundInit* TombRaiderHooks::m_tombSoundInit = nullptr;
 
 /** Tomb Raider var pointers **/
 
+// Pointer to the key state table. If an entry is 1, then the key is pressed.
+uint8_t** TombRaiderHooks::m_tombKeyStates = nullptr;
+
+// Default key binding table. Maps the key scan codes to button IDs.
+int16_t* TombRaiderHooks::m_tombDefaultKeyBindings = nullptr;
+
+// Audio sample pointer table.
+TombRaiderAudioSample*** TombRaiderHooks::m_tombSampleTable = nullptr;
+
+// Sound init booleans. There are two for some reason and both are set to 1 at
+// the same location.
+BOOL* TombRaiderHooks::m_tombSoundInit1 = nullptr;
+BOOL* TombRaiderHooks::m_tombSoundInit2 = nullptr;
+
+// Linear to logarithmic lookup table for decibel conversion.
+int32_t* TombRaiderHooks::m_tombDecibelLut = nullptr;
+
+// CD track currently played.
+int32_t* TombRaiderHooks::m_tombCDTrackID = nullptr;
+
+// CD track to play after the current one has finished. Usually for ambiance tracks.
+int32_t* TombRaiderHooks::m_tombCDTrackIDLoop = nullptr;
+
+// CD loop flag. If TRUE, it re-plays m_tombCDTrackIDLoop after it finished.
+BOOL* TombRaiderHooks::m_tombCDLoop = nullptr;
+
+// Current music volume, ranging from 0 to 10.
+uint32_t* TombRaiderHooks::m_tombCDVolume = nullptr;
+
 // MCI device ID.
 MCIDEVICEID* TombRaiderHooks::m_tombMciDeviceID = nullptr;
 
@@ -24,30 +53,8 @@ uint32_t* TombRaiderHooks::m_tombAuxDeviceID = nullptr;
 // Window handle.
 HWND* TombRaiderHooks::m_tombHwnd = nullptr;
 
-// CD track currently played.
-int32_t* TombRaiderHooks::m_tombCDTrackID = nullptr;
-
-// CD track to play after the current one has finished. Usually for ambiance tracks.
-int32_t* TombRaiderHooks::m_tombCDTrackIDLoop = nullptr;
-
-bool* TombRaiderHooks::m_tombCDLoop = nullptr;
-
-// Current music volume, ranging from 0 to 10.
-uint32_t* TombRaiderHooks::m_tombCDVolume = nullptr;
-
-// Key state table, one byte per key.
-uint8_t** TombRaiderHooks::m_tombKeyStates = nullptr;
-
-// Audio sample pointer table.
-TombRaiderAudioSample*** TombRaiderHooks::m_tombSampleTable = nullptr;
-
-// Sound init booleans. There are two for some reason and both are set to 1 at
-// the same location.
-bool* TombRaiderHooks::m_tombSoundInit1 = nullptr;
-bool* TombRaiderHooks::m_tombSoundInit2 = nullptr;
-
-// Pointer to linear to log lookup table for decibel conversion.
-int32_t* TombRaiderHooks::m_tombDecibelLut = nullptr;
+// Keyboard hook handle.
+HHOOK* TombRaiderHooks::m_tombHhk = nullptr;
 
 int32_t TombRaiderHooks::soundInit() {
     int32_t result = m_tombSoundInit();
@@ -132,46 +139,74 @@ LPDIRECTSOUNDBUFFER TombRaiderHooks::playLoop(int32_t soundID, int32_t volume, i
     return playSample(soundID, volume, pitch, pan, true);
 }
 
-void TombRaiderHooks::keyEvent(int32_t extended, int32_t code, int32_t pressed) {
+LRESULT TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode < 0) {
+        goto next;
+    }
+
+    uint32_t keyData = static_cast<uint32_t>(lParam);
+    uint32_t scanCode = keyData >> 16 & 0xff;
+    uint32_t extended = keyData >> 24 & 0x1;
+    uint32_t pressed = ~keyData >> 31;
+    
+    uint32_t indexCode = scanCode;
+
+    // Remap DOS scan code for certain control keys (ALT, CTRL and SHIFT).
+    // This is also done in the original code, but at several different places
+    // and also in reverse, which may be responsible for the stuck keys bug.
+    // It's an ugly hack but still better than patching both the default key
+    // mappings and the key names.
+    if (indexCode == 29) {
+        indexCode = 157;
+    }
+
+    if (indexCode == 42) {
+        indexCode = 54;
+    }
+
+    if (indexCode == 56) {
+        indexCode = 184;
+    }
+
+    if (extended) {
+        indexCode += 128;
+    }
+
     uint8_t* keyStates = *m_tombKeyStates;
     if (!keyStates) {
-        return;
+        goto next;
     }
 
-    int codeOffset = code;
-    if (extended) {
-        codeOffset += 128;
-    }
-
-    // 325 is the index for the global key. If any key is pressed, it should
-    // also update this index. It is used in "press any key to continue" situations,
-    // like the demo mode or the credits.
-    keyStates[codeOffset] = pressed;
+    keyStates[indexCode] = pressed;
     keyStates[325] = pressed;
 
-    // Old bugged implementation, which just increments the global key state when
-    // any key is pressed, thus leaving the global key in a permanently pressed
-    // state util it eventually overflows.
-    // The assembly code also uses an unitialized edx register, which may be the
-    // reason why the movement keys get sometimes permanenty stuck in a pressed state.
-    //if (keyStates[codeOffset] != pressed) {
-    //    keyStates[codeOffset] = pressed;
-    //    keyStates[325]++;
-    //}
+    // terminate ALT key hook so the menu won't pop up when jumping
+    if (wParam == VK_MENU) {
+        return 1;
+    }
+
+    next:
+    return CallNextHookEx(*m_tombHhk, nCode, wParam, lParam);
 }
 
-bool TombRaiderHooks::playCDRemap(int16_t trackID) {
+BOOL TombRaiderHooks::keyIsPressed(int32_t keyCode) {
+    int16_t keyBinding = m_tombDefaultKeyBindings[keyCode];
+    uint8_t* keyStates = *m_tombKeyStates;
+    return keyStates[keyBinding];
+}
+
+BOOL TombRaiderHooks::playCDRemap(int16_t trackID) {
     LOGF("playCDRemap(%d)", trackID);
     
     // stop CD play on track ID 0
     if (trackID == 0) {
         stopCD();
-        return false;
+        return FALSE;
     }
 
     // ignore redundant PSX ambience track (replaced by 57)
     if (trackID == 5) {
-        return false;
+        return FALSE;
     }
 
     // set current track ID
@@ -180,29 +215,29 @@ bool TombRaiderHooks::playCDRemap(int16_t trackID) {
     return playCD(trackID);
 }
 
-bool TombRaiderHooks::playCDLoop() {
+BOOL TombRaiderHooks::playCDLoop() {
     LOG("playCDLoop()");
 
     // cancel if there's currently no looping track set
     if (*m_tombCDLoop && *m_tombCDTrackIDLoop > 0) {
         playCD(*m_tombCDTrackIDLoop);
-        return false;
+        return FALSE;
     }
 
     return *m_tombCDLoop;
 }
 
-bool TombRaiderHooks::playCD(int16_t trackID) {
+BOOL TombRaiderHooks::playCD(int16_t trackID) {
     LOGF("playCD(%d)", trackID);
 
     // don't play music tracks if volume is set to 0
     if (!*m_tombCDVolume) {
-        return false;
+        return FALSE;
     }
 
     // don't try to play data track
     if (trackID < 2) {
-        return false;
+        return FALSE;
     }
 
     // set looping track ID for ambience tracks
@@ -211,7 +246,7 @@ bool TombRaiderHooks::playCD(int16_t trackID) {
     }
 
     // this one will always be set back to true on the next tick
-    *m_tombCDLoop = false;
+    *m_tombCDLoop = FALSE;
 
     // Calculate volume from current volume setting. The original code used
     // the hardcoded value 0x400400, which equals a volume of 25%.
@@ -224,7 +259,7 @@ bool TombRaiderHooks::playCD(int16_t trackID) {
     setParms.dwTimeFormat = MCI_FORMAT_TMSF;
     if (mciSendCommand(*m_tombMciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT,
         reinterpret_cast<DWORD_PTR>(&setParms))) {
-        return false;
+        return FALSE;
     }
 
     // get length of track to determine dwTo
@@ -233,7 +268,7 @@ bool TombRaiderHooks::playCD(int16_t trackID) {
     statusParms.dwTrack = trackID;
     if (mciSendCommand(*m_tombMciDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK,
         reinterpret_cast<DWORD_PTR>(&statusParms))) {
-        return false;
+        return FALSE;
     }
 
     // send play command
@@ -243,18 +278,18 @@ bool TombRaiderHooks::playCD(int16_t trackID) {
     openParms.dwTo = statusParms.dwReturn;
     if (mciSendCommand(*m_tombMciDeviceID, MCI_PLAY, MCI_NOTIFY | MCI_FROM | MCI_TO,
         reinterpret_cast<DWORD_PTR>(&openParms))) {
-        return false;
+        return FALSE;
     }
 
-    return true;
+    return TRUE;
 }
 
-bool TombRaiderHooks::stopCD() {
+BOOL TombRaiderHooks::stopCD() {
     LOG("stopCD()");
 
     *m_tombCDTrackID = 0;
     *m_tombCDTrackIDLoop = 0;
-    *m_tombCDLoop = false;
+    *m_tombCDLoop = FALSE;
 
     // The original code used MCI_PAUSE, probably to reduce latency when switching
     // tracks. But we'll use MCI_STOP here, since it's expected to use an MCI
@@ -264,14 +299,14 @@ bool TombRaiderHooks::stopCD() {
         reinterpret_cast<DWORD_PTR>(&genParms));
 }
 
-bool TombRaiderHooks::updateCDVolume(int16_t volume) {
+BOOL TombRaiderHooks::updateCDVolume(int16_t volume) {
     LOGF("updateCDVolume(%d)", volume);
 
     uint32_t volumeAux = volume * 0xffff / 0xff;
     volumeAux |= volumeAux << 16;
     auxSetVolume(*m_tombAuxDeviceID, volumeAux);
 
-    return true;
+    return TRUE;
 }
 
 void TombRaiderHooks::setVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume) {

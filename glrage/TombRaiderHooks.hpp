@@ -29,7 +29,6 @@ struct TombRaiderAudioSample {
 
 // Tomb Raider sub types
 typedef int32_t TombRaiderSoundInit();
-typedef void TombRaiderKeyEvent(int32_t, int32_t, int32_t);
 
 class TombRaiderHooks {
 public:
@@ -38,33 +37,37 @@ public:
     static void setPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
     static LPDIRECTSOUNDBUFFER playOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
     static LPDIRECTSOUNDBUFFER playLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
-    static bool playCDRemap(int16_t trackID);
-    static bool playCDLoop();
-    static bool playCD(int16_t trackID);
-    static bool stopCD();
-    static bool updateCDVolume(int16_t volume);
-    static void keyEvent(int32_t extended, int32_t code, int32_t pressed);
+    static BOOL playCDRemap(int16_t trackID);
+    static BOOL playCDLoop();
+    static BOOL playCD(int16_t trackID);
+    static BOOL stopCD();
+    static BOOL updateCDVolume(int16_t volume);
+    static LRESULT keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam);
+    static BOOL keyIsPressed(int32_t keyCode);
 
     static const int32_t DECIBEL_LUT_SIZE = 512;
 
     // Tomb Raider subs
     static TombRaiderSoundInit* m_tombSoundInit;
-    static TombRaiderKeyEvent* m_tombKeyEvent;
 
     // Tomb Raider vars
-    static bool m_ub;
-    static TombRaiderAudioSample*** m_tombSampleTable;
     static uint8_t** m_tombKeyStates;
-    static bool* m_tombSoundInit1;
-    static bool* m_tombSoundInit2;
+    static int16_t* m_tombDefaultKeyBindings;
+    static TombRaiderAudioSample*** m_tombSampleTable;
+    static BOOL* m_tombSoundInit1;
+    static BOOL* m_tombSoundInit2;
     static int32_t* m_tombDecibelLut;
     static int32_t* m_tombCDTrackID;
     static int32_t* m_tombCDTrackIDLoop;
-    static bool* m_tombCDLoop;
+    static BOOL* m_tombCDLoop;
     static uint32_t* m_tombCDVolume;
     static MCIDEVICEID* m_tombMciDeviceID;
     static uint32_t* m_tombAuxDeviceID;
     static HWND* m_tombHwnd;
+    static HHOOK* m_tombHhk;
+
+    // other vars
+    static bool m_ub;
 
 private:
     static LPDIRECTSOUNDBUFFER playSample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop);

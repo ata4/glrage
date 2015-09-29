@@ -211,8 +211,8 @@ void TombRaiderPatcher::applySoundPatches() {
     // panning issue.
     TombRaiderHooks::m_tombSoundInit = reinterpret_cast<TombRaiderSoundInit*>(m_ub ? 0x419DA0 : 0x419E90);
     TombRaiderHooks::m_tombSampleTable = reinterpret_cast<TombRaiderAudioSample***>(m_ub ? 0x45B314 : 0x45B954);
-    TombRaiderHooks::m_tombSoundInit1 = reinterpret_cast<bool*>(m_ub ? 0x459CF4 : 0x45A31C);
-    TombRaiderHooks::m_tombSoundInit2 = reinterpret_cast<bool*>(m_ub ? 0x459CF8 : 0x45A320);
+    TombRaiderHooks::m_tombSoundInit1 = reinterpret_cast<BOOL*>(m_ub ? 0x459CF4 : 0x45A31C);
+    TombRaiderHooks::m_tombSoundInit2 = reinterpret_cast<BOOL*>(m_ub ? 0x459CF8 : 0x45A320);
     TombRaiderHooks::m_tombDecibelLut = reinterpret_cast<int32_t*>(m_ub ? 0x45E9E0 : 0x45F1E0);
 
     if (m_ub) {
@@ -243,7 +243,7 @@ void TombRaiderPatcher::applySoundPatches() {
     TombRaiderHooks::m_tombHwnd = reinterpret_cast<HWND*>(m_ub ? 0x462E00 : 0x463600);
     TombRaiderHooks::m_tombCDTrackID = reinterpret_cast<int32_t*>(m_ub ? 0x4534F4 : 0x4534DC);
     TombRaiderHooks::m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(m_ub ? 0x45B330 : 0x45B97C);
-    TombRaiderHooks::m_tombCDLoop = reinterpret_cast<bool*>(m_ub ? 0x45B30C : 0x45B94C);
+    TombRaiderHooks::m_tombCDLoop = reinterpret_cast<BOOL*>(m_ub ? 0x45B30C : 0x45B94C);
     TombRaiderHooks::m_tombCDVolume = reinterpret_cast<uint32_t*>(m_ub ? 0x455D3C : 0x456334);
 
     // Patch bad mapping function in UB that remaps the music volume from 0-10 to
@@ -281,11 +281,28 @@ void TombRaiderPatcher::applyLogicPatches() {
     // This patch fixes a bug in the global key press handling, which normally
     // interrupts the demo mode and the credit sceens immediately after any key
     // has ever been pressed while the game is running.
-    if (!m_ub) {
-        // hook key event subroutine
-        TombRaiderHooks::m_tombKeyStates = reinterpret_cast<uint8_t**>(0x45B998);
-        patchAddr(0x43D904, "E8 67 A2 FF FF", TombRaiderHooks::keyEvent, 0xE8);
+    TombRaiderHooks::m_tombKeyStates = reinterpret_cast<uint8_t**>(m_ub ? 0x45B348 : 0x45B998);
+    TombRaiderHooks::m_tombDefaultKeyBindings = reinterpret_cast<int16_t*>(m_ub ? 0x454880 : 0x454A08);
+    TombRaiderHooks::m_tombHhk = reinterpret_cast<HHOOK*>(m_ub ? 0x45A314 : 0x45A93C);
+
+    // replace keyboard hook
+    std::vector<uint8_t> tmp;
+    appendBytes(reinterpret_cast<int32_t>(TombRaiderHooks::keyboardProc), tmp);
+    if (m_ub)  {
+        patch(0x43D518, "C0 D1 43 00", tmp);
+    } else {
+        patch(0x43DC30, "C0 D8 43 00", tmp);
     }
+
+    // hook keypress subroutine
+    if (m_ub) {
+        patchAddr(0x41E0E0, "8B 54 24 04 8B", TombRaiderHooks::keyIsPressed, 0xE9);
+    } else {
+        patchAddr(0x41E3E0, "8B 4C 24 04 56", TombRaiderHooks::keyIsPressed, 0xE9);
+    }
+
+    // disable internal scan code remapping
+    patch(m_ub ? 0x42EC81 : 0x42F151, "75 0A", "EB 34");
 
     // Fix infinite loop before starting the credits.
     patch(m_ub ? 0x41CC88 : 0x41CD58, "74", "EB");
