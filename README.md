@@ -32,11 +32,11 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 * Added soundtrack patch, which unlocks the full soundtrack, combining PC ambient tracks with PSX music tracks. Requires a custom CD or WinMM wrapper with the additional tracks.
 
 ### Known problems
+* The savegame format is incompatible to DOS format. To prevent accidental loading or overwriting of existing DOS savegames, the file name format has been changed as well.
+* Custom key bindings have been disabled in the ring menu to prevent various crashes, only the default bindings can be used and displayed right now.
 * The menu is fully opaque when opened in-game.
-* Changing the key bindings in the options crashes the game.
-* Savegame format is incompatible to DOS format.
-* Ambient tracks played from the CD won't loop properly in Windows Vista and later ([caused by a MCI emulation bug in Windows](https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/dfa22274-8122-4b92-a0bc-653f5749b1bd/audio-cd-playing-with-mci-mcinotifysuccessful-never-arrives?forum=windowspro-audiodevelopment)).
-* If the soundtrack patch is activated, music cues are played again when loading a savegame where they have been played already.
+* Ambient tracks played from a physical CD won't loop properly in Windows Vista and later ([caused by a MCI emulation bug in Windows](https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/dfa22274-8122-4b92-a0bc-653f5749b1bd/audio-cd-playing-with-mci-mcinotifysuccessful-never-arrives?forum=windowspro-audiodevelopment)).
+* If the soundtrack patch is activated, music cues triggered by levels are played again when loading a savegame where they have been played already.
 * If Lara is burning, the fire sounds are replayed every tick (60 times per second), causing nasty sound artifacts.
 * There's currently only one SFX channel, which means that only one sound effect can be played at a time. If more than one SFX is played, it replaces the previously played one.
 
