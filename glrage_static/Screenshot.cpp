@@ -8,6 +8,7 @@
 #include <fstream>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace glrage {
 
@@ -62,14 +63,10 @@ void Screenshot::capture() {
     uint8_t depth = 3;
 
     // copy framebuffer to local buffer
-    uint32_t dataSize = width * height * depth;
-    uint8_t* data = new uint8_t[width * height * depth];
-    if (!data) {
-        throw std::runtime_error("Can't allocate screenshot buffer");
-    }
+    std::vector<uint8_t> data(width * height * depth);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glReadPixels(x, y, width, height, GL_BGR, GL_UNSIGNED_BYTE, data);
+    glReadPixels(x, y, width, height, GL_BGR, GL_UNSIGNED_BYTE, &data[0]);
 
     // create Targa header
     MINI_TARGA_HEADER tgaHeader = {0};
@@ -79,10 +76,8 @@ void Screenshot::capture() {
     tgaHeader.depth = depth * 8;
 
     file.write(reinterpret_cast<char*>(&tgaHeader), sizeof(MINI_TARGA_HEADER));
-    file.write(reinterpret_cast<char*>(data), dataSize);
+    file.write(reinterpret_cast<char*>(&data[0]), data.size());
     file.close();
-
-    delete[] data;
 }
 
 }
