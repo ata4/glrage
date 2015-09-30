@@ -7,6 +7,7 @@
 #include "Sampler.hpp"
 #include "ShaderProgram.hpp"
 #include "Config.hpp"
+#include "GLRage.hpp"
 
 #include <cstdint>
 
@@ -28,6 +29,8 @@ private:
     static const GLenum TEX_INTERNAL_FORMAT = GL_RGBA;
     static const GLenum TEX_FORMAT = GL_BGRA;
     static const GLenum TEX_TYPE = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+
+    Context& m_context;
     Config m_config;
     uint32_t m_width;
     uint32_t m_height;

@@ -11,12 +11,7 @@ namespace glrage {
 
 class Context {
 public:
-    // singleton accessor
-    static Context& getInstance() {
-        static Context instance;
-        return instance;
-    }
-
+    Context();
     void init();
     void attach(HWND hwnd);
     void attach();
@@ -39,11 +34,6 @@ public:
     HWND getHWnd();
 
 private:
-    // private singleton constructor and operators
-    Context();
-    Context(Context const&) = delete;
-    void operator=(Context const&) = delete;
-
     // private methods
     void fixWindowRatio(WPARAM edge, LPRECT prect);
     void error(const std::string& message);

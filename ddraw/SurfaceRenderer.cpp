@@ -1,6 +1,5 @@
 #include "SurfaceRenderer.hpp"
 
-#include "glrage.h"
 #include "FragmentShader.hpp"
 #include "VertexShader.hpp"
 #include "GLUtils.hpp"
@@ -12,6 +11,7 @@ using glrage::GLUtils;
 namespace ddraw {
 
 SurfaceRenderer::SurfaceRenderer() :
+    m_context(GLRageGetContext()),
     m_config("DirectDraw"),
     m_surfaceTexture(GL_TEXTURE_2D),
     m_width(0),
@@ -60,8 +60,8 @@ void SurfaceRenderer::upload(DDSURFACEDESC& desc, void* data) {
 }
 
 void SurfaceRenderer::render() {
-    GLRageSwapBuffers();
-    GLRageSetupViewport();
+    m_context.swapBuffers();
+    m_context.setupViewport();
 
     m_program.bind();
     m_surfaceBuffer.bind();

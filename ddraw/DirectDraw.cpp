@@ -2,12 +2,12 @@
 #include "DirectDrawSurface.hpp"
 #include "DirectDrawClipper.hpp"
 
-#include "glrage.h"
 #include "Logger.hpp"
 
 namespace ddraw {
 
 DirectDraw::DirectDraw() :
+    m_context(GLRageGetContext()),
     m_width(DEFAULT_WIDTH),
     m_height(DEFAULT_HEIGHT),
     m_bits(DEFAULT_BITS),
@@ -205,7 +205,7 @@ HRESULT WINAPI DirectDraw::SetCooperativeLevel(HWND hWnd, DWORD dwFlags) {
     TRACE("DirectDraw::SetCooperativeLevel");
 
     if (dwFlags & DDSCL_FULLSCREEN) {
-        GLRageSetFullscreen(true);
+        GLRageGetContext().setFullscreen(true);
     }
 
     return DD_OK;
@@ -233,7 +233,7 @@ HRESULT WINAPI DirectDraw::SetDisplayMode(DWORD dwWidth, DWORD dwHeight, DWORD d
     m_bits = dwBPP;
     m_refreshRate = dwRefreshRate;
 
-    GLRageSetDisplaySize(m_width, m_height);
+    GLRageGetContext().setDisplaySize(m_width, m_height);
 
     return DD_OK;
 }

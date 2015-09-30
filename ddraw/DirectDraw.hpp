@@ -3,6 +3,7 @@
 #include "ddraw.hpp"
 #include "Unknown.hpp"
 #include "SurfaceRenderer.hpp"
+#include "GLRage.hpp"
 
 #include <cstdint>
 
@@ -50,6 +51,7 @@ private:
     const uint32_t DEFAULT_BITS = 16;
     const uint32_t DEFAULT_REFRESH_RATE = 60;
 
+    Context& m_context;
     SurfaceRenderer m_renderer;
     uint32_t m_width;
     uint32_t m_height;

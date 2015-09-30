@@ -2,7 +2,6 @@
 #include "CifUtils.hpp"
 #include "CifUnimplementedException.hpp"
 
-#include "glrage.h"
 #include "GLUtils.hpp"
 #include "FragmentShader.hpp"
 #include "VertexShader.hpp"
@@ -21,6 +20,7 @@ using glrage::GLUtils;
 namespace cif {
 
 CifRenderer::CifRenderer() :
+    m_context(GLRageGetContext()),
     m_config("ATI3DCIF"),
     m_palette(nullptr),
     m_alphaSrc(C3D_EASRC_ONE),
@@ -73,8 +73,8 @@ void CifRenderer::renderBegin(C3D_HRC hRC) {
 
     // CIF always uses an orthographic view, the application deals with the
     // perspective when required
-    float width = static_cast<float>(GLRageGetDisplayWidth());
-    float height = static_cast<float>(GLRageGetDisplayHeight());
+    float width = static_cast<float>(m_context.getDisplayWidth());
+    float height = static_cast<float>(m_context.getDisplayHeight());
     glm::mat4 projection = glm::ortho<float>(0, width, height, 0, 0, 1e6);
     m_program.uniformMatrix4fv("matProjection", 1, GL_FALSE, glm::value_ptr(projection));
 

@@ -3,7 +3,7 @@
 #include "CifUtils.hpp"
 #include "CifUnimplementedException.hpp"
 
-#include "glrage.h"
+#include "GLRage.hpp"
 #include "Logger.hpp"
 
 #include <stdexcept>
@@ -11,20 +11,21 @@
 using cif::CifRenderer;
 using cif::CifUnimplementedException;
 
-CifRenderer* renderer = nullptr;
-bool contextCreated = false;
+static Context& context = GLRageGetContext();
+static CifRenderer* renderer = nullptr;
+static bool contextCreated = false;
 
 C3D_EC HandleException() {
     try {
         throw;
     } catch (const CifUnimplementedException& ex) {
-        MessageBox(GLRageGetHWnd(), ex.what(), nullptr, MB_OK | MB_ICONEXCLAMATION);
+        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONEXCLAMATION);
         return C3D_EC_NOTIMPYET;
     } catch (const std::invalid_argument& ex) {
-        MessageBox(GLRageGetHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
+        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
         return C3D_EC_BADPARAM;
     } catch (const std::exception& ex) {
-        MessageBox(GLRageGetHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
+        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
         return C3D_EC_GENFAIL;
     }
 }
@@ -34,8 +35,8 @@ extern "C" {
 EXPORT(ATI3DCIF_Init, C3D_EC, (void)) {
     TRACE("ATI3DCIF_Init()");
 
-    GLRageInit();
-    GLRageAttach();
+    context.init();
+    context.attach();
 
     // do some cleanup in case the app forgets to call ATI3DCIF_Term
     if (renderer) {
@@ -169,7 +170,7 @@ EXPORT(ATI3DCIF_TexturePaletteAnimate, C3D_EC, (C3D_HTXPAL htxpalToAnimate, C3D_
 EXPORT(ATI3DCIF_ContextCreate, C3D_HRC, (void)) {
     TRACE("ATI3DCIF_ContextCreate()");
 
-    GLRageAttach();
+    context.attach();
 
     // can't create more than one context
     if (contextCreated) {
@@ -373,7 +374,7 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC, (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_
 EXPORT(ATI3DCIF_RenderBegin, C3D_EC, (C3D_HRC hRC)) {
     TRACEF("ATI3DCIF_RenderBegin(0x%p)", hRC);
 
-    GLRageRenderBegin();
+    context.renderBegin();
 
     try {
         renderer->renderBegin(hRC);

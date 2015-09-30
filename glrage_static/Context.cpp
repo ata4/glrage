@@ -8,14 +8,18 @@
 #include <mciapi.h>
 #include <stdexcept>
 
+#define PROP_CONTEXT "Context.this"
+
 namespace glrage {
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    return Context::getInstance().windowProc(hwnd, msg, wParam, lParam);
+static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    Context* context = reinterpret_cast<Context*>(GetProp(hwnd, PROP_CONTEXT));
+    return context->windowProc(hwnd, msg, wParam, lParam);
 }
 
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this) {
-    return Context::getInstance().enumWindowsProc(hwnd);
+static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this) {
+    Context* context = reinterpret_cast<Context*>(_this);
+    return context->enumWindowsProc(hwnd);
 }
 
 Context::Context() :
@@ -92,6 +96,7 @@ void Context::attach(HWND hwnd) {
     m_hwnd = hwnd;
 
     // get window procedure pointer and replace it with custom procedure
+    SetProp(m_hwnd, PROP_CONTEXT, this);
     m_windowProc = reinterpret_cast<WNDPROC>(GetWindowLongPtr(m_hwnd, GWL_WNDPROC));
     SetWindowLongPtr(m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
 
@@ -133,7 +138,7 @@ void Context::attach() {
     }
 
     m_pid = GetCurrentProcessId();
-    EnumWindows(EnumWindowsProc, static_cast<LPARAM>(NULL));
+    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(this));
 }
 
 void Context::detach() {

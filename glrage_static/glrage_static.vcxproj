@@ -81,10 +81,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Context.cpp" />
     <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="gl_core_3_3.c" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Sampler.cpp" />
+    <ClCompile Include="Screenshot.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="StringUtils.cpp" />
@@ -95,12 +97,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.hpp" />
+    <ClInclude Include="Context.hpp" />
     <ClInclude Include="GLUtils.hpp" />
     <ClInclude Include="gl_core_3_3.h" />
     <ClInclude Include="Logger.hpp" />
     <ClInclude Include="Object.hpp" />
     <ClInclude Include="FragmentShader.hpp" />
     <ClInclude Include="Sampler.hpp" />
+    <ClInclude Include="Screenshot.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="ShaderException.hpp" />
     <ClInclude Include="ShaderProgram.hpp" />

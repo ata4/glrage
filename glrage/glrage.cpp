@@ -1,12 +1,8 @@
-#include "glrage.h"
+#include "GLRage.hpp"
 #include "MemoryPatcher.hpp"
-#include "Context.hpp"
 #include "Logger.hpp"
 
-using glrage::Context;
 using glrage::MemoryPatcher;
-
-Context& ctx = Context::getInstance();
 
 const char* DLLMAIN_REASON[] {
     "DLL_PROCESS_DETACH",
@@ -27,74 +23,12 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved) {
     return TRUE;
 }
 
+static Context context;
+
 extern "C" {
 
-void GLRAPI GLRageInit() {
-    ctx.init();
-}
-
-void GLRAPI GLRageAttach() {
-    ctx.attach();
-}
-
-void GLRAPI GLRageDetach() {
-    ctx.detach();
-}
-
-bool GLRAPI GLRageIsFullscreen() {
-    return ctx.isFullscreen();
-}
-
-void GLRAPI GLRageSetFullscreen(bool fullscreen) {
-    ctx.setFullscreen(fullscreen);
-}
-
-void GLRAPI GLRageToggleFullscreen() {
-    ctx.toggleFullscreen();
-}
-
-void GLRAPI GLRageSetDisplaySize(UINT width, UINT height) {
-    ctx.setDisplaySize(width, height);
-}
-
-uint32_t GLRAPI GLRageGetDisplayWidth() {
-    return ctx.getDisplayWidth();
-}
-
-uint32_t GLRAPI GLRageGetDisplayHeight() {
-    return ctx.getDisplayHeight();
-}
-
-void GLRAPI GLRageSetWindowSize(UINT width, UINT height) {
-    ctx.setWindowSize(width, height);
-}
-
-uint32_t GLRAPI GLRageGetWindowWidth() {
-    return ctx.getWindowWidth();
-}
-
-uint32_t GLRAPI GLRageGetWindowHeight() {
-    return ctx.getWindowHeight();
-}
-
-void GLRAPI GLRageSetupViewport() {
-    ctx.setupViewport();
-}
-
-void GLRAPI GLRageSwapBuffers() {
-    ctx.swapBuffers();
-}
-
-void GLRAPI GLRageRenderBegin() {
-    ctx.renderBegin();
-}
-
-bool GLRAPI GLRageIsRendered() {
-    return ctx.isRendered();
-}
-
-HWND GLRAPI GLRageGetHWnd() {
-    return ctx.getHWnd();
+GLRAPI Context& GLRageGetContext() {
+    return context;
 }
 
 }

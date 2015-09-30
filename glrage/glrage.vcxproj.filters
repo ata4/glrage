@@ -21,15 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Context.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Screenshot.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="glrage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AssaultRigsPatcher.hpp">
       <Filter>Header Files\Patches</Filter>
     </ClInclude>
@@ -42,17 +33,11 @@
     <ClInclude Include="TombRaiderPatcher.hpp">
       <Filter>Header Files\Patches</Filter>
     </ClInclude>
+    <ClInclude Include="GLRage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Context.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="glrage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Screenshot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TombRaiderHooks.cpp">
       <Filter>Source Files\Patches</Filter>
     </ClCompile>
@@ -64,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="AssaultRigsPatcher.cpp">
       <Filter>Source Files\Patches</Filter>
+    </ClCompile>
+    <ClCompile Include="GLRage.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

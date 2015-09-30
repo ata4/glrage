@@ -7,6 +7,7 @@
 #include "ShaderProgram.hpp"
 #include "Sampler.hpp"
 #include "Config.hpp"
+#include "GLRage.hpp"
 
 #include <map>
 
@@ -139,6 +140,7 @@ public:
     // state functions end
 
 private:
+    Context& m_context;
     Config m_config;
     bool m_wireframe;
     TextureMap m_textures;

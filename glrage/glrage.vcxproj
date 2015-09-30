@@ -85,19 +85,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssaultRigsPatcher.hpp" />
-    <ClInclude Include="Context.hpp" />
     <ClInclude Include="MemoryPatcher.hpp" />
-    <ClInclude Include="glrage.h" />
-    <ClInclude Include="Screenshot.hpp" />
+    <ClInclude Include="GLRage.hpp" />
     <ClInclude Include="TombRaiderPatcher.hpp" />
     <ClInclude Include="TombRaiderHooks.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssaultRigsPatcher.cpp" />
-    <ClCompile Include="Context.cpp" />
     <ClCompile Include="MemoryPatcher.cpp" />
-    <ClCompile Include="glrage.cpp" />
-    <ClCompile Include="Screenshot.cpp" />
+    <ClCompile Include="GLRage.cpp" />
     <ClCompile Include="TombRaiderPatcher.cpp" />
     <ClCompile Include="TombRaiderHooks.cpp" />
   </ItemGroup>

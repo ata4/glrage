@@ -5,6 +5,7 @@
 #include "DirectDrawClipper.hpp"
 #include "SurfaceRenderer.hpp"
 #include "Unknown.hpp"
+#include "GLRage.hpp"
 
 #include <cstdint>
 
@@ -73,6 +74,7 @@ public:
     BOOL BufferIsClear();
 
 private:
+    Context& m_context;
     DirectDraw& m_dd;
     SurfaceRenderer& m_renderer;
     uint8_t* m_buffer;

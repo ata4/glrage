@@ -1,12 +1,12 @@
 #include "DirectDrawSurface.hpp"
 #include "DirectDrawClipper.hpp"
 
-#include "glrage.h"
 #include "Logger.hpp"
 
 namespace ddraw {
 
 DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD, SurfaceRenderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc) :
+    m_context(GLRageGetContext()),
     m_dd(lpDD),
     m_renderer(renderer),
     m_buffer(nullptr),
@@ -228,7 +228,7 @@ HRESULT WINAPI DirectDrawSurface::Flip(LPDIRECTDRAWSURFACE lpDDSurfaceTargetOver
 
     // don't re-upload surfaces if a renderer was active after lock() has been
     // called
-    if (GLRageIsRendered()) {
+    if (m_context.isRendered()) {
         m_dirty = false;
     }
 
