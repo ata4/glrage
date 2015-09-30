@@ -18,7 +18,8 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 * Fixed an explosion effect crash when killing the Tihocan Centaurs or the Giant Atlantean.
 * Fixed Tomb Raider CD not being detected in the drives 'A' or 'B'.
 * Fixed an integer overflow that caused long voice samples to be missing or cut off.
-* Fixed bugged demo mode and credit screens.
+* Fixed broken demo mode.
+* Fixed broken credit screens.
 * Fixed movement keys sometimes getting stuck in a permanently pressed state until the game has been restarted.
 * Fixed missing looping sounds (rivers, waterfalls, lava, etc.).
 * Fixed music volume control having no effect (changes are applied when the next track is played).
