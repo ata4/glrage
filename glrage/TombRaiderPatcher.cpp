@@ -373,6 +373,11 @@ void TombRaiderPatcher::applyLogicPatches() {
     // Underwater mod. Render everything as if it was beneath water. Trippy!
     //patch(0x417216, "26 94", "C6 93");
     //patch(0x416E08, "34 98", "D4 97");
+
+    // Swap Bacon Lara and normal Lara models. Works correctly in Atlantis levels
+    // only, but gives funny results otherwise.
+    //patch(0x436477, "80 86 42", "A0 7A 41");
+    //patch(0x416E17, "85 0C 00", "65 18 01");
 }
 
 }
