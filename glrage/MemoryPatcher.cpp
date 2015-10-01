@@ -12,11 +12,15 @@
 namespace glrage {
 
 template<class T> void MemoryPatcher::appendBytes(T value, std::vector<uint8_t>& data) {
-    uint8_t const* valueBytes = reinterpret_cast<uint8_t const*>(&value);
+    auto valueBytes = reinterpret_cast<uint8_t const*>(&value);
     for (size_t i = 0; i < sizeof(T); i++) {
         data.push_back(valueBytes[i]);
     }
 }
+
+template void MemoryPatcher::appendBytes<int32_t>(int32_t, std::vector<uint8_t>&);
+template void MemoryPatcher::appendBytes<int16_t>(int16_t, std::vector<uint8_t>&);
+template void MemoryPatcher::appendBytes<float_t>(float_t, std::vector<uint8_t>&);
 
 template<class T> static void MemoryPatcher::runPatch(const std::string& fileName) {
     T patch = T();
@@ -24,10 +28,6 @@ template<class T> static void MemoryPatcher::runPatch(const std::string& fileNam
         patch.apply();
     }
 }
-
-template void MemoryPatcher::appendBytes<int32_t>(int32_t, std::vector<uint8_t>&);
-template void MemoryPatcher::appendBytes<int16_t>(int16_t, std::vector<uint8_t>&);
-template void MemoryPatcher::appendBytes<float_t>(float_t, std::vector<uint8_t>&);
 
 MemoryPatcher::MemoryPatcher(const std::string& configName) :
     m_config(configName) {
