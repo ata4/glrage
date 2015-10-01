@@ -3,6 +3,7 @@
 #include "Logger.hpp"
 
 using glrage::MemoryPatcher;
+using glrage::ContextImpl;
 
 const char* DLLMAIN_REASON[] {
     "DLL_PROCESS_DETACH",
@@ -23,7 +24,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved) {
     return TRUE;
 }
 
-static Context context;
+static ContextImpl context;
 
 extern "C" {
 

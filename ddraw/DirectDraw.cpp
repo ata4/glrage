@@ -205,7 +205,7 @@ HRESULT WINAPI DirectDraw::SetCooperativeLevel(HWND hWnd, DWORD dwFlags) {
     TRACE("DirectDraw::SetCooperativeLevel");
 
     if (dwFlags & DDSCL_FULLSCREEN) {
-        GLRageGetContext().setFullscreen(true);
+        m_context.setFullscreen(true);
     }
 
     return DD_OK;
@@ -233,7 +233,7 @@ HRESULT WINAPI DirectDraw::SetDisplayMode(DWORD dwWidth, DWORD dwHeight, DWORD d
     m_bits = dwBPP;
     m_refreshRate = dwRefreshRate;
 
-    GLRageGetContext().setDisplaySize(m_width, m_height);
+    m_context.setDisplaySize(m_width, m_height);
 
     return DD_OK;
 }

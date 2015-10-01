@@ -1,17 +1,16 @@
 #pragma once
 
+#include "Context.hpp"
 #include "Screenshot.hpp"
 #include "Config.hpp"
 
-#include <Windows.h>
-#include <cstdint>
 #include <string>
 
 namespace glrage {
 
-class Context {
+class ContextImpl : public Context {
 public:
-    Context();
+    ContextImpl();
     void init();
     void attach(HWND hwnd);
     void attach();

@@ -1,4 +1,4 @@
-#include "Context.hpp"
+#include "ContextImpl.hpp"
 #include "Logger.hpp"
 #include "StringUtils.hpp"
 
@@ -13,16 +13,16 @@
 namespace glrage {
 
 static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    Context* context = reinterpret_cast<Context*>(GetProp(hwnd, PROP_CONTEXT));
+    ContextImpl* context = reinterpret_cast<ContextImpl*>(GetProp(hwnd, PROP_CONTEXT));
     return context->windowProc(hwnd, msg, wParam, lParam);
 }
 
 static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this) {
-    Context* context = reinterpret_cast<Context*>(_this);
+    ContextImpl* context = reinterpret_cast<ContextImpl*>(_this);
     return context->enumWindowsProc(hwnd);
 }
 
-Context::Context() :
+ContextImpl::ContextImpl() :
     m_config("Context"),
     m_hwnd(nullptr),
     m_hwndTmp(nullptr),
@@ -47,7 +47,7 @@ Context::Context() :
     m_pfd.iLayerType = PFD_MAIN_PLANE;
 }
 
-void Context::init() {
+void ContextImpl::init() {
     if (m_hglrc) {
         return;
     }
@@ -86,7 +86,7 @@ void Context::init() {
     }
 }
 
-void Context::attach(HWND hwnd) {
+void ContextImpl::attach(HWND hwnd) {
     if (m_hwnd) {
         return;
     }
@@ -132,7 +132,7 @@ void Context::attach(HWND hwnd) {
     }
 }
 
-void Context::attach() {
+void ContextImpl::attach() {
     if (m_hwnd) {
         return;
     }
@@ -141,7 +141,7 @@ void Context::attach() {
     EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(this));
 }
 
-void Context::detach() {
+void ContextImpl::detach() {
     if (!m_hwnd) {
         return;
     }
@@ -155,7 +155,7 @@ void Context::detach() {
     m_hwnd = nullptr;
 }
 
-LRESULT Context::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     // Printscreen on Windows with OpenGL doesn't work in fullscreen, so hook the
     // key and implement screenshot saving to files.
     // For some reason, VK_SNAPSHOT doesn't generate WM_KEYDOWN events but only
@@ -174,7 +174,7 @@ LRESULT Context::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return m_windowProc(hwnd, msg, wParam, lParam);
 }
 
-BOOL Context::enumWindowsProc(HWND hwnd) {
+BOOL ContextImpl::enumWindowsProc(HWND hwnd) {
     // ignore invisible windows
     if (!(GetWindowLong(hwnd, GWL_STYLE) & WS_VISIBLE)) {
         return TRUE;
@@ -193,11 +193,11 @@ BOOL Context::enumWindowsProc(HWND hwnd) {
     return FALSE;
 }
 
-bool Context::isFullscreen() {
+bool ContextImpl::isFullscreen() {
     return m_fullscreen;
 }
 
-void Context::setFullscreen(bool fullscreen) {
+void ContextImpl::setFullscreen(bool fullscreen) {
     m_fullscreen = fullscreen;
 
     if (!m_hwnd) {
@@ -218,11 +218,11 @@ void Context::setFullscreen(bool fullscreen) {
     setWindowSize(width, height);
 }
 
-void Context::toggleFullscreen() {
+void ContextImpl::toggleFullscreen() {
     setFullscreen(!m_fullscreen);
 }
 
-void Context::setDisplaySize(uint32_t width, uint32_t height) {
+void ContextImpl::setDisplaySize(uint32_t width, uint32_t height) {
     LOGF("Display size: %dx%d", width, height);
 
     m_width = width;
@@ -234,15 +234,15 @@ void Context::setDisplaySize(uint32_t width, uint32_t height) {
     }
 }
 
-uint32_t Context::getDisplayWidth() {
+uint32_t ContextImpl::getDisplayWidth() {
     return m_width;
 }
 
-uint32_t Context::getDisplayHeight() {
+uint32_t ContextImpl::getDisplayHeight() {
     return m_height;
 }
 
-void Context::setWindowSize(uint32_t width, uint32_t height) {
+void ContextImpl::setWindowSize(uint32_t width, uint32_t height) {
     if (!m_hwnd) {
         return;
     }
@@ -267,7 +267,7 @@ void Context::setWindowSize(uint32_t width, uint32_t height) {
         SWP_SHOWWINDOW | SWP_FRAMECHANGED);
 }
 
-uint32_t Context::getWindowWidth() {
+uint32_t ContextImpl::getWindowWidth() {
     if (!m_hwnd) {
         return m_width;
     }
@@ -276,7 +276,7 @@ uint32_t Context::getWindowWidth() {
     return m_tmprect.right - m_tmprect.left;
 }
 
-uint32_t Context::getWindowHeight() {
+uint32_t ContextImpl::getWindowHeight() {
     if (!m_hwnd) {
         return m_height;
     }
@@ -285,7 +285,7 @@ uint32_t Context::getWindowHeight() {
     return m_tmprect.bottom - m_tmprect.top;
 }
 
-void Context::setupViewport() {
+void ContextImpl::setupViewport() {
     UINT vpWidth = getWindowWidth();
     UINT vpHeight = getWindowHeight();
 
@@ -311,7 +311,7 @@ void Context::setupViewport() {
     glViewport(vpX, vpY, vpWidth, vpHeight);
 }
 
-void Context::swapBuffers() {
+void ContextImpl::swapBuffers() {
     glFinish();
 
     try {
@@ -325,11 +325,11 @@ void Context::swapBuffers() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Context::renderBegin() {
+void ContextImpl::renderBegin() {
     m_render = true;
 }
 
-bool Context::isRendered() {
+bool ContextImpl::isRendered() {
     bool result = m_render;
     m_render = false;
     return m_render;
@@ -361,7 +361,7 @@ std::string GetLastErrorStdStr() {
     return std::string();
 }
 
-void Context::error(const std::string& message) {
+void ContextImpl::error(const std::string& message) {
     std::string errorString = GetLastErrorStdStr();
 
     if (!errorString.empty()) {
@@ -373,7 +373,7 @@ void Context::error(const std::string& message) {
     ExitProcess(1);
 }
 
-HWND Context::getHWnd() {
+HWND ContextImpl::getHWnd() {
     return m_hwnd;
 }
 
