@@ -64,11 +64,15 @@ void TombRaiderPatcher::applyCrashPatches() {
     // One can still write a program to change the key bindings in the config file.
 
     // Prevent selection of user keys in the options (changing them crashes the game).
-    patch(0x42EB7C, "0F 94 C0", "90 90 90");
+    patch(m_ub ? 0x42E76C : 0x42EB7C, "0F 94 C0", "90 90 90");
 
     // Crude fix for a crash when opening the control options while in-game.
     // The "Inventory" label is broken for some reason, so it needs to be skipped.
-    patch(0x42F6D7, "7C", "78");
+    if (m_ub) {
+        patch(0x42F207, "54", "50");
+    } else {
+        patch(0x42F6DB, "7C", "78");
+    }
 }
 
 void TombRaiderPatcher::applyGraphicPatches() {
@@ -170,6 +174,42 @@ void TombRaiderPatcher::applyGraphicPatches() {
     patch(m_ub ? 0x41666E : 0x41675E, tmpExp, tmpRep);
     patch(m_ub ? 0x416801 : 0x4168F1, tmpExp, tmpRep);
     patch(m_ub ? 0x4168FE : 0x4169EE, tmpExp, tmpRep);
+
+    if (m_config.getBool("patch_draw_distance", false)) {
+        int32_t drawDistFade = m_config.getInt("patch_draw_distance_fade", 12288);
+        int32_t drawDistMax = m_config.getInt("patch_draw_distance_max", 20480);
+
+        std::vector<uint8_t> drawDistFadeData;
+        appendBytes(drawDistFade, drawDistFadeData);
+
+        std::vector<uint8_t> drawDistFadeNegData;
+        appendBytes(-drawDistFade, drawDistFadeNegData);
+
+        std::vector<uint8_t> drawDistMaxData;
+        appendBytes(drawDistMax, drawDistMaxData);
+
+        patch(0x402030, "00 50 00 00", drawDistMaxData);
+        patch(0x402047, "00 30 00 00", drawDistFadeData);
+        patch(0x40205A, "00 30 00 00", drawDistFadeData);
+
+        patch(0x40224B, "00 50 00 00", drawDistMaxData);
+        patch(0x402263, "00 30 00 00", drawDistFadeData);
+        patch(0x402270, "00 D0 FF FF", drawDistFadeNegData);
+
+        patch(m_ub ? 0x4163E4 : 0x4164D4, "00 50 00 00", drawDistMaxData);
+
+        patch(m_ub ? 0x41DB6B : 0x41DE6B, "00 30 00 00", drawDistFadeData);
+
+        patch(m_ub ? 0x42FD82 : 0x430252, "00 30 00 00", drawDistFadeData);
+        patch(m_ub ? 0x42FD91 : 0x430261, "00 D0 FF FF", drawDistFadeNegData);
+
+        patch(m_ub ? 0x42FDDD : 0x4302AD, "00 30 00 00", drawDistFadeData);
+        patch(m_ub ? 0x42FDE6 : 0x4302B6, "00 D0 FF FF", drawDistFadeNegData);
+
+        patch(m_ub ? 0x435521 : 0x435AA1, "00 D0 FF FF", drawDistFadeNegData);
+
+        patch(m_ub ? 0x435729 : 0x435CA9, "00 D0 FF FF", drawDistFadeNegData);
+    }
 
     // This patch raises the maximum FPS from 30 to 60.
     // FIXME: disabled, since only actually works in menu while the game itself
