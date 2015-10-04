@@ -29,13 +29,15 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 * Replaced 800x600 resolution option with the current desktop resolution for widescreen support.
 * Increased vertex color brightness to match DOS and PSX versions. ([Screenshot 1](http://i.imgur.com/S7GP9hH.jpg) / [Screenshot 2](http://i.imgur.com/xqJflAi.jpg))
 * Changed water color from grey-blue to turquoise, similar to the PSX version. ([Screenshot](http://i.imgur.com/NpYRg9j.jpg))
-* Added No-CD mode. Requires `DATA` and `FMV` folders to be copied to the Tomb Raider directory and a WinMM wrapper for CD audio support.
-* Added soundtrack patch, which unlocks the full soundtrack, combining PC ambient tracks with PSX music tracks. Requires a custom CD or WinMM wrapper with the additional tracks.
+* Increased rendering distance. ([Screenshot](http://i.imgur.com/CUnIoIY.jpg), disabled on default)
+* Added No-CD mode. Requires `DATA` and `FMV` folders to be copied to the Tomb Raider directory and a WinMM wrapper for CD audio support. (disabled on default)
+* Added soundtrack patch, which unlocks the full soundtrack, combining PC ambient tracks with PSX music tracks. Requires a custom CD or WinMM wrapper with the additional tracks. (disabled on default)
 
 ### Known problems
 * The savegame format is incompatible to DOS format. To prevent accidental loading or overwriting of existing DOS savegames, the file name format has been changed as well.
 * Custom key bindings have been disabled in the ring menu to prevent various crashes, only the default bindings can be used and displayed right now.
 * The menu is fully opaque when opened in-game.
+* Some objects disappear when viewed from certain angles or are just partially visible.
 * Ambient tracks played from a physical CD won't loop properly in Windows Vista and later ([caused by a MCI emulation bug in Windows](https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/dfa22274-8122-4b92-a0bc-653f5749b1bd/audio-cd-playing-with-mci-mcinotifysuccessful-never-arrives?forum=windowspro-audiodevelopment)).
 * If the soundtrack patch is activated, music cues triggered by levels are played again when loading a savegame where they have been played already.
 * If Lara is burning, the fire sounds are replayed every tick (60 times per second), causing nasty sound artifacts.
