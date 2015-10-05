@@ -161,6 +161,18 @@ void TombRaiderPatcher::applyGraphicPatches() {
             patch(0x42DF6B, "58 67 45 00", tmp);
         }
         tmp.clear();
+
+        // UI scale patch, rescales the in-game overlay to keep the proportions
+        // of the 800x600 resolution on higher resolutions.
+        TombRaiderHooks::m_tombRenderLine = reinterpret_cast<TombRaiderRenderLine*>(0x402710);
+        TombRaiderHooks::m_tombRenderCollectedItem = reinterpret_cast<TombRaiderRenderCollectedItem*>(0x435D80);
+        TombRaiderHooks::m_tombCreateOverlayText = reinterpret_cast<TombRaiderCreateOverlayText*>(0x439780);
+        TombRaiderHooks::m_tombRenderWidth = reinterpret_cast<int32_t*>(0x6CADD4);
+
+        patchAddr(0x41DD85, "E8 46 25 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
+        patchAddr(0x41DF0C, "E8 BF 23 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
+        patchAddr(0x41DE71, "E8 0A 7F 01 00", TombRaiderHooks::renderCollectedItem, 0xE8);
+        patchAddr(0x439B72, "E8 09 FC FF FF", TombRaiderHooks::createFPSText, 0xE8);
     }
 
     // Not sure what exactly this value does, but setting it too low sometimes
@@ -197,8 +209,6 @@ void TombRaiderPatcher::applyGraphicPatches() {
         patch(0x402270, "00 D0 FF FF", drawDistFadeNegData);
 
         patch(m_ub ? 0x4163E4 : 0x4164D4, "00 50 00 00", drawDistMaxData);
-
-        patch(m_ub ? 0x41DB6B : 0x41DE6B, "00 30 00 00", drawDistFadeData);
 
         patch(m_ub ? 0x42FD82 : 0x430252, "00 30 00 00", drawDistFadeData);
         patch(m_ub ? 0x42FD91 : 0x430261, "00 D0 FF FF", drawDistFadeNegData);

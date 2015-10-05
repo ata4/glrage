@@ -13,6 +13,15 @@ bool TombRaiderHooks::m_ub = false;
 // init sound system
 TombRaiderSoundInit* TombRaiderHooks::m_tombSoundInit = nullptr;
 
+// renders a line between two points
+TombRaiderRenderLine* TombRaiderHooks::m_tombRenderLine = nullptr;
+
+// creates overlay text
+TombRaiderCreateOverlayText* TombRaiderHooks::m_tombCreateOverlayText = nullptr;
+
+// renders the previously collected item
+TombRaiderRenderCollectedItem* TombRaiderHooks::m_tombRenderCollectedItem = nullptr;
+
 /** Tomb Raider var pointers **/
 
 // Pointer to the key state table. If an entry is 1, then the key is pressed.
@@ -49,6 +58,9 @@ MCIDEVICEID* TombRaiderHooks::m_tombMciDeviceID = nullptr;
 
 // Auxiliary device ID.
 uint32_t* TombRaiderHooks::m_tombAuxDeviceID = nullptr;
+
+// Rendering width.
+int32_t* TombRaiderHooks::m_tombRenderWidth = nullptr;
 
 // Window handle.
 HWND* TombRaiderHooks::m_tombHwnd = nullptr;
@@ -193,6 +205,79 @@ BOOL TombRaiderHooks::keyIsPressed(int32_t keyCode) {
     int16_t keyBinding = m_tombDefaultKeyBindings[keyCode];
     uint8_t* keyStates = *m_tombKeyStates;
     return keyStates[keyBinding];
+}
+
+BOOL TombRaiderHooks::renderHealthBar(int32_t health) {
+    const int32_t p1 = -100;
+    const int32_t p2 = -200;
+    const int32_t p3 = -300;
+    const int32_t p4 = -400;
+
+    const int32_t healthMax = 100;
+
+    const int32_t x = 8;
+    const int32_t y = 8;
+
+    const int32_t colorBorder1 = 19;
+    const int32_t colorBorder2 = 17;
+    const int32_t colorBackground = 0;
+    const int32_t colorsBar[] = { 8, 11, 8, 6, 24 };
+
+    int32_t scale = *m_tombRenderWidth > 800 ? *m_tombRenderWidth / 800 : 1;
+    int32_t width = healthMax * scale;
+    int32_t height = 5 * scale;
+
+    int32_t padding = 2;
+    int32_t top = x - padding;
+    int32_t left = y - padding;
+    int32_t bottom = top + height + padding + 1;
+    int32_t right = left + width + padding + 1;
+
+    // background
+    for (int32_t i = 1; i < height + 3; i++) {
+        m_tombRenderLine(left + 1, top + i, right, top + i, p1, colorBackground);
+    }
+
+    // top / left border
+    m_tombRenderLine(left, top, right + 1, top, p2, colorBorder1);
+    m_tombRenderLine(left, top, left, bottom, p2, colorBorder1);
+
+    // bottom / right border
+    m_tombRenderLine(left + 1, bottom, right, bottom, p2, colorBorder2);
+    m_tombRenderLine(right, top, right, bottom, p2, colorBorder2);
+
+    // health bar
+    if (health) {
+        width -= (healthMax - health) * scale;
+
+        top = x;
+        left = y;
+        bottom = top + height;
+        right = left + width;
+
+        for (int32_t i = 0; i < height; i++) {
+            int32_t colorIndex = i * _countof(colorsBar) / height;
+            m_tombRenderLine(left, top + i, right, top + i, p4, colorsBar[colorIndex]);
+        }
+    }
+
+    return TRUE;
+}
+
+BOOL TombRaiderHooks::renderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness) {
+    if (*m_tombRenderWidth > 800) {
+        scale = *m_tombRenderWidth * scale / 800;
+    }
+
+    return m_tombRenderCollectedItem(x, y, scale, itemID, brightness);
+}
+
+void* TombRaiderHooks::createFPSText(int16_t x, int16_t y, int16_t a3, const char* text) {
+    if (*m_tombRenderWidth > 800) {
+        y = (*m_tombRenderWidth * 7 / 800) + 23;
+    }
+
+    return m_tombCreateOverlayText(x, y, a3, text);
 }
 
 BOOL TombRaiderHooks::playCDRemap(int16_t trackID) {

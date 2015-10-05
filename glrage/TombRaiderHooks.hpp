@@ -29,6 +29,9 @@ struct TombRaiderAudioSample {
 
 // Tomb Raider sub types
 typedef int32_t TombRaiderSoundInit();
+typedef BOOL TombRaiderRenderLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t a5, int8_t color);
+typedef BOOL TombRaiderRenderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
+typedef void* TombRaiderCreateOverlayText(int16_t x, int16_t y, int16_t a3, const char* text);
 
 class TombRaiderHooks {
 public:
@@ -44,11 +47,17 @@ public:
     static BOOL updateCDVolume(int16_t volume);
     static LRESULT keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam);
     static BOOL keyIsPressed(int32_t keyCode);
+    static BOOL renderHealthBar(int32_t health);
+    static BOOL renderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
+    static void* createFPSText(int16_t x, int16_t y, int16_t a3, const char* text);
 
     static const int32_t DECIBEL_LUT_SIZE = 512;
 
     // Tomb Raider subs
     static TombRaiderSoundInit* m_tombSoundInit;
+    static TombRaiderRenderLine* m_tombRenderLine;
+    static TombRaiderRenderCollectedItem* m_tombRenderCollectedItem;
+    static TombRaiderCreateOverlayText* m_tombCreateOverlayText;
 
     // Tomb Raider vars
     static uint8_t** m_tombKeyStates;
@@ -63,6 +72,7 @@ public:
     static uint32_t* m_tombCDVolume;
     static MCIDEVICEID* m_tombMciDeviceID;
     static uint32_t* m_tombAuxDeviceID;
+    static int32_t* m_tombRenderWidth;
     static HWND* m_tombHwnd;
     static HHOOK* m_tombHhk;
 
