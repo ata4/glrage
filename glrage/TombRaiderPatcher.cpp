@@ -165,14 +165,21 @@ void TombRaiderPatcher::applyGraphicPatches() {
         // UI scale patch, rescales the in-game overlay to keep the proportions
         // of the 800x600 resolution on higher resolutions.
         TombRaiderHooks::m_tombRenderLine = reinterpret_cast<TombRaiderRenderLine*>(0x402710);
-        TombRaiderHooks::m_tombRenderCollectedItem = reinterpret_cast<TombRaiderRenderCollectedItem*>(0x435D80);
-        TombRaiderHooks::m_tombCreateOverlayText = reinterpret_cast<TombRaiderCreateOverlayText*>(0x439780);
-        TombRaiderHooks::m_tombRenderWidth = reinterpret_cast<int32_t*>(0x6CADD4);
+        TombRaiderHooks::m_tombRenderCollectedItem = reinterpret_cast<TombRaiderRenderCollectedItem*>(m_ub ? 0x435800 : 0x435D80);
+        TombRaiderHooks::m_tombCreateOverlayText = reinterpret_cast<TombRaiderCreateOverlayText*>(m_ub ? 0x4390D0 : 0x439780);
+        TombRaiderHooks::m_tombRenderWidth = reinterpret_cast<int32_t*>(m_ub ? 0x6CA5D4 : 0x6CADD4);
 
-        patchAddr(0x41DD85, "E8 46 25 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
-        patchAddr(0x41DF0C, "E8 BF 23 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
-        patchAddr(0x41DE71, "E8 0A 7F 01 00", TombRaiderHooks::renderCollectedItem, 0xE8);
-        patchAddr(0x439B72, "E8 09 FC FF FF", TombRaiderHooks::createFPSText, 0xE8);
+        if (m_ub) {
+            patchAddr(0x41DA85, "E8 76 23 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
+            patchAddr(0x41DC0C, "E8 EF 21 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
+            patchAddr(0x41DB71, "E8 8A 7C 01 00", TombRaiderHooks::renderCollectedItem, 0xE8);
+            patchAddr(0x4394C2, "E8 09 FC FF FF", TombRaiderHooks::createFPSText, 0xE8);
+        } else {
+            patchAddr(0x41DD85, "E8 46 25 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
+            patchAddr(0x41DF0C, "E8 BF 23 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
+            patchAddr(0x41DE71, "E8 0A 7F 01 00", TombRaiderHooks::renderCollectedItem, 0xE8);
+            patchAddr(0x439B72, "E8 09 FC FF FF", TombRaiderHooks::createFPSText, 0xE8);
+        }
     }
 
     // Not sure what exactly this value does, but setting it too low sometimes
