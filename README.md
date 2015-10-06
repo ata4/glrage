@@ -1,8 +1,8 @@
-This is an OpenGL wrapper for the ATI 3D C Interface (ATI3DCIF) and DirectDraw 2. It allows to play vintage Windows 95/98 games designed for the ATI 3D Rage series on modern GPUs and Windows versions in FHD, UHD and beyond.
+GLRage is an OpenGL wrapper for the ATI 3D C Interface (ATI3DCIF) and DirectDraw 2. It allows to play vintage Windows 95/98 games designed for the ATI 3D Rage series on modern GPUs and Windows versions in FHD, UHD and beyond.
 
 It is based on a heavily modified version of [GLCIF](http://glcif.sourceforge.net/) that was originally tailored specifically for Tomb Raider, which has been ported to modern OpenGL and C++ with the goal to support more games.
 
-It also supports non-destructive memory patching, which allows .exe files to be untouched while applying patches on demand.
+It also supports non-destructive memory patching, which allows bug fixes and enhancements while leaving the original .exe files untouched.
 
 # Tested Games
 
@@ -10,6 +10,19 @@ It also supports non-destructive memory patching, which allows .exe files to be 
 
 The original patch for the ATI Rage Pro was released in a pretty unfinished state and contains a mixture of old DOS version bugs, Windows port bugs and new bugs introduced by ATI.
 Therefore, a lot of patches are required to fully restore the original Tomb Raider features and aesthetics.
+
+### Installation instructions
+
+For the absolute minimum installation, the original Tomb Raider CD as well as the correct ATI patch besides this wrapper is required:
+
+* [ATI patch for Tomb Raider](http://web.archive.org/web/20081208051118/http://ftp.eidos-france.fr/pub/fr/tomb_raider/patches/tombatiragepro.zip)
+* [ATI patch for Tomb Raider: Unfinished Business](http://web.archive.org/web/20081208051118/http://ftp.eidos-france.fr/pub/fr/tomb_raider/patches/tombati.zip) (executable only, requires ESCAPE DLLs included in the patch above)
+
+For a standalone installation without requiring the CD, you'll need to copy the `DATA` and `FMV` folders from the CD to the TR directory and set `patch_nocd` to `true` in the `[Tomb Raider]` section of `glrage.ini`.
+To have working music in this mode, you'll need a WinMM wrapper and audio track rips as well. Also, you'll need to separate folders for TR and TR:UB to avoid clashing files.
+
+If you have the GOG.com or Steam release, you'll find the two folders in GAME.GOG/GAME.DAT, which is actually a BIN/CUE image of the Sold-Out Software release of TR. You can temporary rename GAME.DAT to GAME.cue and mount it
+with [WinCDEmu](http://wincdemu.sysprogs.org/) to access the image.
 
 ### Patches
 
@@ -30,8 +43,8 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 * Increased vertex color brightness to match DOS and PSX versions. ([Screenshot 1](http://i.imgur.com/S7GP9hH.jpg) / [Screenshot 2](http://i.imgur.com/xqJflAi.jpg))
 * Changed water color from grey-blue to turquoise, similar to the PSX version. ([Screenshot](http://i.imgur.com/NpYRg9j.jpg))
 * Increased rendering distance. ([Screenshot](http://i.imgur.com/CUnIoIY.jpg), disabled on default)
-* Added No-CD mode. Requires `DATA` and `FMV` folders to be copied to the Tomb Raider directory and a WinMM wrapper for CD audio support. (disabled on default)
-* Added soundtrack patch, which unlocks the full soundtrack, combining PC ambient tracks with PSX music tracks. Requires a custom CD or WinMM wrapper with the additional tracks. (disabled on default)
+* No-CD mode. (disabled on default)
+* Soundtrack patch to unlock the full soundtrack, combining PC ambient tracks with PSX music tracks. (disabled on default)
 
 ### Known problems
 * The savegame format is incompatible to DOS format. To prevent accidental loading or overwriting of existing DOS savegames, the file name format has been changed as well.
@@ -45,7 +58,13 @@ Therefore, a lot of patches are required to fully restore the original Tomb Raid
 
 ## Assault Rigs
 
-Apart from a broken memory check, Assault Rigs runs flawlessly even on recent Windows versions.
+Apart from a broken memory check, Assault Rigs runs flawlessly out of the box, even on recent Windows versions.
+
+### Installation instructions
+
+You'll need the 3D Rage Edition of Assault Rigs that was bundled with ATI 3D Xpression cards. Patching the DOS version is not possible, since both game files and CD audio track order are different.
+
+Unlike the DOS version, the ATI edition has no CD check, so it'll run without if you don't need the music. For a complete standalone installation with music, you'll need a WinMM wrapper and ripped audio tracks.
 
 ### Patches
 
@@ -54,3 +73,7 @@ Apart from a broken memory check, Assault Rigs runs flawlessly even on recent Wi
 
 #### Optional patches
 * Replaced 640x480 resolution option with the current desktop resolution for widescreen support.
+
+# License
+This software is provided under GNU Lesser General Public License version 3.
+See LGPL-3 or http://www.gnu.org/licenses/lgpl.html for the full text of this license.
