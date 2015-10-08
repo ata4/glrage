@@ -58,7 +58,7 @@ with [WinCDEmu](http://wincdemu.sysprogs.org/) to access the image.
 
 ## Assault Rigs
 
-Apart from a broken memory check, Assault Rigs runs flawlessly out of the box, even on recent Windows versions.
+Apart from a broken memory check, Assault Rigs runs almost flawlessly out of the box, even on recent Windows versions.
 
 ### Installation instructions
 
@@ -73,6 +73,9 @@ Unlike the DOS version, the ATI edition has no CD check, so it'll run without if
 
 #### Optional patches
 * Replaced 640x480 resolution option with the current desktop resolution for widescreen support.
+
+### Known problems
+* Videos aren't displayed correctly in Windows 10.
 
 # License
 This software is provided under GNU Lesser General Public License version 3.
