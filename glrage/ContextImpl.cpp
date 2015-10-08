@@ -323,6 +323,8 @@ void ContextImpl::swapBuffers() {
     SwapBuffers(m_hdc);
     glDrawBuffer(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_render = false;
 }
 
 void ContextImpl::renderBegin() {
@@ -330,8 +332,6 @@ void ContextImpl::renderBegin() {
 }
 
 bool ContextImpl::isRendered() {
-    bool result = m_render;
-    m_render = false;
     return m_render;
 }
 

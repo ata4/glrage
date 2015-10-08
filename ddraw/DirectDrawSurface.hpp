@@ -8,6 +8,7 @@
 #include "GLRage.hpp"
 
 #include <cstdint>
+#include <vector>
 
 namespace ddraw {
 
@@ -69,22 +70,20 @@ public:
     HRESULT WINAPI PageLock(DWORD dwFlags); // added in v2
     HRESULT WINAPI PageUnlock(DWORD dwFlags); // added in v2
 
-    /*** Custom methods ***/
-    VOID BufferClear();
-    BOOL BufferIsClear();
-
 private:
     Context& m_context;
     DirectDraw& m_dd;
     SurfaceRenderer& m_renderer;
-    uint8_t* m_buffer;
-    size_t m_bufferSize;
+    std::vector<uint8_t> m_buffer;
     DDSURFACEDESC m_desc;
     DirectDrawSurface* m_backBuffer;
     DirectDrawSurface* m_depthBuffer;
     DirectDrawClipper* m_clipper;
     bool m_locked;
     bool m_dirty;
+
+    /*** Custom methods ***/
+    void clear(int32_t color);
 };
 
 }

@@ -44,7 +44,7 @@ SurfaceRenderer::SurfaceRenderer() :
     GLUtils::checkError("DirectDrawRenderer::DirectDrawRenderer");
 }
 
-void SurfaceRenderer::upload(DDSURFACEDESC& desc, void* data) {
+void SurfaceRenderer::upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data) {
     m_surfaceTexture.bind();
 
     // update buffer if the size is unchanged, otherwise create a new one
@@ -52,17 +52,14 @@ void SurfaceRenderer::upload(DDSURFACEDESC& desc, void* data) {
         m_width = desc.dwWidth;
         m_height = desc.dwHeight;
         glTexImage2D(GL_TEXTURE_2D, 0, TEX_INTERNAL_FORMAT, m_width, m_height, 0,
-            TEX_FORMAT, TEX_TYPE, data);
+            TEX_FORMAT, TEX_TYPE, &data[0]);
     } else {
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height,
-            TEX_FORMAT, TEX_TYPE, data);
+            TEX_FORMAT, TEX_TYPE, &data[0]);
     }
 }
 
 void SurfaceRenderer::render() {
-    m_context.swapBuffers();
-    m_context.setupViewport();
-
     m_program.bind();
     m_surfaceBuffer.bind();
     m_surfaceFormat.bind();

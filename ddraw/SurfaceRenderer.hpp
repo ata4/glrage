@@ -10,6 +10,7 @@
 #include "GLRage.hpp"
 
 #include <cstdint>
+#include <vector>
 
 using glrage::VertexArray;
 using glrage::VertexArrayBuffer;
@@ -23,7 +24,7 @@ namespace ddraw {
 class SurfaceRenderer {
 public:
     SurfaceRenderer();
-    void upload(DDSURFACEDESC& desc, void* data);
+    void upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data);
     void render();
 private:
     static const GLenum TEX_INTERNAL_FORMAT = GL_RGBA;

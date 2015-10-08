@@ -3,14 +3,14 @@
 
 #include "Logger.hpp"
 
+#include <algorithm>
+
 namespace ddraw {
 
 DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD, SurfaceRenderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc) :
     m_context(GLRageGetContext()),
     m_dd(lpDD),
     m_renderer(renderer),
-    m_buffer(nullptr),
-    m_bufferSize(0),
     m_backBuffer(nullptr),
     m_depthBuffer(nullptr),
     m_clipper(nullptr),
@@ -45,11 +45,8 @@ DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD, SurfaceRenderer& renderer
     }
 
     // allocate surface buffer
-    m_bufferSize = m_desc.lPitch * m_desc.dwHeight;
-    m_buffer = new uint8_t[m_bufferSize];
+    m_buffer.resize(m_desc.lPitch * m_desc.dwHeight, 0);
     m_desc.lpSurface = nullptr;
-
-    BufferClear();
 
     // attach back buffer if defined
     if (m_desc.dwFlags & DDSD_BACKBUFFERCOUNT && m_desc.dwBackBufferCount > 0) {
@@ -81,9 +78,7 @@ DirectDrawSurface::~DirectDrawSurface() {
 
     m_dd.Release();
 
-    if (m_buffer) {
-        delete[] m_buffer;
-        m_buffer = nullptr;
+    if (m_desc.lpSurface) {
         m_desc.lpSurface = nullptr;
     }
 }
@@ -147,15 +142,6 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect, LPDIRECTDRAWSURFACE lpD
         return DDERR_LOCKEDSURFACES;
     }
 
-    if (dwFlags & DDBLT_COLORFILL) {
-        BufferClear();
-        m_dirty = true;
-    }
-
-    if (dwFlags & DDBLT_DEPTHFILL && m_depthBuffer) {
-        m_depthBuffer->BufferClear();
-    }
-
     if (lpDDSrcSurface) {
         // first check if the blit will replace the entire buffer
         bool replace = true;
@@ -170,12 +156,26 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect, LPDIRECTDRAWSURFACE lpD
 
         if (replace) {
             DirectDrawSurface* src = static_cast<DirectDrawSurface*>(lpDDSrcSurface);
-            memcpy(m_buffer, src->m_buffer, src->m_bufferSize);
+            m_buffer = src->m_buffer;
         } else {
-            // TODO
+            // TODO: rectangular 2D copy
         }
 
         m_dirty = true;
+    }
+
+    // Clear primary surface in 2D mode ony. OpenGL already does the clearing
+    // on hardware in 3D, so it would be a waste of CPU time.
+    if (m_context.isRendered() && m_desc.ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
+        return DD_OK;
+    }
+
+    if (dwFlags & DDBLT_COLORFILL) {
+        clear(lpDDBltFx->dwFillColor);
+    }
+
+    if (dwFlags & DDBLT_DEPTHFILL && m_depthBuffer) {
+        m_depthBuffer->clear(0);
     }
 
     return DD_OK;
@@ -232,14 +232,13 @@ HRESULT WINAPI DirectDrawSurface::Flip(LPDIRECTDRAWSURFACE lpDDSurfaceTargetOver
         m_dirty = false;
     }
 
-    // flip data pointers
+    // swap front and back buffers
     // TODO: use buffer chain correctly
     // TODO: use lpDDSurfaceTargetOverride when defined
-    uint8_t* bufferTmp = m_buffer;
+    m_buffer.swap(m_backBuffer->m_buffer);
+
     bool dirtyTmp = m_dirty;
-    m_buffer = m_backBuffer->m_buffer;
     m_dirty = m_backBuffer->m_dirty;
-    m_backBuffer->m_buffer = bufferTmp;
     m_backBuffer->m_dirty = dirtyTmp;
 
     // upload surface if dirty
@@ -249,6 +248,8 @@ HRESULT WINAPI DirectDrawSurface::Flip(LPDIRECTDRAWSURFACE lpDDSurfaceTargetOver
     }
     
     // then render it
+    m_context.swapBuffers();
+    m_context.setupViewport();
     m_renderer.render();
 
     return DD_OK;
@@ -354,7 +355,7 @@ HRESULT WINAPI DirectDrawSurface::Lock(LPRECT lpDestRect, LPDDSURFACEDESC lpDDSu
     }
 
     // assign lpSurface
-    m_desc.lpSurface = m_buffer;
+    m_desc.lpSurface = &m_buffer[0];
     m_desc.dwFlags |= DDSD_LPSURFACE;
 
     m_locked = true;
@@ -420,6 +421,8 @@ HRESULT WINAPI DirectDrawSurface::Unlock(LPVOID lp) {
         //for (uint32_t i = 0; i < m_desc.dwHeight; i += 2) {
         //    memcpy(m_buffer + (i + 1) * m_desc.lPitch, m_buffer + i * m_desc.lPitch, m_desc.lPitch);
         //}
+        m_context.swapBuffers();
+        m_context.setupViewport();
         m_renderer.upload(m_desc, m_buffer);
         m_renderer.render();
     }
@@ -500,8 +503,22 @@ HRESULT WINAPI DirectDrawSurface::PageUnlock(DWORD dwFlags) {
 }
 
 /*** Custom methods ***/
-VOID DirectDrawSurface::BufferClear() {
-    memset(m_buffer, 0, m_bufferSize);
+void DirectDrawSurface::clear(int32_t color) {
+    if (m_desc.ddpfPixelFormat.dwRGBBitCount == 8 || color == 0) {
+        // clear() may be called frequently on potentially large buffers, so use
+        // memset instead of std::fill
+        memset(&m_buffer[0], color & 0xff, m_buffer.size());
+    } else if (m_desc.ddpfPixelFormat.dwRGBBitCount % 8 == 0) {
+        int32_t i = 0;
+        std::generate(m_buffer.begin(), m_buffer.end(), [this, &i, &color]() {
+            int32_t colorOffset = i++ * 8 % this->m_desc.ddpfPixelFormat.dwRGBBitCount;
+            return (color >> colorOffset) & 0xff;
+        });
+    } else {
+        // TODO: support odd bit counts?
+    }
+
+    m_dirty = true;
 }
 
 }
