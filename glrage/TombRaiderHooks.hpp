@@ -50,7 +50,6 @@ public:
     static BOOL renderHealthBar(int32_t health);
     static BOOL renderAirBar(int32_t air);
     static BOOL renderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
-    static void* createFPSText(int16_t x, int16_t y, int16_t a3, const char* text);
 
     static const int32_t DECIBEL_LUT_SIZE = 512;
 
