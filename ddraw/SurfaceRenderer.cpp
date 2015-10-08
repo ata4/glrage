@@ -11,7 +11,6 @@ using glrage::GLUtils;
 namespace ddraw {
 
 SurfaceRenderer::SurfaceRenderer() :
-    m_context(GLRageGetContext()),
     m_config("DirectDraw"),
     m_surfaceTexture(GL_TEXTURE_2D),
     m_width(0),
