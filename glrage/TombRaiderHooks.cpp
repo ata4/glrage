@@ -62,6 +62,10 @@ uint32_t* TombRaiderHooks::m_tombAuxDeviceID = nullptr;
 // Rendering width.
 int32_t* TombRaiderHooks::m_tombRenderWidth = nullptr;
 
+// Tick counter, based on the milliseconds since the system has been started.
+// Each second has 60 ticks, so one tick lasts about 16.6 ms.
+int32_t* TombRaiderHooks::m_tombTicks = nullptr;
+
 // Window handle.
 HWND* TombRaiderHooks::m_tombHwnd = nullptr;
 
@@ -208,59 +212,12 @@ BOOL TombRaiderHooks::keyIsPressed(int32_t keyCode) {
 }
 
 BOOL TombRaiderHooks::renderHealthBar(int32_t health) {
-    const int32_t p1 = -100;
-    const int32_t p2 = -200;
-    const int32_t p3 = -300;
-    const int32_t p4 = -400;
+    renderBar(health, false);
+    return TRUE;
+}
 
-    const int32_t healthMax = 100;
-
-    const int32_t x = 8;
-    const int32_t y = 8;
-
-    const int32_t colorBorder1 = 19;
-    const int32_t colorBorder2 = 17;
-    const int32_t colorBackground = 0;
-    const int32_t colorsBar[] = { 8, 11, 8, 6, 24 };
-
-    int32_t scale = *m_tombRenderWidth > 800 ? *m_tombRenderWidth / 800 : 1;
-    int32_t width = healthMax * scale;
-    int32_t height = 5 * scale;
-
-    int32_t padding = 2;
-    int32_t top = x - padding;
-    int32_t left = y - padding;
-    int32_t bottom = top + height + padding + 1;
-    int32_t right = left + width + padding + 1;
-
-    // background
-    for (int32_t i = 1; i < height + 3; i++) {
-        m_tombRenderLine(left + 1, top + i, right, top + i, p1, colorBackground);
-    }
-
-    // top / left border
-    m_tombRenderLine(left, top, right + 1, top, p2, colorBorder1);
-    m_tombRenderLine(left, top, left, bottom, p2, colorBorder1);
-
-    // bottom / right border
-    m_tombRenderLine(left + 1, bottom, right, bottom, p2, colorBorder2);
-    m_tombRenderLine(right, top, right, bottom, p2, colorBorder2);
-
-    // health bar
-    if (health) {
-        width -= (healthMax - health) * scale;
-
-        top = x;
-        left = y;
-        bottom = top + height;
-        right = left + width;
-
-        for (int32_t i = 0; i < height; i++) {
-            int32_t colorIndex = i * _countof(colorsBar) / height;
-            m_tombRenderLine(left, top + i, right, top + i, p4, colorsBar[colorIndex]);
-        }
-    }
-
+BOOL TombRaiderHooks::renderAirBar(int32_t air) {
+    renderBar(air, true);
     return TRUE;
 }
 
@@ -403,6 +360,73 @@ void TombRaiderHooks::setVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume) {
 void TombRaiderHooks::setPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan) {
     if (buffer) {
         buffer->SetPan(convertPanToDecibel(pan));
+    }
+}
+
+void TombRaiderHooks::renderBar(int32_t value, bool air) {
+    const int32_t p1 = -100;
+    const int32_t p2 = -200;
+    const int32_t p3 = -300;
+    const int32_t p4 = -400;
+
+    const int32_t valueMax = 100;
+
+    const int32_t colorBarSize = 5;
+    const int32_t colorBar[2][colorBarSize] = { { 8, 11, 8, 6, 24 }, { 32, 41, 32, 19, 21 } };
+
+    const int32_t colorBorder1 = 19;
+    const int32_t colorBorder2 = 17;
+    const int32_t colorBackground = 0;
+
+    int32_t scale = *m_tombRenderWidth > 800 ? *m_tombRenderWidth / 800 : 1;
+    int32_t width = valueMax * scale;
+    int32_t height = 5 * scale;
+
+    int32_t x = 10;
+    int32_t y = 10;
+
+    // place air bar on the right
+    if (air) {
+        x = *m_tombRenderWidth - width - x;
+    }
+
+    int32_t padding = 2;
+    int32_t top = y - padding;
+    int32_t left = x - padding;
+    int32_t bottom = top + height + padding + 1;
+    int32_t right = left + width + padding + 1;
+
+    // background
+    for (int32_t i = 1; i < height + 3; i++) {
+        m_tombRenderLine(left + 1, top + i, right, top + i, p1, colorBackground);
+    }
+
+    // top / left border
+    m_tombRenderLine(left, top, right + 1, top, p2, colorBorder1);
+    m_tombRenderLine(left, top, left, bottom, p2, colorBorder1);
+
+    // bottom / right border
+    m_tombRenderLine(left + 1, bottom, right, bottom, p2, colorBorder2);
+    m_tombRenderLine(right, top, right, bottom, p2, colorBorder2);
+
+    const int32_t blinkInterval = 20;
+    const int32_t blinkThresh = 20;
+    int32_t blinkTime = *m_tombTicks % blinkInterval;
+    bool blink = value <= blinkThresh && blinkTime > blinkInterval / 2;
+
+    if (value && !blink) {
+        width -= (valueMax - value) * scale;
+
+        top = y;
+        left = x;
+        bottom = top + height;
+        right = left + width;
+
+        for (int32_t i = 0; i < height; i++) {
+            int32_t colorType = air ? 1 : 0;
+            int32_t colorIndex = i * colorBarSize / height;
+            m_tombRenderLine(left, top + i, right, top + i, p4, colorBar[colorType][colorIndex]);
+        }
     }
 }
 
