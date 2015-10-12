@@ -230,11 +230,12 @@ void TombRaiderPatcher::applyGraphicPatches() {
     }
 
     // This patch raises the maximum FPS from 30 to 60.
-    // FIXME: disabled, since only actually works in menu while the game itself
-    // just renders duplicate frames.
+    // Disabed: while this works fine in the menu, the game logic runs at 30 ticks
+    // per second and offers no interpolation, so it's impossible to render more
+    // frames without either rendering duplicate frames or speeding up the game time.
     //if (m_config.getBool("patch_60fps", true)) {
     //    // render on every tick instead of every other
-    //    patch(m_ub ? 0x408A91 : 0x408A84, "02", "01");
+    //    patch(m_ub ? 0x408A91 : 0x408A84, "02", "00");
     //    // disables frame skipping, which also fixes issues with the demo mode
     //    // if the frame rate isn't exactly at limit all the time
     //    patch(m_ub ? 0x408ABA : 0x408AAD, "83 E1 1F", "33 C9 90");

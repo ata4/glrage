@@ -53,7 +53,7 @@ with [WinCDEmu](http://wincdemu.sysprogs.org/) to access the image.
 * Some objects disappear when viewed from certain angles or are just partially visible.
 * Ambient tracks played from a physical CD won't loop properly in Windows Vista and later ([caused by a MCI emulation bug in Windows](https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/dfa22274-8122-4b92-a0bc-653f5749b1bd/audio-cd-playing-with-mci-mcinotifysuccessful-never-arrives?forum=windowspro-audiodevelopment)).
 * If the soundtrack patch is activated, music cues triggered by levels are played again when loading a savegame where they have been played already.
-* If Lara is burning, the fire sounds are replayed every tick (60 times per second), causing nasty sound artifacts.
+* If Lara is burning, the fire sounds are replayed every tick (30 times per second), causing nasty sound artifacts.
 * There's currently only one SFX channel, which means that only one sound effect can be played at a time. If more than one SFX is played, it replaces the previously played one.
 
 ## Assault Rigs

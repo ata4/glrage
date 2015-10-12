@@ -63,7 +63,8 @@ uint32_t* TombRaiderHooks::m_tombAuxDeviceID = nullptr;
 int32_t* TombRaiderHooks::m_tombRenderWidth = nullptr;
 
 // Tick counter, based on the milliseconds since the system has been started.
-// Each second has 60 ticks, so one tick lasts about 16.6 ms.
+// Each second has 60 ticks, so one tick lasts about 16.6 ms. The game logic
+// runs on every other tick at most.
 int32_t* TombRaiderHooks::m_tombTicks = nullptr;
 
 // Window handle.
