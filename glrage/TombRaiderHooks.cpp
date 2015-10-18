@@ -53,6 +53,9 @@ BOOL* TombRaiderHooks::m_tombCDLoop = nullptr;
 // Current music volume, ranging from 0 to 10.
 uint32_t* TombRaiderHooks::m_tombCDVolume = nullptr;
 
+// Number of CD track.
+uint32_t* TombRaiderHooks::m_tombCDNumTracks = nullptr;
+
 // MCI device ID.
 MCIDEVICEID* TombRaiderHooks::m_tombMciDeviceID = nullptr;
 
@@ -289,7 +292,7 @@ BOOL TombRaiderHooks::playCD(int16_t trackID) {
     volume |= volume << 16;
     auxSetVolume(*m_tombAuxDeviceID, volume);
 
-    // configure player
+    // configure time format
     MCI_SET_PARMS setParms;
     setParms.dwTimeFormat = MCI_FORMAT_TMSF;
     if (mciSendCommand(*m_tombMciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT,
@@ -297,21 +300,19 @@ BOOL TombRaiderHooks::playCD(int16_t trackID) {
         return FALSE;
     }
 
-    // get length of track to determine dwTo
-    MCI_STATUS_PARMS statusParms;
-    statusParms.dwItem = MCI_STATUS_LENGTH;
-    statusParms.dwTrack = trackID;
-    if (mciSendCommand(*m_tombMciDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK,
-        reinterpret_cast<DWORD_PTR>(&statusParms))) {
-        return FALSE;
-    }
-
     // send play command
+    DWORD_PTR dwFlags = MCI_NOTIFY | MCI_FROM;
     MCI_PLAY_PARMS openParms;
     openParms.dwCallback = reinterpret_cast<DWORD_PTR>(*m_tombHwnd);
     openParms.dwFrom = trackID;
-    openParms.dwTo = statusParms.dwReturn;
-    if (mciSendCommand(*m_tombMciDeviceID, MCI_PLAY, MCI_NOTIFY | MCI_FROM | MCI_TO,
+
+    // MCI can't play beyond the last track, so omit MCI_TO in that case
+    if (trackID != *m_tombCDNumTracks) {
+        openParms.dwTo = trackID + 1;
+        dwFlags |= MCI_TO;
+    }
+
+    if (mciSendCommand(*m_tombMciDeviceID, MCI_PLAY, dwFlags,
         reinterpret_cast<DWORD_PTR>(&openParms))) {
         return FALSE;
     }

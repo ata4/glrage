@@ -70,6 +70,7 @@ public:
     static int32_t* m_tombCDTrackIDLoop;
     static BOOL* m_tombCDLoop;
     static uint32_t* m_tombCDVolume;
+    static uint32_t* m_tombCDNumTracks;
     static MCIDEVICEID* m_tombMciDeviceID;
     static uint32_t* m_tombAuxDeviceID;
     static int32_t* m_tombRenderWidth;

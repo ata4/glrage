@@ -304,6 +304,7 @@ void TombRaiderPatcher::applySoundPatches() {
     TombRaiderHooks::m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(m_ub ? 0x45B330 : 0x45B97C);
     TombRaiderHooks::m_tombCDLoop = reinterpret_cast<BOOL*>(m_ub ? 0x45B30C : 0x45B94C);
     TombRaiderHooks::m_tombCDVolume = reinterpret_cast<uint32_t*>(m_ub ? 0x455D3C : 0x456334);
+    TombRaiderHooks::m_tombCDNumTracks = reinterpret_cast<uint32_t*>(m_ub ? 0x45B31C : 0x45B99C);
 
     // Patch bad mapping function in UB that remaps the music volume from 0-10 to
     // 5-255 instead of 0-65536, which is the value range for auxSetVolume.
