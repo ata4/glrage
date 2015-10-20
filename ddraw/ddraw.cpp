@@ -12,7 +12,10 @@ static Context& context = GLRageGetContext();
 HRESULT HandleException() {
     try {
         throw;
-    } catch (const std::exception& ex) {
+    } catch (const std::runtime_error& ex) {
+        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
+        return DDERR_GENERIC;
+    } catch (const std::logic_error& ex) {
         MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
         return DDERR_GENERIC;
     }

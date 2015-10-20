@@ -33,6 +33,9 @@
     <ClCompile Include="CifVertexStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CifError.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ati3dcif.h">
@@ -47,10 +50,10 @@
     <ClInclude Include="CifUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CifUnimplementedException.hpp">
+    <ClInclude Include="CifVertexStream.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CifVertexStream.hpp">
+    <ClInclude Include="CifError.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

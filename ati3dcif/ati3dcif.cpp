@@ -1,7 +1,7 @@
 #include "ati3dcif.h"
 #include "CifRenderer.hpp"
 #include "CifUtils.hpp"
-#include "CifUnimplementedException.hpp"
+#include "CifError.hpp"
 
 #include "GLRage.hpp"
 #include "Logger.hpp"
@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 using cif::CifRenderer;
-using cif::CifUnimplementedException;
+using cif::CifError;
 
 static Context& context = GLRageGetContext();
 static CifRenderer* renderer = nullptr;
@@ -18,13 +18,17 @@ static bool contextCreated = false;
 C3D_EC HandleException() {
     try {
         throw;
-    } catch (const CifUnimplementedException& ex) {
+    } catch (const CifError& ex) {
+#ifdef _DEBUG
         MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONEXCLAMATION);
-        return C3D_EC_NOTIMPYET;
-    } catch (const std::invalid_argument& ex) {
+#else
+        LOGF("HandleException: CIF error: %s (0x%x %s)", ex.what(), ex.getErrorCode(), ex.getErrorName());
+#endif
+        return ex.getErrorCode();
+    } catch (const std::runtime_error& ex) {
         MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
-        return C3D_EC_BADPARAM;
-    } catch (const std::exception& ex) {
+        return C3D_EC_GENFAIL;
+    } catch (const std::logic_error& ex) {
         MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
         return C3D_EC_GENFAIL;
     }

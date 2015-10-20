@@ -1,5 +1,5 @@
 #include "CifVertexStream.hpp"
-#include "CifUnimplementedException.hpp"
+#include "CifError.hpp"
 #include "CifUtils.hpp"
 
 #include "Logger.hpp"
@@ -42,7 +42,8 @@ void CifVertexStream::uploadPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) 
         }
 
         default:
-            throw CifUnimplementedException("Unsupported vertex type: " + std::string(C3D_EVERTEX_NAMES[m_vertexType]));
+            throw CifError("Unsupported vertex type: "
+                + std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
     }
 
     GLUtils::checkError("CifVertexStream::uploadPrimStrip");
@@ -70,7 +71,8 @@ void CifVertexStream::uploadPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
         }
 
         default:
-            throw CifUnimplementedException("Unsupported vertex type: " + std::string(C3D_EVERTEX_NAMES[m_vertexType]));
+            throw CifError("Unsupported vertex type: "
+                + std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
     }
 
     GLUtils::checkError("CifVertexStream::uploadPrimList");

@@ -1,6 +1,6 @@
 #include "CifRenderer.hpp"
 #include "CifUtils.hpp"
-#include "CifUnimplementedException.hpp"
+#include "CifError.hpp"
 
 #include "GLUtils.hpp"
 #include "FragmentShader.hpp"
@@ -111,7 +111,7 @@ void CifRenderer::textureUnreg(C3D_HTX htxToUnreg) {
 
     TextureMap::iterator it = m_textures.find(htxToUnreg);
     if (it == m_textures.end()) {
-        throw std::invalid_argument("Invalid texture handle");
+        throw CifError("Invalid texture handle", C3D_EC_BADPARAM);
     }
 
     // unbind texture if it's current
@@ -133,7 +133,7 @@ void CifRenderer::texturePaletteCreate(C3D_ECI_TMAP_TYPE epalette, void* pPalett
         }
 
         default:
-            throw CifUnimplementedException("Unsupported palette type: " + std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]));
+            throw CifError("Unsupported palette type: " + std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]), C3D_EC_NOTIMPYET);
     }
 }
 
@@ -145,7 +145,7 @@ void CifRenderer::texturePaletteDestroy(C3D_HTXPAL htxpalToDestroy) {
 }
 
 void CifRenderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate, C3D_UINT32 u32StartIndex, C3D_UINT32 u32NumEntries, C3D_PPALETTENTRY pclrPalette) {
-    throw CifUnimplementedException("CifRenderer::texturePaletteAnimate: Not implemented");
+    throw CifError("CifRenderer::texturePaletteAnimate: Not implemented", C3D_EC_NOTIMPYET);
 }
 
 void CifRenderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert) {
@@ -203,7 +203,7 @@ void CifRenderer::tmapSelect(C3D_HTX handle) {
     // check if handle is correct
     TextureMap::iterator it = m_textures.find(m_tmap);
     if (it == m_textures.end()) {
-        throw std::invalid_argument("Invalid texture handle");
+        throw CifError("Invalid texture handle", C3D_EC_BADPARAM);
     }
 
     // get texture object and bind it

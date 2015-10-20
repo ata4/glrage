@@ -1,6 +1,6 @@
 #include "CifTexture.hpp"
 #include "CifUtils.hpp"
-#include "CifUnimplementedException.hpp"
+#include "CifError.hpp"
 
 #include "GLUtils.hpp"
 
@@ -90,8 +90,8 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette) {
             }
 
             default:
-                throw CifUnimplementedException("Unsupported texture format: " +
-                    std::string(C3D_ETEXFMT_NAMES[tmap->eTexFormat]));
+                throw CifError("Unsupported texture format: " +
+                    std::string(C3D_ETEXFMT_NAMES[tmap->eTexFormat]), C3D_EC_NOTIMPYET);
         }
 
         // set dimensions for next level

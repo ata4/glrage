@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ati3dcif.cpp" />
+    <ClCompile Include="CifError.cpp" />
     <ClCompile Include="CifTexture.cpp" />
     <ClCompile Include="CifUtils.cpp" />
     <ClCompile Include="CifRenderer.cpp" />
@@ -20,7 +21,7 @@
   <ItemGroup>
     <ClInclude Include="ati3dcif.h" />
     <ClInclude Include="CifTexture.hpp" />
-    <ClInclude Include="CifUnimplementedException.hpp" />
+    <ClInclude Include="CifError.hpp" />
     <ClInclude Include="CifUtils.hpp" />
     <ClInclude Include="CifRenderer.hpp" />
     <ClInclude Include="CifVertexStream.hpp" />
