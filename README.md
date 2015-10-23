@@ -39,12 +39,12 @@ with [WinCDEmu](http://wincdemu.sysprogs.org/) to access the image.
 * Reduced stereo panning issues when sounds are played very closely to Lara's position.
 
 #### Optional patches
-* Replaced 800x600 resolution option with the current desktop resolution for widescreen support.
+* The 800x600 resolution can be customized. ([7680x4320 Screenshot](http://i.imgur.com/RpXgWDD.jpg))
 * Increased vertex color brightness to match DOS and PSX versions. ([Screenshot 1](http://i.imgur.com/S7GP9hH.jpg) / [Screenshot 2](http://i.imgur.com/xqJflAi.jpg))
 * Changed water color from grey-blue to turquoise, similar to the PSX version. ([Screenshot](http://i.imgur.com/NpYRg9j.jpg))
 * Increased rendering distance. ([Screenshot](http://i.imgur.com/CUnIoIY.jpg), disabled on default)
 * No-CD mode. (disabled on default)
-* Soundtrack patch to unlock the full soundtrack, combining PC ambient tracks with PSX music tracks. (disabled on default)
+* Full soundtrack mode, combining PC ambient tracks with PSX music tracks. (disabled on default)
 
 ### Known problems
 * The savegame format is incompatible to DOS format. To prevent accidental loading or overwriting of existing DOS savegames, the file name format has been changed as well.
