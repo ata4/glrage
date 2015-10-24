@@ -87,7 +87,10 @@ private:
     static int32_t convertPanToDecibel(uint16_t pan);
     static int32_t convertVolumeToDecibel(int32_t volume);
     static void renderBar(int32_t value, bool air);
+    static int32_t getOverlayScale();
+    static int32_t getOverlayScale(int32_t base);
 
+    static int32_t m_fpsTextX;
     static int32_t m_fpsTextY;
 };
 

@@ -7,6 +7,7 @@
 namespace glrage {
 
 bool TombRaiderHooks::m_ub = false;
+int32_t TombRaiderHooks::m_fpsTextX = 0;
 int32_t TombRaiderHooks::m_fpsTextY = 0;
 
 /** Tomb Raider sub pointers **/
@@ -227,15 +228,12 @@ BOOL TombRaiderHooks::renderAirBar(int32_t air) {
 }
 
 BOOL TombRaiderHooks::renderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness) {
-    if (*m_tombRenderWidth > 800) {
-        scale = *m_tombRenderWidth * scale / 800;
-    }
-
-    return m_tombRenderCollectedItem(x, y, scale, itemID, brightness);
+    return m_tombRenderCollectedItem(x, y, getOverlayScale(scale), itemID, brightness);
 }
 
 void* TombRaiderHooks::createFPSText(int16_t x, int16_t y, int16_t a3, const char* text) {
-    if (*m_tombRenderWidth > 800) {
+    if (getOverlayScale() > 1) {
+        x = m_fpsTextX;
         y = m_fpsTextY;
     }
 
@@ -381,7 +379,7 @@ void TombRaiderHooks::renderBar(int32_t value, bool air) {
     const int32_t colorBorder2 = 17;
     const int32_t colorBackground = 0;
 
-    int32_t scale = *m_tombRenderWidth > 800 ? *m_tombRenderWidth / 800 : 1;
+    int32_t scale = getOverlayScale();
     int32_t width = valueMax * scale;
     int32_t height = 5 * scale;
 
@@ -401,7 +399,8 @@ void TombRaiderHooks::renderBar(int32_t value, bool air) {
 
     // set offset for FPS text
     if (!air) {
-        m_fpsTextY = bottom + 30;
+        m_fpsTextX = left;
+        m_fpsTextY = bottom + 24;
     }
 
     // background
@@ -435,6 +434,19 @@ void TombRaiderHooks::renderBar(int32_t value, bool air) {
             int32_t colorIndex = i * colorBarSize / height;
             m_tombRenderLine(left, top + i, right, top + i, p4, colorBar[colorType][colorIndex]);
         }
+    }
+}
+
+int32_t TombRaiderHooks::getOverlayScale() {
+    return getOverlayScale(1);
+}
+
+int32_t TombRaiderHooks::getOverlayScale(int32_t base){
+    const int32_t defaultMaxWidth = 800;
+    if (*m_tombRenderWidth > defaultMaxWidth) {
+        return *m_tombRenderWidth * base / defaultMaxWidth;
+    } else {
+        return base;
     }
 }
 
