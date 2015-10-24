@@ -110,7 +110,7 @@ bool MemoryPatcher::patch(uint32_t addr, std::vector<uint8_t>& expectedData, std
 
     result = true;
 
-end:
+    end:
     // restore original page flags
     if (restoreProtect) {
         VirtualProtect(lpaddr, size, oldProtect, nullptr);
