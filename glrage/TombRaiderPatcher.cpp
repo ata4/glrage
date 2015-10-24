@@ -175,11 +175,13 @@ void TombRaiderPatcher::applyGraphicPatches() {
             patchAddr(0x41DC0C, "E8 EF 21 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
             patchAddr(0x41DAD7, "E8 A4 24 01 00", TombRaiderHooks::renderAirBar, 0xE8);
             patchAddr(0x41DB71, "E8 8A 7C 01 00", TombRaiderHooks::renderCollectedItem, 0xE8);
+            patchAddr(0x4394C2, "E8 09 FC FF FF", TombRaiderHooks::createFPSText, 0xE8);
         } else {
             patchAddr(0x41DD85, "E8 46 25 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
             patchAddr(0x41DF0C, "E8 BF 23 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
             patchAddr(0x41DDD7, "E8 74 26 01 00", TombRaiderHooks::renderAirBar, 0xE8);
             patchAddr(0x41DE71, "E8 0A 7F 01 00", TombRaiderHooks::renderCollectedItem, 0xE8);
+            patchAddr(0x439B72, "E8 09 FC FF FF", TombRaiderHooks::createFPSText, 0xE8);
         }
     }
 
