@@ -19,7 +19,10 @@ For the absolute minimum installation, the original Tomb Raider CD as well as th
 * [ATI patch for Tomb Raider: Unfinished Business](http://web.archive.org/web/20081208051118/http://ftp.eidos-france.fr/pub/fr/tomb_raider/patches/tombati.zip) (executable only, requires ESCAPE DLLs included in the patch above)
 
 For a standalone installation without requiring the CD, you'll need to copy the `DATA` and `FMV` folders from the CD to the TR directory and set `patch_nocd` to `true` in the `[Tomb Raider]` section of `glrage.ini`.
-To have working music in this mode, you'll need a WinMM wrapper and audio track rips as well. Also, you'll need to separate folders for TR and TR:UB to avoid clashing files.
+To have working music in this mode, you'll need a WinMM wrapper and audio track rips as well. To unlock the full soundtrack, you also need to set `patch_soundtrack` to `true` and have all tracks set up in the right order.
+[Here's an overview of all TR1 CD audio tracks,](https://docs.google.com/spreadsheets/d/1xQsqGF-T0oqv_TxdgAMJr31XDiJrnch5tuas6QpXzsI/) GLRage uses "Raw" if `patch_soundtrack` is enabled.
+
+Also, you'll need to separate folders for TR and TR:UB to avoid clashing files.
 
 If you have the GOG.com or Steam release, you'll find the two folders in GAME.GOG/GAME.DAT, which is actually a BIN/CUE image of the Sold-Out Software release of TR. You can temporary rename GAME.DAT to GAME.cue and mount it
 with [WinCDEmu](http://wincdemu.sysprogs.org/) to access the image.
