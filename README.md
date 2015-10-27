@@ -7,7 +7,7 @@ It also supports non-destructive memory patching, which allows bug fixes and enh
 # Requirements
 
 * Windows 7 or higher (may work on Vista, but I haven't tested it).
-* An OpenGL 3.2 compatible graphics card. Anything that was made post 2010 should be fine.
+* An OpenGL 3.3 compatible graphics card. Anything that was made post 2010 should be fine.
 * [Visual C++ Redistributable Package.](http://www.microsoft.com/en-us/download/details.aspx?id=40784)
 
 # Tested Games
