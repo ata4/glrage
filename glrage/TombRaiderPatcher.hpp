@@ -14,6 +14,7 @@ private:
     void applyGraphicPatches();
     void applySoundPatches();
     void applyLogicPatches();
+    void applyLocalePatches();
 
     bool m_ub;
 };

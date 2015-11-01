@@ -4,6 +4,11 @@
 #include "StringUtils.hpp"
 #include "Logger.hpp"
 
+#include <map>
+#include <string>
+#include <fstream>
+#include <sstream>
+
 namespace glrage {
 
 TombRaiderPatcher::TombRaiderPatcher() :
@@ -421,6 +426,12 @@ void TombRaiderPatcher::applyLogicPatches() {
         patch(0x453CCC, "67 61 6D 65 2E 25 64 00", "61 74 69 2E 25 64 00 00");
     }
 
+    // Experimental localization patch. Replaces string pointers with pointers
+    // for translations.
+    if (m_config.getBool("patch_localization", true)) {
+        applyLocalePatches();
+    }
+
     // Random fun patches, discovered from various experiments.
     
     // Crazy/creepy SFX mod. Forces a normally unused raw reading mode on all 
@@ -440,6 +451,80 @@ void TombRaiderPatcher::applyLogicPatches() {
     // only, but gives funny results otherwise.
     //patch(0x436477, "80 86 42", "A0 7A 41");
     //patch(0x416E17, "85 0C 00", "65 18 01");
+}
+
+void TombRaiderPatcher::applyLocalePatches() {
+    std::string localePath = "locale\\";
+
+    // load locale file
+    std::string locale = m_config.getString("patch_localization_locale", "en_GB");
+    std::string langPath = localePath + locale + ".txt";
+    std::ifstream langStream(langPath);
+
+    if (!langStream.good()) {
+        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file " + langPath);
+        return;
+    }
+
+    static std::map<int32_t, std::string> stringMap;
+
+    std::string line;
+    for (int32_t lineNum = 0; std::getline(langStream, line); lineNum++) {
+        try {
+            int32_t stringIndex = std::stoi(line.substr(0, 4));
+            stringMap[stringIndex] = line.substr(5, std::string::npos);
+        } catch (...) {
+            LOGF("TombRaiderPatcher::applyLocalePatches: Invalid string index at line %d", lineNum);
+        }
+    }
+
+    // load string data file
+    std::string stringsPath = localePath + "strings.txt";
+    std::ifstream stringsStream(stringsPath);
+
+    if (!stringsStream.good()) {
+        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file " + stringsPath);
+        return;
+    }
+
+    std::vector<uint8_t> expected;
+    std::vector<uint8_t> replaced;
+
+    while (std::getline(stringsStream, line)) {
+        std::istringstream lineStream(line);
+
+        int32_t stringIndex = 0;
+        int32_t stringPos = 0;
+        std::string string;
+        for (int32_t value, valueIndex = 0; lineStream >> value; valueIndex++) {
+            // first value is the index
+            if (valueIndex == 0) {
+                stringIndex = value;
+                if (stringMap.find(stringIndex) == stringMap.end()) {
+                    LOGF("TombRaiderPatcher::applyLocalePatches: Missing translation for %d '%s'", stringIndex, string.c_str());
+                    break;
+                }
+
+                lineStream >> std::hex;
+                continue;
+            }
+
+            // second value is the position
+            if (valueIndex == 1) {
+                stringPos = value;
+                expected.clear();
+                appendBytes(stringPos, expected);
+                string = std::string(reinterpret_cast<char*>(stringPos));
+                continue;
+            }
+
+            // remaining values are pointers, which need to be patched
+            replaced.clear();
+            appendBytes(reinterpret_cast<int32_t>(&stringMap[stringIndex][0]), replaced);
+
+            patch(value, expected, replaced);
+        }
+    }
 }
 
 }
