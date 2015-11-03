@@ -87,6 +87,7 @@
     <ClInclude Include="AssaultRigsPatcher.hpp" />
     <ClInclude Include="Context.hpp" />
     <ClInclude Include="ContextImpl.hpp" />
+    <ClInclude Include="RuntimeData.hpp" />
     <ClInclude Include="RuntimePatcher.hpp" />
     <ClInclude Include="GLRage.hpp" />
     <ClInclude Include="Screenshot.hpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="AssaultRigsPatcher.cpp" />
     <ClCompile Include="ContextImpl.cpp" />
     <ClCompile Include="GLRage.cpp" />
+    <ClCompile Include="RuntimeData.cpp" />
     <ClCompile Include="RuntimePatcher.cpp" />
     <ClCompile Include="Screenshot.cpp" />
     <ClCompile Include="TombRaiderPatcher.cpp" />

@@ -89,15 +89,15 @@ void TombRaiderPatcher::applyGraphicPatches() {
         float divisor = (1.0f / brightness) * 1024;
         float multi = 0.0625f * brightness;
 
-        std::vector<uint8_t> tmp;
-        appendBytes(divisor, tmp);
+        m_tmp.clear();
+        m_tmp << divisor;
 
-        patch(0x451034, "00 00 00 45", tmp);
+        patch(0x451034, "00 00 00 45", m_tmp);
 
-        tmp.clear();
-        appendBytes(multi, tmp);
+        m_tmp.clear();
+        m_tmp << multi;
 
-        patch(0x45103C, "DB F6 FE 3C", tmp);
+        patch(0x45103C, "DB F6 FE 3C", m_tmp);
     }
 
     // This patch allows the customization of the water color, which is rather
@@ -106,11 +106,10 @@ void TombRaiderPatcher::applyGraphicPatches() {
         float filterRed = m_config.getFloat("patch_watercolor_filter_red", 0.3f);
         float filterGreen = m_config.getFloat("patch_watercolor_filter_green", 1.0f);
 
-        std::vector<uint8_t> tmp;
-        appendBytes(filterRed, tmp);
-        appendBytes(filterGreen, tmp);
+        m_tmp.clear();
+        m_tmp << filterRed << filterGreen;
 
-        patch(0x451028, "9A 99 19 3F 33 33 33 3F", tmp);
+        patch(0x451028, "9A 99 19 3F 33 33 33 3F", m_tmp);
     }
 
     // This patch replaces 800x600 with a custom resolution for widescreen
@@ -127,45 +126,43 @@ void TombRaiderPatcher::applyGraphicPatches() {
             height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
         }
 
-        std::vector<uint8_t> tmp;
-
         // update display mode and viewport parameters
-        appendBytes(width, tmp);
-        patch(m_ub ? 0x407CAA : 0x407C9D, "20 03 00 00", tmp);
-        tmp.clear();
+        m_tmp.clear();
+        m_tmp << width;
+        patch(m_ub ? 0x407CAA : 0x407C9D, "20 03 00 00", m_tmp);
 
-        appendBytes(height, tmp);
-        patch(m_ub ? 0x407CB4 : 0x407CA7, "58 02 00 00", tmp);
-        tmp.clear();
+        m_tmp.clear();
+        m_tmp << height;
+        patch(m_ub ? 0x407CB4 : 0x407CA7, "58 02 00 00", m_tmp);
 
-        appendBytes(static_cast<float_t>(width - 1), tmp);
-        patch(m_ub ? 0x407CBE : 0x407CB1, "00 C0 47 44", tmp);
-        tmp.clear();
+        m_tmp.clear();
+        m_tmp << static_cast<float_t>(width - 1);
+        patch(m_ub ? 0x407CBE : 0x407CB1, "00 C0 47 44", m_tmp);
 
-        appendBytes(static_cast<float_t>(height - 1), tmp);
-        patch(m_ub ? 0x407CC8 : 0x407CBB, "00 C0 15 44", tmp);
-        tmp.clear();
+        m_tmp.clear();
+        m_tmp << static_cast<float_t>(height - 1);
+        patch(m_ub ? 0x407CC8 : 0x407CBB, "00 C0 15 44", m_tmp);
 
         // update clipping size
-        appendBytes(static_cast<int16_t>(width), tmp);
-        patch(m_ub ? 0x408A64 : 0x408A57, "20 03", tmp);
-        tmp.clear();
+        m_tmp.clear();
+        m_tmp << static_cast<int16_t>(width);
+        patch(m_ub ? 0x408A64 : 0x408A57, "20 03", m_tmp);
 
-        appendBytes(static_cast<int16_t>(height), tmp);
-        patch(m_ub ? 0x408A6D : 0x408A60, "58 02", tmp);
-        tmp.clear();
+        m_tmp.clear();
+        m_tmp << static_cast<int16_t>(height);
+        patch(m_ub ? 0x408A6D : 0x408A60, "58 02", m_tmp);
 
         // set display string (needs to be static so the data won't vanish after
         // patching has finished)
         static std::string displayMode = StringUtils::format("%dx%d", 24, width, height);
 
-        appendBytes(reinterpret_cast<int32_t>(displayMode.c_str()), tmp);
+        m_tmp.clear();
+        m_tmp << reinterpret_cast<int32_t>(displayMode.c_str());
         if (m_ub) {
-            patch(0x42DB5B, "40 61 45 00 ", tmp);
+            patch(0x42DB5B, "40 61 45 00 ", m_tmp);
         } else {
-            patch(0x42DF6B, "58 67 45 00", tmp);
+            patch(0x42DF6B, "58 67 45 00", m_tmp);
         }
-        tmp.clear();
 
         // UI scale patch, rescales the in-game overlay to keep the proportions
         // of the 800x600 resolution on higher resolutions.
@@ -206,14 +203,14 @@ void TombRaiderPatcher::applyGraphicPatches() {
         int32_t drawDistFade = m_config.getInt("patch_draw_distance_fade", 12288);
         int32_t drawDistMax = m_config.getInt("patch_draw_distance_max", 20480);
 
-        std::vector<uint8_t> drawDistFadeData;
-        appendBytes(drawDistFade, drawDistFadeData);
+        RuntimeData drawDistFadeData;
+        drawDistFadeData << drawDistFade;
 
-        std::vector<uint8_t> drawDistFadeNegData;
-        appendBytes(-drawDistFade, drawDistFadeNegData);
+        RuntimeData drawDistFadeNegData;
+        drawDistFadeNegData << -drawDistFade;
 
-        std::vector<uint8_t> drawDistMaxData;
-        appendBytes(drawDistMax, drawDistMaxData);
+        RuntimeData drawDistMaxData;
+        drawDistMaxData << drawDistMax;
 
         patch(0x402030, "00 50 00 00", drawDistMaxData);
         patch(0x402047, "00 30 00 00", drawDistFadeData);
@@ -353,12 +350,13 @@ void TombRaiderPatcher::applyLogicPatches() {
     TombRaiderHooks::m_tombHhk = reinterpret_cast<HHOOK*>(m_ub ? 0x45A314 : 0x45A93C);
 
     // replace keyboard hook
-    std::vector<uint8_t> tmp;
-    appendBytes(reinterpret_cast<int32_t>(TombRaiderHooks::keyboardProc), tmp);
+    m_tmp.clear();
+    m_tmp << reinterpret_cast<int32_t>(TombRaiderHooks::keyboardProc);
+
     if (m_ub)  {
-        patch(0x43D518, "C0 D1 43 00", tmp);
+        patch(0x43D518, "C0 D1 43 00", m_tmp);
     } else {
-        patch(0x43DC30, "C0 D8 43 00", tmp);
+        patch(0x43DC30, "C0 D8 43 00", m_tmp);
     }
 
     // hook keypress subroutine
@@ -487,8 +485,8 @@ void TombRaiderPatcher::applyLocalePatches() {
         return;
     }
 
-    std::vector<uint8_t> expected;
-    std::vector<uint8_t> replaced;
+    RuntimeData expected;
+    RuntimeData replacement;
 
     while (std::getline(stringsStream, line)) {
         std::istringstream lineStream(line);
@@ -513,16 +511,16 @@ void TombRaiderPatcher::applyLocalePatches() {
             if (valueIndex == 1) {
                 stringPos = value;
                 expected.clear();
-                appendBytes(stringPos, expected);
+                expected << stringPos;
                 string = std::string(reinterpret_cast<char*>(stringPos));
                 continue;
             }
 
             // remaining values are pointers, which need to be patched
-            replaced.clear();
-            appendBytes(reinterpret_cast<int32_t>(&stringMap[stringIndex][0]), replaced);
+            replacement.clear();
+            replacement << reinterpret_cast<int32_t>(&stringMap[stringIndex][0]);
 
-            patch(value, expected, replaced);
+            patch(value, expected, replacement);
         }
     }
 }

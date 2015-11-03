@@ -11,17 +11,6 @@
 
 namespace glrage {
 
-template<class T> void RuntimePatcher::appendBytes(T value, std::vector<uint8_t>& data) {
-    auto valueBytes = reinterpret_cast<uint8_t const*>(&value);
-    for (size_t i = 0; i < sizeof(T); i++) {
-        data.push_back(valueBytes[i]);
-    }
-}
-
-template void RuntimePatcher::appendBytes<int32_t>(int32_t, std::vector<uint8_t>&);
-template void RuntimePatcher::appendBytes<int16_t>(int16_t, std::vector<uint8_t>&);
-template void RuntimePatcher::appendBytes<float_t>(float_t, std::vector<uint8_t>&);
-
 template<class T> static void RuntimePatcher::runPatch(const std::string& fileName) {
     T patch = T();
     if (patch.applicable(fileName)) {
@@ -56,23 +45,23 @@ void RuntimePatcher::patch() {
 }
 
 bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, const std::string& replacement) {
-    // parse strings to byte vectors
-    std::vector<uint8_t> originalData = StringUtils::hexToBytes(expected);
-    std::vector<uint8_t> replacementData = StringUtils::hexToBytes(replacement);
-
-    return patch(addr, originalData, replacementData);
+    RuntimeData expectedData(StringUtils::hexToBytes(expected));
+    RuntimeData replacementData(StringUtils::hexToBytes(replacement));
+    return patch(addr, expectedData, replacementData);
 }
 
-bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, std::vector<uint8_t>& replacementData) {
-    // parse strings to byte vectors
-    std::vector<uint8_t> originalData = StringUtils::hexToBytes(expected);
-
-    return patch(addr, originalData, replacementData);
+bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, const RuntimeData& replacement) {
+    RuntimeData expectedData(StringUtils::hexToBytes(expected));
+    return patch(addr, expectedData, replacement);
 }
 
-bool RuntimePatcher::patch(uint32_t addr, std::vector<uint8_t>& expectedData, std::vector<uint8_t>& replacementData) {
+bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement) {
     bool result = false;
     bool restoreProtect = false;
+
+    const std::vector<uint8_t> expectedData = expected.data();
+    const std::vector<uint8_t> replacementData = replacement.data();
+
     size_t size = expectedData.size();
     std::vector<uint8_t> actualData(size);
 
@@ -116,14 +105,12 @@ bool RuntimePatcher::patch(uint32_t addr, std::vector<uint8_t>& expectedData, st
         VirtualProtect(lpaddr, size, oldProtect, nullptr);
     }
 
-    LOGF("Patch at 0x%x with %d bytes %s", addr, size, result ? "successful" : "failed");
-    LOG("Expected: " + StringUtils::bytesToHex(expectedData));
-    
     if (!result) {
+        LOGF("Patch at 0x%x with %d bytes failed!", addr, size);
+        LOG("Expected: " + StringUtils::bytesToHex(expectedData));
         LOG("Actual:   " + StringUtils::bytesToHex(actualData));
+        LOG("Patch:    " + StringUtils::bytesToHex(replacementData));
     }
-
-    LOG("Patched:  " + StringUtils::bytesToHex(replacementData));
 
     return result;
 }
@@ -132,11 +119,10 @@ void RuntimePatcher::patchAddr(int32_t addrCall, const std::string& expected, vo
     int32_t addrFunc = reinterpret_cast<int32_t>(func);
     int32_t addrCallNew = addrFunc - addrCall - 5;
 
-    std::vector<uint8_t> replacement;
-    replacement.push_back(op);
-    appendBytes(addrCallNew, replacement);
+    m_tmp.clear();
+    m_tmp << op << addrCallNew;
 
-    patch(addrCall, expected, replacement);
+    patch(addrCall, expected, m_tmp);
 }
 
 }
