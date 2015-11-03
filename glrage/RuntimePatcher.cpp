@@ -1,4 +1,4 @@
-#include "MemoryPatcher.hpp"
+#include "RuntimePatcher.hpp"
 #include "TombRaiderPatcher.hpp"
 #include "AssaultRigsPatcher.hpp"
 
@@ -11,29 +11,29 @@
 
 namespace glrage {
 
-template<class T> void MemoryPatcher::appendBytes(T value, std::vector<uint8_t>& data) {
+template<class T> void RuntimePatcher::appendBytes(T value, std::vector<uint8_t>& data) {
     auto valueBytes = reinterpret_cast<uint8_t const*>(&value);
     for (size_t i = 0; i < sizeof(T); i++) {
         data.push_back(valueBytes[i]);
     }
 }
 
-template void MemoryPatcher::appendBytes<int32_t>(int32_t, std::vector<uint8_t>&);
-template void MemoryPatcher::appendBytes<int16_t>(int16_t, std::vector<uint8_t>&);
-template void MemoryPatcher::appendBytes<float_t>(float_t, std::vector<uint8_t>&);
+template void RuntimePatcher::appendBytes<int32_t>(int32_t, std::vector<uint8_t>&);
+template void RuntimePatcher::appendBytes<int16_t>(int16_t, std::vector<uint8_t>&);
+template void RuntimePatcher::appendBytes<float_t>(float_t, std::vector<uint8_t>&);
 
-template<class T> static void MemoryPatcher::runPatch(const std::string& fileName) {
+template<class T> static void RuntimePatcher::runPatch(const std::string& fileName) {
     T patch = T();
     if (patch.applicable(fileName)) {
         patch.apply();
     }
 }
 
-MemoryPatcher::MemoryPatcher(const std::string& configName) :
+RuntimePatcher::RuntimePatcher(const std::string& configName) :
     m_config(configName) {
 }
 
-void MemoryPatcher::patch() {
+void RuntimePatcher::patch() {
     // get executable name
     TCHAR modulePath[MAX_PATH] = { 0 };
     GetModuleFileName(nullptr, modulePath, MAX_PATH);
@@ -55,7 +55,7 @@ void MemoryPatcher::patch() {
     runPatch<AssaultRigsPatcher>(moduleFileName);
 }
 
-bool MemoryPatcher::patch(uint32_t addr, const std::string& expected, const std::string& replacement) {
+bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, const std::string& replacement) {
     // parse strings to byte vectors
     std::vector<uint8_t> originalData = StringUtils::hexToBytes(expected);
     std::vector<uint8_t> replacementData = StringUtils::hexToBytes(replacement);
@@ -63,14 +63,14 @@ bool MemoryPatcher::patch(uint32_t addr, const std::string& expected, const std:
     return patch(addr, originalData, replacementData);
 }
 
-bool MemoryPatcher::patch(uint32_t addr, const std::string& expected, std::vector<uint8_t>& replacementData) {
+bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, std::vector<uint8_t>& replacementData) {
     // parse strings to byte vectors
     std::vector<uint8_t> originalData = StringUtils::hexToBytes(expected);
 
     return patch(addr, originalData, replacementData);
 }
 
-bool MemoryPatcher::patch(uint32_t addr, std::vector<uint8_t>& expectedData, std::vector<uint8_t>& replacementData) {
+bool RuntimePatcher::patch(uint32_t addr, std::vector<uint8_t>& expectedData, std::vector<uint8_t>& replacementData) {
     bool result = false;
     bool restoreProtect = false;
     size_t size = expectedData.size();
@@ -128,7 +128,7 @@ bool MemoryPatcher::patch(uint32_t addr, std::vector<uint8_t>& expectedData, std
     return result;
 }
 
-void MemoryPatcher::patchAddr(int32_t addrCall, const std::string& expected, void* func, uint8_t op) {
+void RuntimePatcher::patchAddr(int32_t addrCall, const std::string& expected, void* func, uint8_t op) {
     int32_t addrFunc = reinterpret_cast<int32_t>(func);
     int32_t addrCallNew = addrFunc - addrCall - 5;
 

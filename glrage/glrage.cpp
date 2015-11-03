@@ -1,8 +1,8 @@
 #include "GLRage.hpp"
-#include "MemoryPatcher.hpp"
+#include "RuntimePatcher.hpp"
 #include "Logger.hpp"
 
-using glrage::MemoryPatcher;
+using glrage::RuntimePatcher;
 using glrage::ContextImpl;
 
 const char* DLLMAIN_REASON[] {
@@ -17,7 +17,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved) {
 
     switch (dwReason) {
         case DLL_PROCESS_ATTACH:
-            MemoryPatcher::patch();
+            RuntimePatcher::patch();
             break;
     }
 

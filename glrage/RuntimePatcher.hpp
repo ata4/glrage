@@ -8,9 +8,9 @@
 
 namespace glrage {
 
-class MemoryPatcher {
+class RuntimePatcher {
 public:
-    MemoryPatcher(const std::string& configName);
+    RuntimePatcher(const std::string& configName);
     static void patch();
     virtual bool applicable(const std::string& fileName) = 0;
     virtual void apply() = 0;

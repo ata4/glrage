@@ -12,7 +12,7 @@
 namespace glrage {
 
 TombRaiderPatcher::TombRaiderPatcher() :
-    MemoryPatcher("Tomb Raider")
+    RuntimePatcher("Tomb Raider")
 {
 }
 

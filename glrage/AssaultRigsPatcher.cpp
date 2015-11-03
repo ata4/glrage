@@ -7,7 +7,7 @@
 namespace glrage {
 
 AssaultRigsPatcher::AssaultRigsPatcher() :
-    MemoryPatcher("Assault Rigs") {
+    RuntimePatcher("Assault Rigs") {
 }
 
 bool AssaultRigsPatcher::applicable(const std::string& fileName) {

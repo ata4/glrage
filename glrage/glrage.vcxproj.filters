@@ -24,9 +24,6 @@
     <ClInclude Include="AssaultRigsPatcher.hpp">
       <Filter>Header Files\Patches</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryPatcher.hpp">
-      <Filter>Header Files\Patches</Filter>
-    </ClInclude>
     <ClInclude Include="TombRaiderHooks.hpp">
       <Filter>Header Files\Patches</Filter>
     </ClInclude>
@@ -45,15 +42,15 @@
     <ClInclude Include="ContextImpl.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RuntimePatcher.hpp">
+      <Filter>Header Files\Patches</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TombRaiderHooks.cpp">
       <Filter>Source Files\Patches</Filter>
     </ClCompile>
     <ClCompile Include="TombRaiderPatcher.cpp">
-      <Filter>Source Files\Patches</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryPatcher.cpp">
       <Filter>Source Files\Patches</Filter>
     </ClCompile>
     <ClCompile Include="AssaultRigsPatcher.cpp">
@@ -67,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="ContextImpl.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimePatcher.cpp">
+      <Filter>Source Files\Patches</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

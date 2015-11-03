@@ -1,10 +1,10 @@
 #pragma once
 
-#include "MemoryPatcher.hpp"
+#include "RuntimePatcher.hpp"
 
 namespace glrage {
 
-class TombRaiderPatcher : public MemoryPatcher {
+class TombRaiderPatcher : public RuntimePatcher {
 public:
     TombRaiderPatcher();
     virtual bool applicable(const std::string& fileName);
