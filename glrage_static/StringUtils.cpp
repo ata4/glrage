@@ -26,28 +26,32 @@ void StringUtils::formatImpl(std::string& str, const std::string& fmt, const int
     vsnprintf_s(&str[0], maxlen, _TRUNCATE, fmt.c_str(), vl);
 }
 
-std::string StringUtils::bytesToHex(std::vector<uint8_t>& data) {
+std::string StringUtils::bytesToHex(const std::vector<uint8_t>& data) {
     std::ostringstream ss;
     ss << std::hex << std::uppercase << std::setfill('0');
-    for (int c : data) {
-        ss << std::setw(2) << c;
-        ss << ' ';
+
+    for (uint32_t byte : data) {
+        ss <<  std::setw(2) << byte << ' ';
     }
+
+    // remove last space
     std::string str = ss.str();
     if (!str.empty()) {
         str.pop_back();
     }
+
     return str;
 }
 
 std::vector<uint8_t> StringUtils::hexToBytes(const std::string& str) {
     std::vector<uint8_t> data;
-    size_t len = str.length();
-    for (size_t i = 0; i < len; i += 3) {
-        std::string hex = str.substr(i, 2);
-        int32_t dec = std::stoi(hex, nullptr, 16);
-        data.push_back(dec);
+    std::istringstream ss(str);
+    ss >> std::hex >> std::setw(2);
+
+    for (uint32_t byte; ss >> byte; ) {
+        data.push_back(byte);
     }
+
     return data;
 }
 
