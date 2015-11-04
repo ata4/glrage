@@ -442,12 +442,16 @@ int32_t TombRaiderHooks::getOverlayScale() {
 }
 
 int32_t TombRaiderHooks::getOverlayScale(int32_t base){
-    const int32_t defaultMaxWidth = 800;
-    if (*m_tombRenderWidth > defaultMaxWidth) {
-        return *m_tombRenderWidth * base / defaultMaxWidth;
-    } else {
-        return base;
+    double result = static_cast<double>(*m_tombRenderWidth);
+    result *= base;
+    result /= 800.0;
+
+    // only scale up, not down
+    if (result < base) {
+        result = base;
     }
+
+    return static_cast<int32_t>(std::round(result));
 }
 
 }
