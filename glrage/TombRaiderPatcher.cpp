@@ -187,6 +187,35 @@ void TombRaiderPatcher::applyGraphicPatches() {
         }
     }
 
+    // Field of view customization patch.
+    if (m_config.getBool("patch_fov", true)) {
+        int32_t fov = m_config.getInt("patch_fov_value", 65);
+
+        int8_t fov8 = static_cast<int8_t>(fov);
+        m_tmp.clear();
+        m_tmp << fov8;
+
+        patch(m_ub ? 0x4163E2 : 0x4164D2, "50", m_tmp);
+
+        int16_t fov16 = fov * 182;
+        m_tmp.clear();
+        m_tmp << fov16;
+
+        patch(m_ub ? 0x41AAAA : 0x41AB9A, "E0 38", m_tmp);
+        patch(m_ub ? 0x41E45B : 0x41E7DB, "E0 38", m_tmp);
+
+        // change the FOV mode from horizontal to vertical if enabled
+        if (m_config.getBool("patch_fov_vertical", true)) {
+            if (m_ub) {
+                patch(0x40266F, "D4 A5 6C", "A8 EB 68");
+                patch(0x4026E8, "D4 A5 6C", "A8 EB 68");
+            } else {
+                patch(0x40266F, "D4 AD 6C", "A8 F3 68");
+                patch(0x4026E8, "D4 AD 6C", "A8 F3 68");
+            }
+        }
+    }
+
     // Not sure what exactly this value does, but setting it too low sometimes
     // produces wrong vertex positions on the far left and right side of the
     // screen, especially on high resolutions.
@@ -308,7 +337,7 @@ void TombRaiderPatcher::applySoundPatches() {
     TombRaiderHooks::m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(m_ub ? 0x45B330 : 0x45B97C);
     TombRaiderHooks::m_tombCDLoop = reinterpret_cast<BOOL*>(m_ub ? 0x45B30C : 0x45B94C);
     TombRaiderHooks::m_tombCDVolume = reinterpret_cast<uint32_t*>(m_ub ? 0x455D3C : 0x456334);
-    TombRaiderHooks::m_tombCDNumTracks = reinterpret_cast<uint32_t*>(m_ub ? 0x45B34C : 0x45B964);
+    TombRaiderHooks::m_tombCDNumTracks = reinterpret_cast<uint32_t*>(m_ub ? 0x45B31C : 0x45B964);
 
     // Patch bad mapping function in UB that remaps the music volume from 0-10 to
     // 5-255 instead of 0-65536, which is the value range for auxSetVolume.
