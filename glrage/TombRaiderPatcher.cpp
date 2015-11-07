@@ -63,21 +63,13 @@ void TombRaiderPatcher::applyCrashPatches() {
     // damage to Lara, but that's still better than no explosions or even a crash.
     patch(m_ub ? 0x43C288 : 0x43C938, "F6 C3 1C 74", "90 90 90 EB");
 
-    // User keys are heavily bugged in the ATI patch and is the source of
-    // several crashes, possibly a result of the Windows port, so disable it
-    // entirely instead of creating hundreds of assembly patches to fix it somehow.
-    // One can still write a program to change the key bindings in the config file.
-
-    // Prevent selection of user keys in the options (changing them crashes the game).
-    patch(m_ub ? 0x42E76C : 0x42EB7C, "0F 94 C0", "90 90 90");
-
-    // Crude fix for a crash when opening the control options while in-game.
-    // The "Inventory" label is broken for some reason, so it needs to be skipped.
-    if (m_ub) {
-        patch(0x42F207, "54", "50");
-    } else {
-        patch(0x42F6DB, "7C", "78");
-    }
+    // Fix for a crash when opening the control options in-game while the FPS
+    // counter is visible. There are apparently too many text overlays visible
+    // in that case and there's no error handling when the text overlay creation
+    // fails, so a positioning function is fed with a null pointer when rendering
+    // the "Inventory" label. This patch prevents the text overlay sub from creating
+    // a null pointer if there are too many text overlays.
+    patch(m_ub ? 0x4390E3 : 0x439793, "33 C0", "90 90");
 }
 
 void TombRaiderPatcher::applyGraphicPatches() {
@@ -313,14 +305,12 @@ void TombRaiderPatcher::applySoundPatches() {
         patchAddr(0x4386EA, "E8 E1 17 FF FF", TombRaiderHooks::setPan, 0xE8);
         patchAddr(0x4385F2, "E8 29 F2 FF FF", TombRaiderHooks::playOneShot, 0xE8);
         patchAddr(0x438648, "E8 A3 F2 FF FF", TombRaiderHooks::playLoop, 0xE8);
-        patchAddr(0x42EAF8, "E8 F3 8D 00 00", TombRaiderHooks::playLoop, 0xE8);
     } else {
         patchAddr(0x438129, "E8 62 1D FE FF", TombRaiderHooks::soundInit, 0xE8);
         patchAddr(0x438D0A, "E8 21 F2 FF FF", TombRaiderHooks::setVolume, 0xE8);
         patchAddr(0x438D2A, "E8 01 F2 FF FF", TombRaiderHooks::setPan, 0xE8);
         patchAddr(0x438C32, "E8 D9 F1 FF FF", TombRaiderHooks::playOneShot, 0xE8);
         patchAddr(0x438C88, "E8 33 EF FF FF", TombRaiderHooks::playLoop, 0xE8);
-        patchAddr(0x42EF35, "E8 86 8C 00 00", TombRaiderHooks::playLoop, 0xE8);
     }
 
     // Very optional patch: replace ambient track "derelict" with "water", which,

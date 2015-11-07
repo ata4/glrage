@@ -10,6 +10,12 @@ bool TombRaiderHooks::m_ub = false;
 int32_t TombRaiderHooks::m_fpsTextX = 0;
 int32_t TombRaiderHooks::m_fpsTextY = 0;
 
+std::map<int32_t, int32_t> TombRaiderHooks::m_keyCodeMap = {
+    {29, 157}, // CTRL
+    {42, 54},  // SHIFT
+    {56, 184}  // ALT
+};
+
 /** Tomb Raider sub pointers **/
 
 // init sound system
@@ -170,28 +176,16 @@ LRESULT TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lPara
     uint32_t scanCode = keyData >> 16 & 0xff;
     uint32_t extended = keyData >> 24 & 0x1;
     uint32_t pressed = ~keyData >> 31;
-    
-    uint32_t indexCode = scanCode;
 
-    // Remap DOS scan code for certain control keys (ALT, CTRL and SHIFT).
+    // Remap DOS scan code for certain control keys.
     // This is also done in the original code, but at several different places
     // and also in reverse, which may be responsible for the stuck keys bug.
     // It's an ugly hack but still better than patching both the default key
     // mappings and the key names.
-    if (indexCode == 29) {
-        indexCode = 157;
-    }
-
-    if (indexCode == 42) {
-        indexCode = 54;
-    }
-
-    if (indexCode == 56) {
-        indexCode = 184;
-    }
-
-    if (extended) {
-        indexCode += 128;
+    if (m_keyCodeMap.find(scanCode) != m_keyCodeMap.end()) {
+        scanCode = m_keyCodeMap[scanCode];
+    } else if (extended) {
+        scanCode += 128;
     }
 
     uint8_t* keyStates = *m_tombKeyStates;
@@ -199,7 +193,7 @@ LRESULT TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lPara
         goto next;
     }
 
-    keyStates[indexCode] = pressed;
+    keyStates[scanCode] = pressed;
     keyStates[325] = pressed;
 
     // terminate ALT key hook so the menu won't pop up when jumping

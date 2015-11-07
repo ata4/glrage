@@ -4,6 +4,7 @@
 #include <mmeapi.h>
 #include <dsound.h>
 #include <cstdint>
+#include <map>
 
 namespace glrage {
 
@@ -92,6 +93,7 @@ private:
 
     static int32_t m_fpsTextX;
     static int32_t m_fpsTextY;
+    static std::map<int32_t, int32_t> m_keyCodeMap;
 };
 
 }
