@@ -448,7 +448,7 @@ void TombRaiderPatcher::applyLogicPatches() {
 
     // Experimental localization patch. Replaces string pointers with pointers
     // for translations.
-    if (m_config.getBool("patch_localization", true)) {
+    if (m_config.getBool("patch_localization", false)) {
         applyLocalePatches();
     }
 
