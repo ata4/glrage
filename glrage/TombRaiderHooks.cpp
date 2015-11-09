@@ -131,7 +131,7 @@ int32_t TombRaiderHooks::convertPanToDecibel(uint16_t pan) {
     return result;
 }
 
-LPDIRECTSOUNDBUFFER TombRaiderHooks::playSample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop) {
+LPDIRECTSOUNDBUFFER TombRaiderHooks::soundPlaySample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop) {
     // check if sound system is initialized
     if (!*m_tombSoundInit1 || !*m_tombSoundInit2) {
         return nullptr;
@@ -162,15 +162,17 @@ LPDIRECTSOUNDBUFFER TombRaiderHooks::playSample(int32_t soundID, int32_t volume,
     return buffer;
 }
 
-LPDIRECTSOUNDBUFFER TombRaiderHooks::playOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan) {
-    return playSample(soundID, volume, pitch, pan, false);
+LPDIRECTSOUNDBUFFER TombRaiderHooks::soundPlayOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan) {
+    return soundPlaySample(soundID, volume, pitch, pan, false);
 }
 
-LPDIRECTSOUNDBUFFER TombRaiderHooks::playLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7) {
-    return playSample(soundID, volume, pitch, pan, true);
+LPDIRECTSOUNDBUFFER TombRaiderHooks::soundPlayLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7) {
+    return soundPlaySample(soundID, volume, pitch, pan, true);
 }
 
-void TombRaiderHooks::stopSounds() {
+void TombRaiderHooks::soundStopAll() {
+    TRACEF("TombRaiderHooks::soundStopAll()");
+
     // check if sound system is initialized
     if (!*m_tombSoundInit1 || !*m_tombSoundInit2) {
         return;
@@ -252,12 +254,12 @@ void* TombRaiderHooks::createFPSText(int16_t x, int16_t y, int16_t a3, const cha
     return m_tombCreateOverlayText(x, y, a3, text);
 }
 
-BOOL TombRaiderHooks::playCDRemap(int16_t trackID) {
-    LOGF("playCDRemap(%d)", trackID);
+BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID) {
+    TRACEF("TombRaiderHooks::musicPlayRemap(%d)", trackID);
     
     // stop CD play on track ID 0
     if (trackID == 0) {
-        stopCD();
+        musicStop();
         return FALSE;
     }
 
@@ -269,23 +271,23 @@ BOOL TombRaiderHooks::playCDRemap(int16_t trackID) {
     // set current track ID
     *m_tombCDTrackID = trackID;
 
-    return playCD(trackID);
+    return musicPlay(trackID);
 }
 
-BOOL TombRaiderHooks::playCDLoop() {
-    LOG("playCDLoop()");
+BOOL TombRaiderHooks::musicPlayLoop() {
+    TRACE("TombRaiderHooks::musicPlayLoop()");
 
     // cancel if there's currently no looping track set
     if (*m_tombCDLoop && *m_tombCDTrackIDLoop > 0) {
-        playCD(*m_tombCDTrackIDLoop);
+        musicPlay(*m_tombCDTrackIDLoop);
         return FALSE;
     }
 
     return *m_tombCDLoop;
 }
 
-BOOL TombRaiderHooks::playCD(int16_t trackID) {
-    LOGF("playCD(%d)", trackID);
+BOOL TombRaiderHooks::musicPlay(int16_t trackID) {
+    TRACEF("TombRaiderHooks::musicPlay(%d)", trackID);
 
     // don't play music tracks if volume is set to 0
     if (!*m_tombCDVolume) {
@@ -339,8 +341,8 @@ BOOL TombRaiderHooks::playCD(int16_t trackID) {
     return TRUE;
 }
 
-BOOL TombRaiderHooks::stopCD() {
-    LOG("stopCD()");
+BOOL TombRaiderHooks::musicStop() {
+    TRACEF("TombRaiderHooks::musicStop()");
 
     *m_tombCDTrackID = 0;
     *m_tombCDTrackIDLoop = 0;
@@ -354,8 +356,8 @@ BOOL TombRaiderHooks::stopCD() {
         reinterpret_cast<DWORD_PTR>(&genParms));
 }
 
-BOOL TombRaiderHooks::updateCDVolume(int16_t volume) {
-    LOGF("updateCDVolume(%d)", volume);
+BOOL TombRaiderHooks::musicSetVolume(int16_t volume) {
+    TRACEF("TombRaiderHooks::musicSetVolume(%d)", volume);
 
     uint32_t volumeAux = volume * 0xffff / 0xff;
     volumeAux |= volumeAux << 16;
@@ -364,13 +366,13 @@ BOOL TombRaiderHooks::updateCDVolume(int16_t volume) {
     return TRUE;
 }
 
-void TombRaiderHooks::setVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume) {
+void TombRaiderHooks::soundSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume) {
     if (buffer) {
         buffer->SetVolume(convertVolumeToDecibel(volume));
     }
 }
 
-void TombRaiderHooks::setPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan) {
+void TombRaiderHooks::soundSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan) {
     if (buffer) {
         buffer->SetPan(convertPanToDecibel(pan));
     }

@@ -37,16 +37,16 @@ typedef void* TombRaiderCreateOverlayText(int16_t x, int16_t y, int16_t a3, cons
 class TombRaiderHooks {
 public:
     static int32_t soundInit();
-    static void setVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume);
-    static void setPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
-    static LPDIRECTSOUNDBUFFER playOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
-    static LPDIRECTSOUNDBUFFER playLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
-    static void stopSounds();
-    static BOOL playCDRemap(int16_t trackID);
-    static BOOL playCDLoop();
-    static BOOL playCD(int16_t trackID);
-    static BOOL stopCD();
-    static BOOL updateCDVolume(int16_t volume);
+    static void soundSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume);
+    static void soundSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
+    static LPDIRECTSOUNDBUFFER soundPlayOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
+    static LPDIRECTSOUNDBUFFER soundPlayLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
+    static void soundStopAll();
+    static BOOL musicPlayRemap(int16_t trackID);
+    static BOOL musicPlayLoop();
+    static BOOL musicPlay(int16_t trackID);
+    static BOOL musicStop();
+    static BOOL musicSetVolume(int16_t volume);
     static LRESULT keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam);
     static BOOL keyIsPressed(int32_t keyCode);
     static BOOL renderHealthBar(int32_t health);
@@ -86,7 +86,7 @@ public:
     static bool m_ub;
 
 private:
-    static LPDIRECTSOUNDBUFFER playSample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop);
+    static LPDIRECTSOUNDBUFFER soundPlaySample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop);
     static int32_t convertPanToDecibel(uint16_t pan);
     static int32_t convertVolumeToDecibel(int32_t volume);
     static void renderBar(int32_t value, bool air);
