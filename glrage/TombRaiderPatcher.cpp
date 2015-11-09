@@ -294,6 +294,7 @@ void TombRaiderPatcher::applySoundPatches() {
     // It also replaces the subroutine for normal sounds to fix the annoying
     // panning issue.
     TombRaiderHooks::m_tombSoundInit = reinterpret_cast<TombRaiderSoundInit*>(m_ub ? 0x419DA0 : 0x419E90);
+    TombRaiderHooks::m_tombNumAudioSamples = reinterpret_cast<int32_t*>(m_ub ? 0x45B324 : 0x45B96C);
     TombRaiderHooks::m_tombSampleTable = reinterpret_cast<TombRaiderAudioSample***>(m_ub ? 0x45B314 : 0x45B954);
     TombRaiderHooks::m_tombSoundInit1 = reinterpret_cast<BOOL*>(m_ub ? 0x459CF4 : 0x45A31C);
     TombRaiderHooks::m_tombSoundInit2 = reinterpret_cast<BOOL*>(m_ub ? 0x459CF8 : 0x45A320);
@@ -305,12 +306,14 @@ void TombRaiderPatcher::applySoundPatches() {
         patchAddr(0x4386EA, "E8 E1 17 FF FF", TombRaiderHooks::setPan, 0xE8);
         patchAddr(0x4385F2, "E8 29 F2 FF FF", TombRaiderHooks::playOneShot, 0xE8);
         patchAddr(0x438648, "E8 A3 F2 FF FF", TombRaiderHooks::playLoop, 0xE8);
+        patchAddr(0x438680, "A1 74 60 45 00", TombRaiderHooks::stopSounds, 0xE9);
     } else {
         patchAddr(0x438129, "E8 62 1D FE FF", TombRaiderHooks::soundInit, 0xE8);
         patchAddr(0x438D0A, "E8 21 F2 FF FF", TombRaiderHooks::setVolume, 0xE8);
         patchAddr(0x438D2A, "E8 01 F2 FF FF", TombRaiderHooks::setPan, 0xE8);
         patchAddr(0x438C32, "E8 D9 F1 FF FF", TombRaiderHooks::playOneShot, 0xE8);
         patchAddr(0x438C88, "E8 33 EF FF FF", TombRaiderHooks::playLoop, 0xE8);
+        patchAddr(0x438CC0, "A1 88 66 45 00", TombRaiderHooks::stopSounds, 0xE9);
     }
 
     // Very optional patch: replace ambient track "derelict" with "water", which,

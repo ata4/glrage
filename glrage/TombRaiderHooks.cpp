@@ -38,6 +38,9 @@ uint8_t** TombRaiderHooks::m_tombKeyStates = nullptr;
 // Default key binding table. Maps the key scan codes to button IDs.
 int16_t* TombRaiderHooks::m_tombDefaultKeyBindings = nullptr;
 
+// Number of currently loaded audio samples.
+int32_t* TombRaiderHooks::m_tombNumAudioSamples = nullptr;
+
 // Audio sample pointer table.
 TombRaiderAudioSample*** TombRaiderHooks::m_tombSampleTable = nullptr;
 
@@ -165,6 +168,21 @@ LPDIRECTSOUNDBUFFER TombRaiderHooks::playOneShot(int32_t soundID, int32_t volume
 
 LPDIRECTSOUNDBUFFER TombRaiderHooks::playLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7) {
     return playSample(soundID, volume, pitch, pan, true);
+}
+
+void TombRaiderHooks::stopSounds() {
+    // check if sound system is initialized
+    if (!*m_tombSoundInit1 || !*m_tombSoundInit2) {
+        return;
+    }
+
+    for (int32_t i = 0; i < *m_tombNumAudioSamples; i++) {
+        TombRaiderAudioSample* sample = (*m_tombSampleTable)[i];
+
+        if (sample) {
+            sample->buffer->Stop();
+        }
+    }
 }
 
 LRESULT TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam) {

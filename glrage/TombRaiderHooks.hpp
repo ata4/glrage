@@ -41,6 +41,7 @@ public:
     static void setPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
     static LPDIRECTSOUNDBUFFER playOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
     static LPDIRECTSOUNDBUFFER playLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
+    static void stopSounds();
     static BOOL playCDRemap(int16_t trackID);
     static BOOL playCDLoop();
     static BOOL playCD(int16_t trackID);
@@ -64,6 +65,7 @@ public:
     // Tomb Raider vars
     static uint8_t** m_tombKeyStates;
     static int16_t* m_tombDefaultKeyBindings;
+    static int32_t* m_tombNumAudioSamples;
     static TombRaiderAudioSample*** m_tombSampleTable;
     static BOOL* m_tombSoundInit1;
     static BOOL* m_tombSoundInit2;
