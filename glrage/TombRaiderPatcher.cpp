@@ -391,10 +391,10 @@ void TombRaiderPatcher::applyLogicPatches() {
     // disable internal scan code remapping
     patch(m_ub ? 0x42EC81 : 0x42F151, "75 0A", "EB 34");
 
-    // Fix infinite loop before starting the credits.
+    // fix infinite loop before starting the credits
     patch(m_ub ? 0x41CC88 : 0x41CD58, "74", "EB");
 
-    // Fix black frames in between the credit screens.
+    // fix black frames in between the credit screens
     if (m_ub) {
         patch(0x41D1F3, "D9 CC 00 00", "57 BC FE FF");
         patch(0x41D226, "A6 CC 00 00", "24 BC FE FF");
@@ -407,6 +407,9 @@ void TombRaiderPatcher::applyLogicPatches() {
         patch(0x41D4F5, "37 AA 01 00", "48 B9 FE FF");
         patch(0x41D528, "04 AA 01 00", "15 B9 FE FF");
     }
+
+    // prevent selection of user keys in the options (they don't work anyway)
+    patch(m_ub ? 0x42E76C : 0x42EB7C, "0F 94 C0", "90 90 90");
 
     // No-CD patch. Allows the game to load game files and movies from the local
     // directory instead from the CD.
