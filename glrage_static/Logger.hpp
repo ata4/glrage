@@ -34,7 +34,6 @@ public:
     static LogTarget getTarget();
     static void log(void* returnAddress, const std::string& message);
     static void log(void* returnAddress, const char* message);
-    static void logf(void* returnAddress, const std::string& message, ...);
     static void logf(void* returnAddress, const char* message, ...);
 private:
     static void logImpl(void* returnAddress, const char*);

@@ -34,15 +34,6 @@ void Logger::log(void* returnAddress, const char* message) {
     logImpl(returnAddress, message);
 }
 
-void Logger::logf(void* returnAddress, const std::string& message, ...) {
-    va_list list;
-    va_start(list, message);
-    vsnprintf_s(m_info, sizeof(m_info), _TRUNCATE, message.c_str(), list);
-    va_end(list);
-
-    logImpl(returnAddress, m_info);
-}
-
 void Logger::logf(void* returnAddress, const char* message, ...) {
     va_list list;
     va_start(list, message);
