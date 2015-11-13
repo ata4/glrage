@@ -46,24 +46,6 @@ static const GLenum GLCIF_BLEND_FUNC[] = {
     GL_ONE_MINUS_DST_ALPHA  // C3D_EASRC_INVDSTALPHA / C3D_EADST_INVDSTALPHA
 };
 
-// for RenderPrimList
-static const GLenum GLCIF_PRIM_MODES[] = {
-    GL_LINES,           // C3D_EPRIM_LINE
-    GL_TRIANGLES,       // C3D_EPRIM_TRI
-    GL_TRIANGLE_STRIP,  // C3D_EPRIM_QUAD
-    GL_TRIANGLE_STRIP,  // C3D_EPRIM_RECT
-    GL_POINTS           // C3D_EPRIM_POINT
-};
-
-// for RenderPrimStrip
-static const GLenum GLCIF_PRIMSTRIP_MODES[] = {
-    GL_LINE_STRIP,      // C3D_EPRIM_LINE
-    GL_TRIANGLE_STRIP,  // C3D_EPRIM_TRI
-    GL_TRIANGLE_STRIP,  // C3D_EPRIM_QUAD
-    GL_TRIANGLE_STRIP,  // C3D_EPRIM_RECT
-    GL_POINTS           // C3D_EPRIM_POINT
-};
-
 static const GLenum GLCIF_TEXTURE_MIN_FILTER[] = {
     GL_NEAREST,                 // C3D_ETFILT_MINPNT_MAGPNT
     GL_LINEAR,                  // C3D_ETFILT_MINPNT_MAG2BY2
@@ -148,7 +130,6 @@ private:
 
     C3D_EASRC m_alphaSrc;
     C3D_EADST m_alphaDst;
-    C3D_EPRIM m_primType;
     C3D_HTX m_tmap;
 
     ShaderProgram m_program;

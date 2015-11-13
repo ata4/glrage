@@ -9,10 +9,9 @@ using glrage::GLUtils;
 
 namespace cif {
 
-CifVertexStream::CifVertexStream() {
-    m_maxVert = 0;
-    m_vertexBufferSize = 0;
-
+CifVertexStream::CifVertexStream() :
+    m_vertexBufferSize(0)
+{
     // bind vertex buffer
     m_vertexBuffer.bind();
 
@@ -25,7 +24,7 @@ CifVertexStream::CifVertexStream() {
     GLUtils::checkError("CifVertexStream::CifVertexStream");
 }
 
-void CifVertexStream::uploadPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) {
+void CifVertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) {
     switch (m_vertexType) {
         case C3D_EV_VTCF: {
             // bind vertex format
@@ -46,25 +45,46 @@ void CifVertexStream::uploadPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) 
                 + std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
     }
 
-    GLUtils::checkError("CifVertexStream::uploadPrimStrip");
+    glDrawArrays(GLCIF_PRIMSTRIP_MODES[m_primType], 0, numVert);
+
+    GLUtils::checkError("CifVertexStream::renderPrimStrip");
 }
 
-void CifVertexStream::uploadPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
+void CifVertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
     switch (m_vertexType) {
         case C3D_EV_VTCF: {
             // bind vertex format
             m_vtcFormat.bind();
 
-            // resize vertex buffer if required
-            reserve(numVert, sizeof(C3D_VTCF));
-
             // copy vertices to vertex vector buffer, then to the vertex buffer
             // (OpenGL can't handle arrays of pointers)
             C3D_VTCF** vListVtcf = reinterpret_cast<C3D_VTCF**>(vertList);
-            for (C3D_UINT32 i = 0; i < numVert; i++) {
-                m_vtcBuffer[i] = *vListVtcf[i];
+            m_vtcBuffer.clear();
+
+            if (m_primType == C3D_EPRIM_QUAD) {
+                // triangulate quads
+                for (C3D_UINT32 i = 0; i < numVert; i += 4) {
+                    m_vtcBuffer.push_back(*vListVtcf[i + 0]);
+                    m_vtcBuffer.push_back(*vListVtcf[i + 1]);
+                    m_vtcBuffer.push_back(*vListVtcf[i + 2]);
+
+                    m_vtcBuffer.push_back(*vListVtcf[i + 2]);
+                    m_vtcBuffer.push_back(*vListVtcf[i + 3]);
+                    m_vtcBuffer.push_back(*vListVtcf[i + 0]);
+                }
+
+                numVert = m_vtcBuffer.size();
+            } else {
+                // direct copy
+                for (C3D_UINT32 i = 0; i < numVert; i++) {
+                    m_vtcBuffer.push_back(*vListVtcf[i]);
+                }
             }
 
+            // resize vertex buffer if required
+            reserve(numVert, sizeof(C3D_VTCF));
+
+            // upload vertex buffer
             m_vertexBuffer.subData(0, sizeof(C3D_VTCF) * numVert, &m_vtcBuffer[0]);
 
             break;
@@ -75,11 +95,21 @@ void CifVertexStream::uploadPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
                 + std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
     }
 
-    GLUtils::checkError("CifVertexStream::uploadPrimList");
+    glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, numVert);
+
+    GLUtils::checkError("CifVertexStream::renderPrimList");
 }
 
 C3D_EVERTEX CifVertexStream::vertexType() {
     return m_vertexType;
+}
+
+C3D_EPRIM CifVertexStream::primType() {
+    return m_primType;
+}
+
+void CifVertexStream::primType(C3D_EPRIM primType) {
+    m_primType = primType;
 }
 
 void CifVertexStream::vertexType(C3D_EVERTEX vertexType) {
@@ -87,12 +117,6 @@ void CifVertexStream::vertexType(C3D_EVERTEX vertexType) {
 }
 
 void CifVertexStream::reserve(C3D_UINT32 numVert, size_t vertSize) {
-    if (numVert > m_maxVert) {
-        LOGF("CifVertexStream::reserve: Vertex vector resize: %d -> %d", m_maxVert, numVert);
-        m_vtcBuffer.resize(numVert);
-        m_maxVert = numVert;
-    }
-
     size_t vertexBufferSize = vertSize * numVert;
     if (vertexBufferSize > m_vertexBufferSize) {
         LOGF("CifVertexStream::reserve: Vertex buffer resize: %d -> %d", m_vertexBufferSize, vertexBufferSize);

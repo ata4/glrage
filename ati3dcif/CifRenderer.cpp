@@ -149,17 +149,11 @@ void CifRenderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate, C3D_UINT32 u
 }
 
 void CifRenderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert) {
-    m_vertexStream.uploadPrimStrip(vStrip, u32NumVert);
-    glDrawArrays(GLCIF_PRIMSTRIP_MODES[m_primType], 0, u32NumVert);
-
-    GLUtils::checkError("CifRenderer::renderPrimList");
+    m_vertexStream.renderPrimStrip(vStrip, u32NumVert);
 }
 
 void CifRenderer::renderPrimList(C3D_VLIST vList, C3D_UINT32 u32NumVert) {
-    m_vertexStream.uploadPrimList(vList, u32NumVert);
-    glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, u32NumVert);
-
-    GLUtils::checkError("CifRenderer::renderPrimList");
+    m_vertexStream.renderPrimList(vList, u32NumVert);
 }
 
 void CifRenderer::fogColor(C3D_COLOR color) {
@@ -171,7 +165,7 @@ void CifRenderer::vertexType(C3D_EVERTEX type) {
 }
 
 void CifRenderer::primType(C3D_EPRIM type) {
-    m_primType = type;
+    m_vertexStream.primType(type);
 }
 
 void CifRenderer::solidColor(C3D_COLOR color) {
