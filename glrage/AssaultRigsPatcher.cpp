@@ -41,6 +41,10 @@ void AssaultRigsPatcher::apply() {
         // Replace "640 BY 480" in the options with "CUSTOM".
         patch(0x486AC0, "36 34 30 20 42 59 20 34 38 30", "43 55 53 54 4F 4D 20 20 20 20");
     }
+
+    // Disable re-initialization when losing window focus, which is unnecessary and
+    // pretty annoying.
+    patch(0x004342F8, "0F 86 59 F4 FF FF", "90 90 90 90 90 90");
 }
 
 }
