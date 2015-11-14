@@ -21,8 +21,6 @@
 #define C3D_ETL_ALPHA_DECAL     2    //  TEXout = (Tclr*Talp)+(CInt*(1-Talp))
 #define C3D_ETL_NUM             3    //  invalid enumeration
 
-#define CHROMA_EPS 1.0 / 255.0
-
 in vec4 vertColor;
 flat in vec4 vertColorFlat;
 in vec3 vertTexCoords;
