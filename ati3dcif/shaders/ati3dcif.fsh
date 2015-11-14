@@ -38,14 +38,13 @@ uniform int tmapLight;
 uniform int texOp;
 
 void main(void) {
+    // discard fragment if there's no shading mode and no texture
+    if (shadeMode == C3D_ESH_NONE && !tmapEn) {
+        discard;
+    }
+
+    // shading
     switch (shadeMode) {
-        case C3D_ESH_NONE:
-            if (!tmapEn) {
-                // no texture and no shading mode: nothing to render
-                discard;
-            }
-            break;
-    
         case C3D_ESH_SOLID:
             fragColor = solidColor;
             break;
@@ -59,21 +58,27 @@ void main(void) {
             break;
     }
 
+    // texturing
     if (tmapEn) {
+        // chroma keying
         if (texOp == C3D_ETEXOP_CHROMAKEY) {
-            // discard fragment if texel matches chroma key
+            // fetch raw texel for fragment
             ivec2 size = textureSize2D(tex0, 0);
             int tx = int((vertTexCoords.x / vertTexCoords.z) * size.x) % size.x;
             int ty = int((vertTexCoords.y / vertTexCoords.z) * size.y) % size.y;
             vec4 texel = texelFetch(tex0, ivec2(tx, ty), 0);
+            
+            // discard fragment if texel matches chroma key
             float diff = abs(distance(texel.rgb, chromaKey));
             if (diff == 0) {
                 discard;
             }
         }
 
+        // texture mapping
         vec4 texColor = texture(tex0, vertTexCoords.xy / vertTexCoords.z);
-
+        
+        // texture lighting
         switch (tmapLight) {
             case C3D_ETL_NONE:
                 fragColor = texColor;
