@@ -16,7 +16,7 @@ void main(void) {
     
     // normalize colors
     vertColor = inColor / 255.0;
-    vertColorFlat = inColor / 255.0;
+    vertColorFlat = vertColor;
     
     vertTexCoords = inTexCoords;
 }

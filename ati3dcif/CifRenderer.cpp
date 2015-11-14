@@ -210,7 +210,7 @@ void CifRenderer::tmapSelect(C3D_HTX handle) {
 }
 
 void CifRenderer::tmapLight(C3D_ETLIGHT mode) {
-    // TODO
+    m_program.uniform1i("tmapLight", mode);
 }
 
 void CifRenderer::tmapPerspCor(C3D_ETPERSPCOR mode) {
