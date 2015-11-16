@@ -1,5 +1,6 @@
 #include "ShaderProgram.hpp"
 #include "ShaderProgramException.hpp"
+#include "Logger.hpp"
 
 namespace glrage {
 
@@ -49,14 +50,14 @@ void ShaderProgram::fragmentData(const std::string& name) {
 }
 
 GLint ShaderProgram::attributeLocation(const std::string& name) {
-    std::map<std::string, GLint>::iterator it = m_attributeLocations.find(name);
+    auto it = m_attributeLocations.find(name);
     if (it != m_attributeLocations.end()) {
         return it->second;
     }
 
     GLint location = glGetAttribLocation(m_id, name.c_str());
     if (location == -1) {
-        throw ShaderProgramException("Shader attribute not found: " + name);
+        LOG("ShaderProgram::attributeLocation: Shader attribute not found: " + name);
     }
 
     m_attributeLocations[name] = location;
@@ -65,14 +66,14 @@ GLint ShaderProgram::attributeLocation(const std::string& name) {
 }
 
 GLint ShaderProgram::uniformLocation(const std::string& name) {
-    std::map<std::string, GLint>::iterator it = m_uniformLocations.find(name);
+    auto it = m_uniformLocations.find(name);
     if (it != m_uniformLocations.end()) {
         return it->second;
     }
 
     GLint location = glGetUniformLocation(m_id, name.c_str());
     if (location == -1) {
-        throw ShaderProgramException("Shader uniform not found: " + name);
+        LOG("ShaderProgram::uniformLocation: Shader uniform not found: " + name);
     }
 
     m_uniformLocations[name] = location;
@@ -81,19 +82,31 @@ GLint ShaderProgram::uniformLocation(const std::string& name) {
 }
 
 void ShaderProgram::uniform3f(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2) {
-    glUniform3f(uniformLocation(name), v0, v1, v2);
+    GLint loc = uniformLocation(name);
+    if (loc != -1) {
+        glUniform3f(loc, v0, v1, v2);
+    }
 }
 
 void ShaderProgram::uniform4f(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) {
-    glUniform4f(uniformLocation(name), v0, v1, v2, v3);
+    GLint loc = uniformLocation(name);
+    if (loc != -1) {
+        glUniform4f(loc, v0, v1, v2, v3);
+    }
 }
 
 void ShaderProgram::uniform1i(const std::string& name, GLint v0) {
-    glUniform1i(uniformLocation(name), v0);
+    GLint loc = uniformLocation(name);
+    if (loc != -1) {
+        glUniform1i(loc, v0);
+    }
 }
 
 void ShaderProgram::uniformMatrix4fv(const std::string& name, GLsizei count, GLboolean transpose, const GLfloat* value) {
-    glUniformMatrix4fv(uniformLocation(name), count, transpose, value);
+    GLint loc = uniformLocation(name);
+    if (loc != -1) {
+        glUniformMatrix4fv(loc, count, transpose, value);
+    }
 }
 
 std::string ShaderProgram::infoLog() {
