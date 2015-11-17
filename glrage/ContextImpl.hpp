@@ -33,9 +33,9 @@ public:
     HWND getHWnd();
 
 private:
-    // private methods
-    void fixWindowRatio(WPARAM edge, LPRECT prect);
-    void error(const std::string& message);
+    // constants
+    static const LONG STYLE_WINDOW = WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPED | WS_SYSMENU;
+    static const LONG STYLE_WINDOW_EX = WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE;
 
     // config object
     Config m_config;
@@ -74,6 +74,9 @@ private:
     // DirectDraw display mode dimension
     uint32_t m_width;
     uint32_t m_height;
+
+    // private methods
+    void error(const std::string& message);
 };
 
 }
