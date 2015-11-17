@@ -48,6 +48,9 @@
     <ClInclude Include="RuntimeData.hpp">
       <Filter>Header Files\Patches</Filter>
     </ClInclude>
+    <ClInclude Include="WipeoutPatcher.hpp">
+      <Filter>Header Files\Patches</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TombRaiderHooks.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files\Patches</Filter>
     </ClCompile>
     <ClCompile Include="RuntimeData.cpp">
+      <Filter>Source Files\Patches</Filter>
+    </ClCompile>
+    <ClCompile Include="WipeoutPatcher.cpp">
       <Filter>Source Files\Patches</Filter>
     </ClCompile>
   </ItemGroup>

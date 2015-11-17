@@ -1,6 +1,7 @@
 #include "RuntimePatcher.hpp"
 #include "TombRaiderPatcher.hpp"
 #include "AssaultRigsPatcher.hpp"
+#include "WipeoutPatcher.hpp"
 
 #include "StringUtils.hpp"
 #include "Logger.hpp"
@@ -42,6 +43,7 @@ void RuntimePatcher::patch() {
     // run known patches
     runPatch<TombRaiderPatcher>(moduleFileName);
     runPatch<AssaultRigsPatcher>(moduleFileName);
+    runPatch<WipeoutPatcher>(moduleFileName);
 }
 
 bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, const std::string& replacement) {

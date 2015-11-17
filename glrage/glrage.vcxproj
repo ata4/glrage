@@ -93,6 +93,7 @@
     <ClInclude Include="Screenshot.hpp" />
     <ClInclude Include="TombRaiderPatcher.hpp" />
     <ClInclude Include="TombRaiderHooks.hpp" />
+    <ClInclude Include="WipeoutPatcher.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssaultRigsPatcher.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="Screenshot.cpp" />
     <ClCompile Include="TombRaiderPatcher.cpp" />
     <ClCompile Include="TombRaiderHooks.cpp" />
+    <ClCompile Include="WipeoutPatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="glrage.ini" />
