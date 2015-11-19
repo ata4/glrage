@@ -33,6 +33,13 @@ Also, you'll need to separate folders for TR and TR:UB to avoid clashing files.
 If you have the GOG.com or Steam release, you'll find the two folders in GAME.GOG/GAME.DAT, which is actually a BIN/CUE image of the Sold-Out Software release of TR. You can temporary rename GAME.DAT to GAME.cue and mount it
 with [WinCDEmu](http://wincdemu.sysprogs.org/) to access the image.
 
+### Hotkeys
+
+With the wrapper installed, following key combinations are available:
+
+* Print screen: creates a screenshot in the Targa format inside the current game directory.
+* Alt + enter: switch between windowed/fullscreen mode.
+
 ### Patches
 
 #### Forced patches
@@ -53,11 +60,12 @@ with [WinCDEmu](http://wincdemu.sysprogs.org/) to access the image.
 * Changed water color from grey-blue to turquoise, similar to the PSX version. ([Screenshot](http://i.imgur.com/NpYRg9j.jpg))
 * Increased rendering distance. ([Screenshot](http://i.imgur.com/CUnIoIY.jpg), disabled on default)
 * No-CD mode. (disabled on default)
+* Customizable field of view.
 * Full soundtrack mode, combining PC ambient tracks with PSX music tracks. (disabled on default)
 
 ### Known problems
 * The savegame format is incompatible to DOS format. To prevent accidental loading or overwriting of existing DOS savegames, the file name format has been changed as well.
-* Custom key bindings have been disabled in the ring menu to prevent various crashes, only the default bindings can be used and displayed right now.
+* Custom key bindings have been partially disabled in the ring menu to prevent various crashes.
 * The menu is fully opaque when opened in-game.
 * Some objects disappear when viewed from certain angles or are just partially visible.
 * Ambient tracks played from a physical CD won't loop properly in Windows Vista and later ([caused by a MCI emulation bug in Windows](https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/dfa22274-8122-4b92-a0bc-653f5749b1bd/audio-cd-playing-with-mci-mcinotifysuccessful-never-arrives?forum=windowspro-audiodevelopment)).
@@ -85,6 +93,18 @@ Unlike the DOS version, the ATI edition has no CD check, so it'll run without if
 
 ### Known problems
 * Videos aren't displayed correctly in Windows 10.
+* Slightly low subpixel vertex accuracy, which causes wobbly polygons in higher resolutions.
+
+## Wipeout
+
+You'll need the 3D Rage Edition of Wipeout that was bundled with Sony Vaio PCV laptops. A patch for the DOS version may be possible but is not yet available.
+
+Wipeout runs without crashes, but there are some graphical glitches right now.
+
+### Known problems
+* Low subpixel vertex accuracy, which causes wobbly polygons in higher resolutions.
+* Some background images aren't rendered correctly.
+* Certain parts of objects, including one half of the skybox, are invisible.
 
 # License
 This software is provided under GNU Lesser General Public License version 3.
