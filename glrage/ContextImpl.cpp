@@ -156,22 +156,42 @@ void ContextImpl::detach() {
 }
 
 LRESULT ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    // Printscreen on Windows with OpenGL doesn't work in fullscreen, so hook the
-    // key and implement screenshot saving to files.
-    // For some reason, VK_SNAPSHOT doesn't generate WM_KEYDOWN events but only
-    // WM_KEYUP. Works just as well, though.
-    if (msg == WM_KEYUP && wParam == VK_SNAPSHOT) {
-        m_screenshot.schedule();
-        return TRUE;
+    switch (msg) {
+        // Printscreen on Windows with OpenGL doesn't work in fullscreen, so hook the
+        // key and implement screenshot saving to files.
+        // For some reason, VK_SNAPSHOT doesn't generate WM_KEYDOWN events but only
+        // WM_KEYUP. Works just as well, though.
+        case WM_KEYUP:
+            if (wParam == VK_SNAPSHOT) {
+                m_screenshot.schedule();
+                return TRUE;
+            }
+            break;
+
+        // toggle fullscreen if alt + return is pressed
+        case WM_SYSKEYDOWN:
+            if (wParam == VK_RETURN && lParam & 1 << 29 && !(lParam & 1 << 30)) {
+                toggleFullscreen();
+                return TRUE;
+            }
+            break;
+
+        // force default handling for some window messages when in windowed mode,
+        // especially important for Tomb Raider
+        case WM_MOVE:
+        case WM_MOVING:
+        case WM_SIZE:
+        case WM_NCPAINT:
+        case WM_SETCURSOR:
+        case WM_GETMINMAXINFO:
+        case WM_ERASEBKGND:
+            if (!m_fullscreen) {
+                return CallWindowProc(DefWindowProc, hwnd, msg, wParam, lParam);
+            }
+            break;
     }
 
-    // toggle fullscreen if alt + return is pressed
-    if (msg == WM_SYSKEYDOWN && wParam == VK_RETURN && lParam & 1 << 29 && !(lParam & 1 << 30)) {
-        toggleFullscreen();
-        return TRUE;
-    }
-
-    return m_windowProc(hwnd, msg, wParam, lParam);
+    return CallWindowProc(m_windowProc, hwnd, msg, wParam, lParam);
 }
 
 BOOL ContextImpl::enumWindowsProc(HWND hwnd) {
@@ -198,12 +218,32 @@ bool ContextImpl::isFullscreen() {
 }
 
 void ContextImpl::setFullscreen(bool fullscreen) {
+    if (m_fullscreen == fullscreen) {
+        return;
+    }
+
     m_fullscreen = fullscreen;
 
     if (!m_hwnd) {
         return;
     }
 
+    // change window style
+    LONG style = GetWindowLong(m_hwnd, GWL_STYLE);
+    LONG styleEx = GetWindowLong(m_hwnd, GWL_EXSTYLE);
+
+    if (m_fullscreen) {
+        style &= ~STYLE_WINDOW;
+        styleEx &= ~STYLE_WINDOW_EX;
+    } else {
+        style |= STYLE_WINDOW;
+        styleEx |= STYLE_WINDOW_EX;
+    }
+
+    SetWindowLong(m_hwnd, GWL_STYLE, style);
+    SetWindowLong(m_hwnd, GWL_EXSTYLE, styleEx);
+
+    // change window size
     int32_t width;
     int32_t height;
 
@@ -214,6 +254,8 @@ void ContextImpl::setFullscreen(bool fullscreen) {
         width = m_width;
         height = m_height;
     }
+
+    ShowCursor(!m_fullscreen);
 
     setWindowSize(width, height);
 }

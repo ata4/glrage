@@ -204,9 +204,7 @@ HRESULT WINAPI DirectDraw::RestoreDisplayMode() {
 HRESULT WINAPI DirectDraw::SetCooperativeLevel(HWND hWnd, DWORD dwFlags) {
     TRACE("DirectDraw::SetCooperativeLevel");
 
-    if (dwFlags & DDSCL_FULLSCREEN) {
-        m_context.setFullscreen(true);
-    }
+    m_context.setFullscreen(dwFlags & DDSCL_FULLSCREEN);
 
     return DD_OK;
 }
