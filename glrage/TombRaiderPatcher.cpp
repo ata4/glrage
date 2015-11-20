@@ -31,8 +31,6 @@ bool TombRaiderPatcher::applicable(const std::string& fileName) {
 }
 
 void TombRaiderPatcher::apply() {
-    TombRaiderHooks::m_ub = m_ub;
-
     // mandatory crash patches
     applyCrashPatches();
 
@@ -162,6 +160,7 @@ void TombRaiderPatcher::applyGraphicPatches() {
         TombRaiderHooks::m_tombRenderCollectedItem = reinterpret_cast<TombRaiderRenderCollectedItem*>(m_ub ? 0x435800 : 0x435D80);
         TombRaiderHooks::m_tombCreateOverlayText = reinterpret_cast<TombRaiderCreateOverlayText*>(m_ub ? 0x4390D0 : 0x439780);
         TombRaiderHooks::m_tombRenderWidth = reinterpret_cast<int32_t*>(m_ub ? 0x6CA5D4 : 0x6CADD4);
+        TombRaiderHooks::m_tombRenderHeight = reinterpret_cast<int32_t*>(m_ub ? 0x68EBA8 : 0x68F3A8);
         TombRaiderHooks::m_tombTicks = reinterpret_cast<int32_t*>(m_ub ? 0x459CF0 : 0x45A318);
 
         if (m_ub) {
@@ -198,12 +197,28 @@ void TombRaiderPatcher::applyGraphicPatches() {
 
         // change the FOV mode from horizontal to vertical if enabled
         if (m_config.getBool("patch_fov_vertical", true)) {
+            TombRaiderHooks::m_tombSetFOV = reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
+
+            // replace inline FOV conversion code with function call that contains the same code
             if (m_ub) {
-                patch(0x40266F, "D4 A5 6C", "A8 EB 68");
-                patch(0x4026E8, "D4 A5 6C", "A8 EB 68");
+                patch(0x402666, "56 E8 64 7D 02 00 8B F8 A1 D4", "D1 E6 56 E8 62 00 00 00 EB 1B");
             } else {
-                patch(0x40266F, "D4 AD 6C", "A8 F3 68");
-                patch(0x4026E8, "D4 AD 6C", "A8 F3 68");
+                patch(0x402666, "56 E8 84 81 02 00 8B F8 A1 D4", "D1 E6 56 E8 62 00 00 00 EB 1B");
+            }
+
+            // replace FOV conversion function with custom function
+            patchAddr(0x402669, "E8 62 00 00 00", TombRaiderHooks::setFOV, 0xE8);
+
+            if (m_ub) {
+                patchAddr(0x4113E9, "E8 E2 12 FF FF", TombRaiderHooks::setFOV, 0xE8);
+                patchAddr(0x411624, "E8 A7 10 FF FF", TombRaiderHooks::setFOV, 0xE8);
+                patchAddr(0x41AACC, "E8 FF 7B FE FF", TombRaiderHooks::setFOV, 0xE8);
+                patchAddr(0x41E45F, "E8 6C 42 FE FF", TombRaiderHooks::setFOV, 0xE8);
+            } else {
+                patchAddr(0x411469, "E8 62 12 FF FF", TombRaiderHooks::setFOV, 0xE8);
+                patchAddr(0x41171A, "E8 B1 0F FF FF", TombRaiderHooks::setFOV, 0xE8);
+                patchAddr(0x41ABBC, "E8 0F 7B FE FF", TombRaiderHooks::setFOV, 0xE8);
+                patchAddr(0x41E7DF, "E8 EC 3E FE FF", TombRaiderHooks::setFOV, 0xE8);
             }
         }
     }
@@ -342,19 +357,49 @@ void TombRaiderPatcher::applySoundPatches() {
     patchAddr(m_ub ? 0x4379E0 : 0x437FB0, "83 EC 18 53 8B", TombRaiderHooks::musicPlay, 0xE9);
 
     // Soundtrack patch. Allows both ambient and music cues to be played via MCI.
-    if (!m_ub && m_config.getBool("patch_soundtrack", false)) {
+    if (m_config.getBool("patch_soundtrack", false)) {
         // hook play function (level music)
-        patchAddr(0x438D40, "66 83 3D 34 63", TombRaiderHooks::musicPlayRemap, 0xE9);
-        // hook play function (cutscene music)
-        patchAddr(0x439030, "66 83 3D 34 63", TombRaiderHooks::musicPlayRemap, 0xE9);
-        // hook stop function
-        patchAddr(0x438E40, "66 A1 DC 34 45", TombRaiderHooks::musicStop, 0xE9);
-        // hook function that is called when a track has finished
-        patchAddr(0x4380C0, "A1 4C B9 45 00", TombRaiderHooks::musicPlayLoop, 0xE9);
+        if (m_ub) {
+            patchAddr(0x438700, "66 83 3D 3C 5D", TombRaiderHooks::musicPlayRemap, 0xE9);
+        } else {
+            patchAddr(0x438D40, "66 83 3D 34 63", TombRaiderHooks::musicPlayRemap, 0xE9);
+        }
+        
+        // hook play function (cutscene music, not present in UB)
+        if (!m_ub) {
+            patchAddr(0x439030, "66 83 3D 34 63", TombRaiderHooks::musicPlayRemap, 0xE9);
+        }
 
+        // hook stop function
+        if (m_ub) {
+            patchAddr(0x438880, "66 A1 F4 34 45", TombRaiderHooks::musicStop, 0xE9);
+        } else {
+            patchAddr(0x438E40, "66 A1 DC 34 45", TombRaiderHooks::musicStop, 0xE9);
+        }
+        
+        // hook function that is called when a track has finished
+        if (m_ub) {
+            patchAddr(0x437AF0, "A1 0C B3 45 00", TombRaiderHooks::musicPlayLoop, 0xE9);
+        } else {
+            patchAddr(0x4380C0, "A1 4C B9 45 00", TombRaiderHooks::musicPlayLoop, 0xE9);
+        }
+        
         // also pass 0 to the CD play sub when loading a level so the background
         // track can be silenced correctly
-        patch(0x43639E, "74 09", "90 90");
+        if (m_ub) {
+            patch(0x437AF7, "74 0E", "90 90");
+        } else {
+            patch(0x43639E, "74 09", "90 90");
+        }
+
+        // fix level audio mapping to match the track list of the original game
+        if (m_ub) {
+            patch(0x456400, "03 00 03 00 04 00 04 00", "3B 00 3B 00 3C 00 3C 00");
+        }
+    } else {
+        // without patch_soundtrack, there are only three tracks left for UB, which are
+        // all looping
+        TombRaiderHooks::m_musicAlwaysLoop = m_ub;
     }
 }
 
