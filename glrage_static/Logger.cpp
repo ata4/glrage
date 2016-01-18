@@ -2,6 +2,9 @@
 
 #include <string>
 #include <iostream>
+
+// fix for "K32GetModuleBaseNameA not found in KERNEL32.dll" error on Vista
+#define PSAPI_VERSION 1
 #include <psapi.h>
 
 bool Logger::m_verbose = false;
