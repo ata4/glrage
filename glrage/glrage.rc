@@ -1,4 +1,4 @@
-#include "version.h"
+#include "gitversion.h"
 
 1 VERSIONINFO
 BEGIN
@@ -10,7 +10,7 @@ BEGIN
             VALUE "FileDescription", "GLRage Helper Library"
             VALUE "InternalName", "glrage"
             VALUE "OriginalFileName", "glrage.dll"
-            VALUE "ProductVersion", GLRAGE_VERSION            
+            VALUE "ProductVersion", GIT_VERSION            
         END
     END
     BLOCK "VarFileInfo"

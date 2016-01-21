@@ -270,7 +270,7 @@ _Pvt_Extensions
 ### Project ###
 
 # Automatically generated files
-glrage_static/version.h
+glrage_static/gitversion.h
 
 # Other
 private/
