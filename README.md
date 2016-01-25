@@ -105,6 +105,7 @@ Wipeout runs without crashes, but there are some graphical glitches right now.
 * Low subpixel vertex accuracy, which causes wobbly polygons in higher resolutions.
 * Some background images aren't rendered correctly.
 * Certain parts of objects, including one half of the skybox, are invisible.
+* The game changes the keyboard repeat rate to zero and doesn't restore the original value if it's closed unexpectedly.
 
 # License
 This software is provided under GNU Lesser General Public License version 3.
