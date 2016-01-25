@@ -1,5 +1,6 @@
 #include "Shader.hpp"
 #include "ShaderException.hpp"
+#include "ErrorUtils.hpp"
 
 #include <string>
 #include <fstream>
@@ -28,7 +29,8 @@ Shader& Shader::fromFile(const std::string& path) {
     std::ifstream file;
     file.open(path.c_str());
     if (!file.good()) {
-        throw std::runtime_error("Can't open shader file '" + path + "'");
+        throw std::runtime_error("Can't open shader file '" + path + "': " +
+            ErrorUtils::getSystemErrorString());
     }
 
     // read file to a string stream

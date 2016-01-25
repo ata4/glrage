@@ -2,6 +2,7 @@
 
 #include "gl_core_3_3.h"
 #include "StringUtils.hpp"
+#include "ErrorUtils.hpp"
 
 #include <stdexcept>
 #include <exception>
@@ -13,7 +14,7 @@
 namespace glrage {
 
 // heavily simplified Targa header struct for raw BGR(A) data
-struct MINI_TARGA_HEADER {
+struct MiniTargaHeader {
     uint8_t blank1[2];
     uint8_t format;
     uint8_t blank2[9];
@@ -22,9 +23,6 @@ struct MINI_TARGA_HEADER {
     uint8_t depth;
     uint8_t blank3;
 };
-
-Screenshot::Screenshot() : m_index(0), m_schedule(false) {
-}
 
 void Screenshot::schedule() {
     m_schedule = true;
@@ -49,7 +47,8 @@ void Screenshot::capture() {
     // open screenshot file
     std::ofstream file(path, std::ofstream::binary);
     if (!file.good()) {
-        throw std::runtime_error("Can't open screenshot file " + path);
+        throw std::runtime_error("Can't open screenshot file '" + path + "': " +
+            ErrorUtils::getSystemErrorString());
     }
 
     // get viewport dimension
@@ -69,13 +68,13 @@ void Screenshot::capture() {
     glReadPixels(x, y, width, height, GL_BGR, GL_UNSIGNED_BYTE, &data[0]);
 
     // create Targa header
-    MINI_TARGA_HEADER tgaHeader = {0};
+    MiniTargaHeader tgaHeader = {0};
     tgaHeader.format = 2;
     tgaHeader.width = width;
     tgaHeader.height = height;
     tgaHeader.depth = depth * 8;
 
-    file.write(reinterpret_cast<char*>(&tgaHeader), sizeof(MINI_TARGA_HEADER));
+    file.write(reinterpret_cast<char*>(&tgaHeader), sizeof(MiniTargaHeader));
     file.write(reinterpret_cast<char*>(&data[0]), data.size());
     file.close();
 }

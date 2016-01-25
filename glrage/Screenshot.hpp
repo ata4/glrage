@@ -6,13 +6,13 @@ namespace glrage {
 
 class Screenshot {
 public:
-    Screenshot();
     void schedule();
     void captureScheduled();
     void capture();
+
 private:
-    uint32_t m_index;
-    bool m_schedule;
+    uint32_t m_index = 0;
+    bool m_schedule = false;
 };
 
 }

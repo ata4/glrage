@@ -1,11 +1,14 @@
 #include "SurfaceDebugUtils.hpp"
 
 #include "Logger.hpp"
+#include "ErrorUtils.hpp"
 
 #include <vector>
 #include <fstream>
 #include <exception>
 #include <cstdint>
+
+using glrage::ErrorUtils;
 
 namespace ddraw {
 
@@ -140,7 +143,8 @@ void SurfaceDebugUtils::dumpBuffer(DDSURFACEDESC& desc, void* buffer, const std:
 
     std::ofstream file(path, std::ofstream::binary);
     if (!file.good()) {
-        throw std::runtime_error("Can't open file " + path);
+        throw std::runtime_error("Can't open file '" + path + "': " +
+            ErrorUtils::getSystemErrorString());
     }
 
     file.write(reinterpret_cast<char*>(dst[0]), dataSize);

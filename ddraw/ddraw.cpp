@@ -2,24 +2,14 @@
 
 #include "GLRage.hpp"
 #include "Logger.hpp"
+#include "ErrorUtils.hpp"
 
 #include <string>
 
 using ddraw::DirectDraw;
+using glrage::ErrorUtils;
 
 static Context& context = GLRageGetContext();
-
-HRESULT HandleException() {
-    try {
-        throw;
-    } catch (const std::runtime_error& ex) {
-        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
-        return DDERR_GENERIC;
-    } catch (const std::logic_error& ex) {
-        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
-        return DDERR_GENERIC;
-    }
-}
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) {
     TRACEF("DirectDraw DllMain(%p,%d)",hModule, dwReason); 
@@ -32,10 +22,13 @@ HRESULT WINAPI DirectDrawCreate(GUID FAR *lpGUID, LPDIRECTDRAW FAR *lplpDD, IUnk
     context.init();
     context.attach();
 
+    ErrorUtils::setHWnd(context.getHWnd());
+
     try {
         *lplpDD = new DirectDraw();
-    } catch (...) {
-        return HandleException();
+    } catch (const std::exception& ex) {
+        ErrorUtils::warning(ex);
+        return DDERR_GENERIC;
     }
 
     return DD_OK;

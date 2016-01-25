@@ -2,6 +2,7 @@
 #include "TombRaiderHooks.hpp"
 
 #include "StringUtils.hpp"
+#include "ErrorUtils.hpp"
 #include "Logger.hpp"
 
 #include <map>
@@ -530,7 +531,8 @@ void TombRaiderPatcher::applyLocalePatches() {
     std::ifstream langStream(langPath);
 
     if (!langStream.good()) {
-        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file " + langPath);
+        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file '" +
+            langPath +"': " + ErrorUtils::getSystemErrorString());
         return;
     }
 
@@ -551,7 +553,8 @@ void TombRaiderPatcher::applyLocalePatches() {
     std::ifstream stringsStream(stringsPath);
 
     if (!stringsStream.good()) {
-        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file " + stringsPath);
+        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file '" +
+            stringsPath + "': " + ErrorUtils::getSystemErrorString());
         return;
     }
 
