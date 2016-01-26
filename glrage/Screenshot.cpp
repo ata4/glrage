@@ -47,6 +47,11 @@ void Screenshot::capture() {
         dwAttrib = GetFileAttributes(path.c_str());
     } while (dwAttrib != INVALID_FILE_ATTRIBUTES && m_index < 9999);
 
+    // rather unlikely, but better safe than sorry
+    if (dwAttrib != INVALID_FILE_ATTRIBUTES) {
+        throw std::runtime_error("All available screenshot slots are used up!");
+    }
+
     // open screenshot file
     std::ofstream file(path, std::ofstream::binary);
     if (!file.good()) {
@@ -67,6 +72,7 @@ void Screenshot::capture() {
     // copy framebuffer to local buffer
     std::vector<uint8_t> data(width * height * depth);
 
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glReadPixels(x, y, width, height, GL_BGR, GL_UNSIGNED_BYTE, &data[0]);
 
