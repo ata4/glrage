@@ -1,9 +1,10 @@
 #include "ErrorUtils.hpp"
+#include "StringUtils.hpp"
 
 namespace glrage {
 
 void ErrorUtils::warning(const std::string& message) {
-    MessageBox(hwnd, message.c_str(), "Warning", MB_ICONWARNING | MB_OK);
+    MessageBox(hwnd, StringUtils::utf8ToWide(message).c_str(), L"Warning", MB_ICONWARNING | MB_OK);
 }
 
 void ErrorUtils::warning(const std::string& message, const std::exception& exception) {
@@ -23,7 +24,7 @@ void ErrorUtils::warning(const std::exception& exception) {
 }
 
 void ErrorUtils::error(const std::string& message) {
-    MessageBox(hwnd, message.c_str(), "Error", MB_ICONERROR | MB_OK);
+    MessageBox(hwnd, StringUtils::utf8ToWide(message).c_str(), L"Error", MB_ICONERROR | MB_OK);
     ExitProcess(1);
 }
 

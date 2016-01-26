@@ -1,5 +1,6 @@
 #include "ContextImpl.hpp"
 #include "Logger.hpp"
+#include "StringUtils.hpp"
 #include "ErrorUtils.hpp"
 
 #include "gl_core_3_3.h"
@@ -7,14 +8,13 @@
 
 #include <mciapi.h>
 #include <Shlwapi.h>
-#include <stdexcept>
 
-#define PROP_CONTEXT "Context.this"
+#include <stdexcept>
 
 namespace glrage {
 
 static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    ContextImpl* context = reinterpret_cast<ContextImpl*>(GetProp(hwnd, PROP_CONTEXT));
+    ContextImpl* context = reinterpret_cast<ContextImpl*>(GetProp(hwnd, ContextImpl::PROP_CONTEXT));
     return context->windowProc(hwnd, msg, wParam, lParam);
 }
 
@@ -44,7 +44,7 @@ void ContextImpl::init() {
     // The exact point where the application will create its window is unknown,
     // but a valid OpenGL context is required at this point, so just create a
     // dummy window for now and transfer the context later.
-    HWND m_hwndTmp = CreateWindow("STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
+    HWND m_hwndTmp = CreateWindow(L"STATIC", L"", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
         NULL, NULL, GetModuleHandle(NULL), NULL);
     ShowWindow(m_hwndTmp, SW_HIDE);
 
@@ -154,7 +154,7 @@ LRESULT ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         // WM_KEYUP. Works just as well, though.
         case WM_KEYUP:
             if (wParam == VK_SNAPSHOT) {
-                m_screenshot.schedule();
+                m_screenshot.schedule(true);
                 return TRUE;
             }
             break;
@@ -351,6 +351,7 @@ void ContextImpl::swapBuffers() {
         m_screenshot.captureScheduled();
     } catch (const std::exception& ex) {
         ErrorUtils::warning("Can't capture screenshot", ex);
+        m_screenshot.schedule(false);
     }
 
     SwapBuffers(m_hdc);
@@ -372,12 +373,12 @@ HWND ContextImpl::getHWnd() {
     return m_hwnd;
 }
 
-std::string ContextImpl::getBasePath() {
-    char path[MAX_PATH];
+std::wstring ContextImpl::getBasePath() {
+    TCHAR path[MAX_PATH];
     HMODULE hModule = NULL;
     DWORD dwFlags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
 
-    if (!GetModuleHandleExA(dwFlags, reinterpret_cast<LPCSTR>(&WindowProc), &hModule)) {
+    if (!GetModuleHandleEx(dwFlags, reinterpret_cast<LPCWSTR>(&WindowProc), &hModule)) {
         throw std::runtime_error("Can't get module handle");
     }
 

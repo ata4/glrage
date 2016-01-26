@@ -8,6 +8,8 @@ namespace glrage {
 
 class ContextImpl : public Context {
 public:
+    static constexpr TCHAR* PROP_CONTEXT = L"Context.this";
+
     ContextImpl();
     void init();
     void attach(HWND hwnd);
@@ -29,7 +31,7 @@ public:
     void renderBegin();
     bool isRendered();
     HWND getHWnd();
-    std::string getBasePath();
+    std::wstring getBasePath();
 
 private:
     // constants
@@ -37,7 +39,7 @@ private:
     static const LONG STYLE_WINDOW_EX = WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE;
 
     // config object
-    Config m_config{ "Context" };
+    Config m_config{ "Context", getBasePath() };
 
     // window handle
     HWND m_hwnd = nullptr;

@@ -39,7 +39,8 @@ private:
     static void logImpl(void* returnAddress, const char*);
     static bool m_verbose;
     static LogTarget m_target;
-    static TCHAR m_name[MAX_PATH];
-    static TCHAR m_info[1024];
-    static TCHAR m_line[1024];
+    //static char m_name[MAX_PATH];
+    //static TCHAR m_namew[MAX_PATH];
+    //static char m_info[1024];
+    //static char m_line[1024];
 };

@@ -5,9 +5,11 @@
 
 #include "StringUtils.hpp"
 #include "Logger.hpp"
+#include "GLRage.hpp"
 
 #include <Windows.h>
 #include <Shlwapi.h>
+
 #include <algorithm>
 
 namespace glrage {
@@ -20,25 +22,29 @@ template<class T> static void RuntimePatcher::runPatch(const std::string& fileNa
 }
 
 RuntimePatcher::RuntimePatcher(const std::string& configName) :
-    m_config(configName) {
+    m_config(configName, GLRageGetContext().getBasePath()) {
 }
 
 void RuntimePatcher::patch() {
+    
+
     // get executable name
-    TCHAR modulePath[MAX_PATH] = { 0 };
+    TCHAR modulePath[MAX_PATH];
     GetModuleFileName(nullptr, modulePath, MAX_PATH);
 
-    // extract file name from path
-    std::string moduleFileName = std::string(PathFindFileName(modulePath));
+    // extract file name
+    TCHAR* modulePathTmp = PathFindFileName(modulePath);
 
     // remove extension
-    int32_t extIndex = moduleFileName.find_last_of(".");
-    if (extIndex) {
-        moduleFileName = moduleFileName.substr(0, extIndex);
-    }
+    PathRemoveExtension(modulePathTmp);
+
+    std::wstring modulePathW = modulePathTmp;
 
     // convert to lower case
-    transform(moduleFileName.begin(), moduleFileName.end(), moduleFileName.begin(), ::tolower);
+    transform(modulePathW.begin(), modulePathW.end(), modulePathW.begin(), ::towlower);
+
+    // convert to UTF-8
+    std::string moduleFileName = std::string(StringUtils::wideToUtf8(modulePathW));
 
     // run known patches
     runPatch<TombRaiderPatcher>(moduleFileName);

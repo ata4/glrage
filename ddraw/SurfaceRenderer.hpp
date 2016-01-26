@@ -7,6 +7,7 @@
 #include "Sampler.hpp"
 #include "ShaderProgram.hpp"
 #include "Config.hpp"
+#include "GLRage.hpp"
 
 #include <cstdint>
 #include <vector>
@@ -31,7 +32,8 @@ private:
     static const GLenum TEX_FORMAT = GL_BGRA;
     static const GLenum TEX_TYPE = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 
-    Config m_config{ "DirectDraw" };
+    Context& m_context = GLRageGetContext();
+    Config m_config{ "DirectDraw", m_context.getBasePath() };
     uint32_t m_width = 0;
     uint32_t m_height = 0;
     VertexArray m_surfaceFormat;

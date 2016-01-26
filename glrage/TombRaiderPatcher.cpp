@@ -498,7 +498,12 @@ void TombRaiderPatcher::applyLogicPatches() {
     // Experimental localization patch. Replaces string pointers with pointers
     // for translations.
     if (m_config.getBool("patch_localization", false)) {
-        applyLocalePatches();
+        try {
+            applyLocalePatches();
+        } catch (const std::runtime_error& ex) {
+            // translation files are optional, so simply log if they're missing
+            LOGF("TombRaiderPatcher::applyLogicPatches: Can't apply translation patch: %s", ex.what());
+        }
     }
 
     // Random fun patches, discovered from various experiments.
@@ -523,18 +528,18 @@ void TombRaiderPatcher::applyLogicPatches() {
 }
 
 void TombRaiderPatcher::applyLocalePatches() {
-    std::string basePath = GLRageGetContext().getBasePath();
-    std::string localePath = basePath + "\\locale\\";
+    std::wstring basePath = GLRageGetContext().getBasePath();
+    std::wstring localePath = basePath + L"\\locale\\";
 
     // load locale file
     std::string locale = m_config.getString("patch_localization_locale", "en_GB");
-    std::string langPath = localePath + locale + ".txt";
+    std::wstring langPath = localePath + StringUtils::utf8ToWide(locale) + L".txt";
     std::ifstream langStream(langPath);
 
     if (!langStream.good()) {
-        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file '" +
-            langPath +"': " + ErrorUtils::getSystemErrorString());
-        return;
+        throw std::runtime_error("Can't open translation file '" +
+            StringUtils::wideToUtf8(langPath) + "': " +
+            ErrorUtils::getSystemErrorString());
     }
 
     static std::map<int32_t, std::string> stringMap;
@@ -545,18 +550,18 @@ void TombRaiderPatcher::applyLocalePatches() {
             int32_t stringIndex = std::stoi(line.substr(0, 4));
             stringMap[stringIndex] = line.substr(5, std::string::npos);
         } catch (...) {
-            LOGF("TombRaiderPatcher::applyLocalePatches: Invalid string index at line %d", lineNum);
+            throw std::runtime_error("Invalid string index at line " + lineNum);
         }
     }
 
     // load string data file
-    std::string stringsPath = localePath + "strings.txt";
+    std::wstring stringsPath = localePath + L"strings.txt";
     std::ifstream stringsStream(stringsPath);
 
     if (!stringsStream.good()) {
-        LOG("TombRaiderPatcher::applyLocalePatches: Can't open translation file '" +
-            stringsPath + "': " + ErrorUtils::getSystemErrorString());
-        return;
+        throw std::runtime_error("Can't open translation strings file '" +
+            StringUtils::wideToUtf8(stringsPath) + "': " +
+            ErrorUtils::getSystemErrorString());
     }
 
     RuntimeData expected;

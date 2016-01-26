@@ -1,6 +1,7 @@
 #include "SurfaceDebugUtils.hpp"
 
 #include "Logger.hpp"
+#include "StringUtils.hpp"
 #include "ErrorUtils.hpp"
 
 #include <vector>
@@ -8,6 +9,7 @@
 #include <exception>
 #include <cstdint>
 
+using glrage::StringUtils;
 using glrage::ErrorUtils;
 
 namespace ddraw {
@@ -107,7 +109,7 @@ void SurfaceDebugUtils::dumpInfo(DDSURFACEDESC& desc) {
 #endif
 }
 
-void SurfaceDebugUtils::dumpBuffer(DDSURFACEDESC& desc, void* buffer, const std::string& path) {
+void SurfaceDebugUtils::dumpBuffer(DDSURFACEDESC& desc, void* buffer, const std::wstring& path) {
     uint32_t imageSize = desc.dwWidth * desc.dwHeight;
     uint32_t dataSize = imageSize * 3;
     uint32_t headerSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
@@ -143,7 +145,7 @@ void SurfaceDebugUtils::dumpBuffer(DDSURFACEDESC& desc, void* buffer, const std:
 
     std::ofstream file(path, std::ofstream::binary);
     if (!file.good()) {
-        throw std::runtime_error("Can't open file '" + path + "': " +
+        throw std::runtime_error("Can't open file '" + StringUtils::wideToUtf8(path) + "': " +
             ErrorUtils::getSystemErrorString());
     }
 

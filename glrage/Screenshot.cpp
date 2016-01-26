@@ -25,8 +25,8 @@ struct MiniTargaHeader {
     uint8_t blank3;
 };
 
-void Screenshot::schedule() {
-    m_schedule = true;
+void Screenshot::schedule(bool schedule) {
+    m_schedule = schedule;
 }
 
 void Screenshot::captureScheduled() {
@@ -38,18 +38,19 @@ void Screenshot::captureScheduled() {
 
 void Screenshot::capture() {
     // find unused screenshot file name
-    std::string basePath = GLRageGetContext().getBasePath();
-    std::string path;
+    std::wstring basePath = GLRageGetContext().getBasePath();
+    std::wstring path;
     DWORD dwAttrib;
     do {
-        StringUtils::format(path, "%s\\screenshot%04d.tga", MAX_PATH, basePath.c_str(), m_index++);
+        std::string fileName = StringUtils::format("screenshot%04d.tga", 20, m_index++);
+        path = basePath + L"\\" + StringUtils::utf8ToWide(fileName);
         dwAttrib = GetFileAttributes(path.c_str());
-    } while (dwAttrib != INVALID_FILE_ATTRIBUTES);
+    } while (dwAttrib != INVALID_FILE_ATTRIBUTES && m_index < 9999);
 
     // open screenshot file
     std::ofstream file(path, std::ofstream::binary);
     if (!file.good()) {
-        throw std::runtime_error("Can't open screenshot file '" + path + "': " +
+        throw std::runtime_error("Can't open screenshot file '" + StringUtils::wideToUtf8(path) + "': " +
             ErrorUtils::getSystemErrorString());
     }
 

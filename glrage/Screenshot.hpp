@@ -6,7 +6,7 @@ namespace glrage {
 
 class Screenshot {
 public:
-    void schedule();
+    void schedule(bool schedule);
     void captureScheduled();
     void capture();
 

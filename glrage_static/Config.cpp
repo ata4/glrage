@@ -1,20 +1,25 @@
 #include "Config.hpp"
+#include "StringUtils.hpp"
 
 #include <Windows.h>
 
 namespace glrage {
 
-std::string Config::m_configPath = ".\\glrage.ini";
-
-Config::Config(const std::string& section) {
+Config::Config(const std::string& section, const std::wstring& directory) {
     m_section = section;
+    m_configPath = directory + L"\\glrage.ini";
 }
 
 std::string Config::getString(const std::string& name, const std::string& defaultValue) {
-    static TCHAR value[1024];
-    GetPrivateProfileString(m_section.c_str(), name.c_str(), defaultValue.c_str(),
-        value, sizeof(value) / sizeof(value[0]), m_configPath.c_str());
-    return std::string(value);
+    std::wstring sectionW = StringUtils::utf8ToWide(m_section);
+    std::wstring nameW = StringUtils::utf8ToWide(name);
+    std::wstring defaultValueW = StringUtils::utf8ToWide(defaultValue);
+    static TCHAR valueW[1024];
+
+    GetPrivateProfileString(sectionW.c_str(), nameW.c_str(), defaultValueW.c_str(),
+        valueW, sizeof(valueW) / sizeof(valueW[0]), m_configPath.c_str());
+
+    return StringUtils::wideToUtf8(valueW);
 }
 
 int32_t Config::getInt(const std::string& name, const int32_t defaultValue) {

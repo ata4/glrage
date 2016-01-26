@@ -1,5 +1,6 @@
 #include "Shader.hpp"
 #include "ShaderException.hpp"
+#include "StringUtils.hpp"
 #include "ErrorUtils.hpp"
 
 #include <string>
@@ -24,12 +25,13 @@ Shader::~Shader() {
 void Shader::bind() {
 }
 
-Shader& Shader::fromFile(const std::string& path) {
+Shader& Shader::fromFile(const std::wstring& path) {
     // open and check shader file
     std::ifstream file;
     file.open(path.c_str());
     if (!file.good()) {
-        throw std::runtime_error("Can't open shader file '" + path + "': " +
+        throw std::runtime_error("Can't open shader file '" +
+            StringUtils::wideToUtf8(path) + "': " +
             ErrorUtils::getSystemErrorString());
     }
 

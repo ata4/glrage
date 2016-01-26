@@ -3,7 +3,6 @@
 #include "FragmentShader.hpp"
 #include "VertexShader.hpp"
 #include "GLUtils.hpp"
-#include "GLRage.hpp"
 
 using glrage::VertexShader;
 using glrage::FragmentShader;
@@ -31,9 +30,9 @@ SurfaceRenderer::SurfaceRenderer() {
     m_sampler.parameteri(GL_TEXTURE_MIN_FILTER, filterMethodEnum);
 
     // configure shaders
-    std::string basePath = GLRageGetContext().getBasePath();
-    m_program.attach(VertexShader().fromFile(basePath + "\\shaders\\ddraw.vsh"));
-    m_program.attach(FragmentShader().fromFile(basePath + "\\shaders\\ddraw.fsh"));
+    std::wstring basePath = m_context.getBasePath();
+    m_program.attach(VertexShader().fromFile(basePath + L"\\shaders\\ddraw.vsh"));
+    m_program.attach(FragmentShader().fromFile(basePath + L"\\shaders\\ddraw.fsh"));
     m_program.link();
     m_program.fragmentData("fragColor");
 
