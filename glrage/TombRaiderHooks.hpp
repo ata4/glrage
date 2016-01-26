@@ -33,6 +33,7 @@ typedef int32_t TombRaiderSoundInit();
 typedef BOOL TombRaiderRenderLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t a5, int8_t color);
 typedef BOOL TombRaiderRenderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
 typedef void* TombRaiderCreateOverlayText(int16_t x, int16_t y, int16_t a3, const char* text);
+typedef int16_t TombRaiderSetFOV(int16_t fov);
 
 class TombRaiderHooks {
 public:
@@ -53,6 +54,7 @@ public:
     static BOOL renderAirBar(int32_t air);
     static BOOL renderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
     static void* createFPSText(int16_t x, int16_t y, int16_t a3, const char* text);
+    static int16_t setFOV(int16_t fov);
 
     static const int32_t DECIBEL_LUT_SIZE = 512;
 
@@ -61,6 +63,7 @@ public:
     static TombRaiderRenderLine* m_tombRenderLine;
     static TombRaiderRenderCollectedItem* m_tombRenderCollectedItem;
     static TombRaiderCreateOverlayText* m_tombCreateOverlayText;
+    static TombRaiderSetFOV* m_tombSetFOV;
 
     // Tomb Raider vars
     static uint8_t** m_tombKeyStates;
@@ -78,12 +81,13 @@ public:
     static MCIDEVICEID* m_tombMciDeviceID;
     static uint32_t* m_tombAuxDeviceID;
     static int32_t* m_tombRenderWidth;
+    static int32_t* m_tombRenderHeight;
     static int32_t* m_tombTicks;
     static HWND* m_tombHwnd;
     static HHOOK* m_tombHhk;
 
     // other vars
-    static bool m_ub;
+    static bool m_musicAlwaysLoop;
 
 private:
     static LPDIRECTSOUNDBUFFER soundPlaySample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop);

@@ -57,7 +57,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>opengl32.lib;Shlwapi.lib;winmm.lib;glrage_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Shlwapi.lib;winmm.lib;psapi.lib;glrage_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y $(ProjectDir)glrage.ini $(SolutionDir)build\$(Configuration)\</Command>

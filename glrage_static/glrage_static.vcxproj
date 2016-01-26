@@ -60,7 +60,7 @@
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>call version.bat</Command>
+      <Command>call gitversion.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,11 +79,12 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>call version.bat</Command>
+      <Command>call gitversion.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="ErrorUtils.cpp" />
     <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="gl_core_3_3.c" />
     <ClCompile Include="Logger.cpp" />
@@ -98,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.hpp" />
+    <ClInclude Include="ErrorUtils.hpp" />
     <ClInclude Include="GLUtils.hpp" />
     <ClInclude Include="gl_core_3_3.h" />
     <ClInclude Include="Logger.hpp" />

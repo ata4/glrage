@@ -5,11 +5,13 @@
 
 #include "GLRage.hpp"
 #include "Logger.hpp"
+#include "ErrorUtils.hpp"
 
 #include <stdexcept>
 
 using cif::CifRenderer;
 using cif::CifError;
+using glrage::ErrorUtils;
 
 static Context& context = GLRageGetContext();
 static CifRenderer* renderer = nullptr;
@@ -20,16 +22,16 @@ C3D_EC HandleException() {
         throw;
     } catch (const CifError& ex) {
 #ifdef _DEBUG
-        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONEXCLAMATION);
+        ErrorUtils::warning(ex);
 #else
         LOGF("HandleException: CIF error: %s (0x%x %s)", ex.what(), ex.getErrorCode(), ex.getErrorName());
 #endif
         return ex.getErrorCode();
     } catch (const std::runtime_error& ex) {
-        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
+        ErrorUtils::warning(ex);
         return C3D_EC_GENFAIL;
     } catch (const std::logic_error& ex) {
-        MessageBox(context.getHWnd(), ex.what(), nullptr, MB_OK | MB_ICONERROR);
+        ErrorUtils::warning(ex);
         return C3D_EC_GENFAIL;
     }
 }
@@ -41,6 +43,8 @@ EXPORT(ATI3DCIF_Init, C3D_EC, (void)) {
 
     context.init();
     context.attach();
+
+    ErrorUtils::setHWnd(context.getHWnd());
 
     // do some cleanup in case the app forgets to call ATI3DCIF_Term
     if (renderer) {

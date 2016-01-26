@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <cstdint>
+#include <string>
 
 namespace glrage {
 
@@ -27,6 +28,7 @@ public:
     virtual void renderBegin() = 0;
     virtual bool isRendered() = 0;
     virtual HWND getHWnd() = 0;
+    virtual std::string getBasePath() = 0;
 };
 
 }

@@ -1,11 +1,12 @@
 #include "ContextImpl.hpp"
 #include "Logger.hpp"
-#include "StringUtils.hpp"
+#include "ErrorUtils.hpp"
 
 #include "gl_core_3_3.h"
 #include "wgl_ext.h"
 
 #include <mciapi.h>
+#include <Shlwapi.h>
 #include <stdexcept>
 
 #define PROP_CONTEXT "Context.this"
@@ -22,19 +23,7 @@ static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this) {
     return context->enumWindowsProc(hwnd);
 }
 
-ContextImpl::ContextImpl() :
-    m_config("Context"),
-    m_hwnd(nullptr),
-    m_hwndTmp(nullptr),
-    m_hdc(nullptr),
-    m_hglrc(nullptr),
-    m_pid(0),
-    m_windowProc(nullptr),
-    m_fullscreen(false),
-    m_render(false),
-    m_width(0),
-    m_height(0)
-{
+ContextImpl::ContextImpl() {
     SetRectEmpty(&m_tmprect);
 
     // set pixel format
@@ -61,21 +50,21 @@ void ContextImpl::init() {
 
     m_hdc = GetDC(m_hwndTmp);
     if (!m_hdc) {
-        error("Can't get device context.");
+        ErrorUtils::error("Can't get device context", ErrorUtils::getWindowsErrorString());
     }
 
     int pf = ChoosePixelFormat(m_hdc, &m_pfd);
     if (!pf) {
-        error("Can't choose pixel format.");
+        ErrorUtils::error("Can't choose pixel format", ErrorUtils::getWindowsErrorString());
     }
 
     if (!SetPixelFormat(m_hdc, pf, &m_pfd)) {
-        error("Can't set pixel format.");
+        ErrorUtils::error("Can't set pixel format", ErrorUtils::getWindowsErrorString());
     }
 
     m_hglrc = wglCreateContext(m_hdc);
     if (!m_hglrc || !wglMakeCurrent(m_hdc, m_hglrc)) {
-        error("Can't create OpenGL context.");
+        ErrorUtils::error("Can't create OpenGL context", ErrorUtils::getWindowsErrorString());
     }
 
     glClearColor(0, 0, 0, 0);
@@ -95,6 +84,8 @@ void ContextImpl::attach(HWND hwnd) {
 
     m_hwnd = hwnd;
 
+    ErrorUtils::setHWnd(m_hwnd);
+
     // get window procedure pointer and replace it with custom procedure
     SetProp(m_hwnd, PROP_CONTEXT, this);
     m_windowProc = reinterpret_cast<WNDPROC>(GetWindowLongPtr(m_hwnd, GWL_WNDPROC));
@@ -113,12 +104,12 @@ void ContextImpl::attach(HWND hwnd) {
     m_hdc = GetDC(m_hwnd);
     INT pf = ChoosePixelFormat(m_hdc, &m_pfd);
     if (!pf || !SetPixelFormat(m_hdc, pf, &m_pfd)) {
-        error("Can't set pixel format.");
+        ErrorUtils::error("Can't set pixel format", ErrorUtils::getWindowsErrorString());
     }
 
     // set context on new window 
     if (!m_hglrc || !wglMakeCurrent(m_hdc, m_hglrc)) {
-        error("Can't attach window to OpenGL context.");
+        ErrorUtils::error("Can't attach window to OpenGL context", ErrorUtils::getWindowsErrorString());
     }
 
     // apply previously applied window size
@@ -359,7 +350,7 @@ void ContextImpl::swapBuffers() {
     try {
         m_screenshot.captureScheduled();
     } catch (const std::exception& ex) {
-        error(ex.what());
+        ErrorUtils::warning("Can't capture screenshot", ex);
     }
 
     SwapBuffers(m_hdc);
@@ -377,46 +368,23 @@ bool ContextImpl::isRendered() {
     return m_render;
 }
 
-// Create a string with last error message
-std::string GetLastErrorStdStr() {
-    DWORD error = GetLastError();
-    if (error) {
-        LPVOID lpMsgBuf;
-        DWORD bufLen = FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-            FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            error,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR) &lpMsgBuf,
-            0, NULL
-        );
-
-        if (bufLen) {
-            LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;
-            std::string result(lpMsgStr, lpMsgStr + bufLen);
-            LocalFree(lpMsgBuf);
-            return result;
-        }
-    }
-    return std::string();
-}
-
-void ContextImpl::error(const std::string& message) {
-    std::string errorString = GetLastErrorStdStr();
-
-    if (!errorString.empty()) {
-        MessageBox(m_hwnd, (message + " " + errorString).c_str(), "Error", MB_OK);
-    } else {
-        MessageBox(m_hwnd, message.c_str(), "Error", MB_OK);
-    }
-
-    ExitProcess(1);
-}
-
 HWND ContextImpl::getHWnd() {
     return m_hwnd;
+}
+
+std::string ContextImpl::getBasePath() {
+    char path[MAX_PATH];
+    HMODULE hModule = NULL;
+    DWORD dwFlags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+
+    if (!GetModuleHandleExA(dwFlags, reinterpret_cast<LPCSTR>(&WindowProc), &hModule)) {
+        throw std::runtime_error("Can't get module handle");
+    }
+
+    GetModuleFileName(hModule, path, sizeof(path));
+    PathRemoveFileSpec(path);
+
+    return path;
 }
 
 }

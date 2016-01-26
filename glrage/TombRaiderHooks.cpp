@@ -6,7 +6,7 @@
 
 namespace glrage {
 
-bool TombRaiderHooks::m_ub = false;
+bool TombRaiderHooks::m_musicAlwaysLoop = false;
 int32_t TombRaiderHooks::m_fpsTextX = 0;
 int32_t TombRaiderHooks::m_fpsTextY = 0;
 
@@ -26,6 +26,9 @@ TombRaiderRenderLine* TombRaiderHooks::m_tombRenderLine = nullptr;
 
 // creates overlay text
 TombRaiderCreateOverlayText* TombRaiderHooks::m_tombCreateOverlayText = nullptr;
+
+// changes the current horizontal field of view value
+TombRaiderSetFOV* TombRaiderHooks::m_tombSetFOV = nullptr;
 
 // renders the previously collected item
 TombRaiderRenderCollectedItem* TombRaiderHooks::m_tombRenderCollectedItem = nullptr;
@@ -73,8 +76,9 @@ MCIDEVICEID* TombRaiderHooks::m_tombMciDeviceID = nullptr;
 // Auxiliary device ID.
 uint32_t* TombRaiderHooks::m_tombAuxDeviceID = nullptr;
 
-// Rendering width.
+// Rendering width and height.
 int32_t* TombRaiderHooks::m_tombRenderWidth = nullptr;
+int32_t* TombRaiderHooks::m_tombRenderHeight = nullptr;
 
 // Tick counter, based on the milliseconds since the system has been started.
 // Each second has 60 ticks, so one tick lasts about 16.6 ms. The game logic
@@ -254,6 +258,22 @@ void* TombRaiderHooks::createFPSText(int16_t x, int16_t y, int16_t a3, const cha
     return m_tombCreateOverlayText(x, y, a3, text);
 }
 
+int16_t TombRaiderHooks::setFOV(int16_t fov) {
+    double aspectRatio = *m_tombRenderWidth / static_cast<double>(*m_tombRenderHeight);
+
+    // convert to radians ("fov" is in degrees mapped from 0 to 32760)
+    double hFovRad = fov * M_PI / 32760;
+
+    // convert horizontal FOV to vertical
+    double vFovRad = 2 * std::atan(aspectRatio * std::tan(hFovRad / 2));
+
+    // convert back to degrees
+    fov = static_cast<int16_t>(std::round((vFovRad / M_PI) * 32760));
+
+    // call original setFOV function that expects a horizontal FOV
+    return m_tombSetFOV(fov);
+}
+
 BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID) {
     TRACEF("TombRaiderHooks::musicPlayRemap(%d)", trackID);
     
@@ -300,7 +320,7 @@ BOOL TombRaiderHooks::musicPlay(int16_t trackID) {
     }
 
     // set looping track ID for ambience tracks
-    if (m_ub || trackID >= 57) {
+    if (m_musicAlwaysLoop || trackID >= 57) {
         *m_tombCDTrackIDLoop = trackID;
     }
 

@@ -4,8 +4,6 @@
 #include "Screenshot.hpp"
 #include "Config.hpp"
 
-#include <string>
-
 namespace glrage {
 
 class ContextImpl : public Context {
@@ -31,6 +29,7 @@ public:
     void renderBegin();
     bool isRendered();
     HWND getHWnd();
+    std::string getBasePath();
 
 private:
     // constants
@@ -38,45 +37,42 @@ private:
     static const LONG STYLE_WINDOW_EX = WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE;
 
     // config object
-    Config m_config;
+    Config m_config{ "Context" };
 
     // window handle
-    HWND m_hwnd;
-    HWND m_hwndTmp;
+    HWND m_hwnd = nullptr;
+    HWND m_hwndTmp = nullptr;
 
     // GDI device context
-    HDC m_hdc;
+    HDC m_hdc = nullptr;
 
     // OpenGL context handle
-    HGLRC m_hglrc;
+    HGLRC m_hglrc = nullptr;
 
     // Attached process ID
-    DWORD m_pid;
+    DWORD m_pid = 0;
 
     // Pixel format
     PIXELFORMATDESCRIPTOR m_pfd;
 
     // Original window properties
-    WNDPROC m_windowProc;
+    WNDPROC m_windowProc = nullptr;
 
     // fullscreen flag
-    bool m_fullscreen;
+    bool m_fullscreen = false;
 
     // rendering flag
-    bool m_render;
+    bool m_render = false;
 
     // screenshot object
     Screenshot m_screenshot;
 
     // temporary rectangle
-    RECT m_tmprect;
+    RECT m_tmprect{ 0 };
 
     // DirectDraw display mode dimension
-    uint32_t m_width;
-    uint32_t m_height;
-
-    // private methods
-    void error(const std::string& message);
+    uint32_t m_width = 0;
+    uint32_t m_height = 0;
 };
 
 }

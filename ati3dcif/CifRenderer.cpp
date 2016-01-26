@@ -37,8 +37,9 @@ CifRenderer::CifRenderer() :
     }
 
     // compile and link shaders and configure program
-    m_program.attach(VertexShader().fromFile("shaders\\ati3dcif.vsh"));
-    m_program.attach(FragmentShader().fromFile("shaders\\ati3dcif.fsh"));
+    std::string basePath = GLRageGetContext().getBasePath();
+    m_program.attach(VertexShader().fromFile(basePath + "\\shaders\\ati3dcif.vsh"));
+    m_program.attach(FragmentShader().fromFile(basePath + "\\shaders\\ati3dcif.fsh"));
     m_program.link();
     m_program.fragmentData("fragColor");
     m_program.bind();
