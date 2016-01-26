@@ -92,7 +92,6 @@ Unlike the DOS version, the ATI edition has no CD check, so it'll run without if
 * Replaced 640x480 resolution option with the current desktop resolution for widescreen support.
 
 ### Known problems
-* Videos aren't displayed correctly in Windows 10.
 * Slightly low subpixel vertex accuracy, which causes wobbly polygons in higher resolutions.
 
 ## Wipeout
