@@ -98,13 +98,18 @@ Unlike the DOS version, the ATI edition has no CD check, so it'll run without if
 
 You'll need the 3D Rage Edition of Wipeout that was bundled with Sony Vaio PCV laptops. A patch for the DOS version may be possible but is not yet available.
 
-Wipeout runs without crashes, but there are some graphical glitches right now.
+Wipeout runs mostly stable, but there are some graphical glitches right now.
+
+#### Forced patches
+* Preventing the game from messing with the key repeat rate and screensaver settings.
+
+#### Optional patches
+* Added option to skip the title screen.
 
 ### Known problems
 * Low subpixel vertex accuracy, which causes wobbly polygons in higher resolutions.
 * Some background images aren't rendered correctly.
 * Certain parts of objects, including one half of the skybox, are invisible.
-* The game changes the keyboard repeat rate to zero and doesn't restore the original value if it's closed unexpectedly.
 
 # License
 This software is provided under GNU Lesser General Public License version 3.
