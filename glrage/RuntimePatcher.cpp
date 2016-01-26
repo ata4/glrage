@@ -26,8 +26,6 @@ RuntimePatcher::RuntimePatcher(const std::string& configName) :
 }
 
 void RuntimePatcher::patch() {
-    
-
     // get executable name
     TCHAR modulePath[MAX_PATH];
     GetModuleFileName(nullptr, modulePath, MAX_PATH);
@@ -70,7 +68,7 @@ bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& expected, const Run
     const std::vector<uint8_t> expectedData = expected.data();
     const std::vector<uint8_t> replacementData = replacement.data();
 
-    size_t size = expectedData.size();
+    const size_t size = expectedData.size();
     std::vector<uint8_t> actualData(size);
 
     // vectors must match in size
@@ -117,6 +115,50 @@ bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& expected, const Run
         LOGF("Patch at 0x%x with %d bytes failed!", addr, size);
         LOG("Expected: " + StringUtils::bytesToHex(expectedData));
         LOG("Actual:   " + StringUtils::bytesToHex(actualData));
+        LOG("Patch:    " + StringUtils::bytesToHex(replacementData));
+    }
+
+    return result;
+}
+
+bool RuntimePatcher::patch(uint32_t addr, const std::string& replacement) {
+    RuntimeData replacementData(StringUtils::hexToBytes(replacement));
+    return patch(addr, replacementData);
+}
+
+bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& replacement) {
+    bool result = false;
+    bool restoreProtect = false;
+
+    const std::vector<uint8_t> replacementData = replacement.data();
+    const size_t size = replacementData.size();
+
+    // apply read/write flags to the memory page
+    DWORD oldProtect = 0;
+    LPVOID lpaddr = reinterpret_cast<LPVOID>(addr);
+    if (!VirtualProtect(lpaddr, size, PAGE_EXECUTE_READWRITE, &oldProtect)) {
+        goto end;
+    }
+
+    restoreProtect = true;
+    HANDLE proc = GetCurrentProcess();
+
+    // write patched data to memory
+    DWORD numWritten = 0;
+    if (!WriteProcessMemory(proc, lpaddr, &replacementData[0], size, &numWritten) || numWritten != size) {
+        goto end;
+    }
+
+    result = true;
+
+    end:
+    // restore original page flags
+    if (restoreProtect) {
+        VirtualProtect(lpaddr, size, oldProtect, nullptr);
+    }
+
+    if (!result) {
+        LOGF("Patch at 0x%x with %d bytes failed!", addr, size);
         LOG("Patch:    " + StringUtils::bytesToHex(replacementData));
     }
 

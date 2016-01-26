@@ -23,6 +23,10 @@ protected:
     bool patch(uint32_t addr, const std::string& expected, const std::string& replacement);
     bool patch(uint32_t addr, const std::string& expected, const RuntimeData& replacement);
     bool patch(uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement);
+
+    bool patch(uint32_t addr, const std::string& replacement);
+    bool patch(uint32_t addr, const RuntimeData& replacement);
+
     void patchAddr(int32_t addrCall, const std::string& expected, void* func, uint8_t op);
 
     Config m_config;

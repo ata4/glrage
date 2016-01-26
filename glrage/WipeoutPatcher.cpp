@@ -25,7 +25,7 @@ void WipeoutPatcher::apply() {
     // that behavior.
     m_tmp.clear();
     m_tmp << hookSystemParametersInfoA;
-    patch(0x7E0290, "30 6C 54 76", m_tmp);
+    patch(0x7E0290, m_tmp);
 
     // Disable bugged alt+tab check that causes a segfault after playing the into
     // video on Windows 10 and possibly older versions as well.
