@@ -27,13 +27,16 @@ void WipeoutPatcher::apply() {
     m_tmp << hookSystemParametersInfoA;
     patch(0x7E0290, "30 6C 54 76", m_tmp);
 
-    // Disable unskippable title screen, saves a few seconds of wait time.
-    patch(0x46B885, "E8 B8 40 00 00", "90 90 90 90 90");
-
-    // Disable bugged alt+tab check that causes a segfault on Windows 10.
+    // Disable bugged alt+tab check that causes a segfault after playing the into
+    // video on Windows 10 and possibly older versions as well.
     // GLRage doesn't really need it anyway and the only side effect is that the
     // game continues to run in the background when tabbed.
     patch(0x46AFB3, "00", "01");
+
+    // Disable unskippable title screen, saves a few seconds of wait time.
+    if (m_config.getBool("patch_disable_title_screen", false)) {
+        patch(0x46B885, "E8 B8 40 00 00", "90 90 90 90 90");
+    }
 }
 
 BOOL WipeoutPatcher::hookSystemParametersInfoA(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni) {
