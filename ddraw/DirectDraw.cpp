@@ -6,13 +6,7 @@
 
 namespace ddraw {
 
-DirectDraw::DirectDraw() :
-    m_context(GLRageGetContext()),
-    m_width(DEFAULT_WIDTH),
-    m_height(DEFAULT_HEIGHT),
-    m_bits(DEFAULT_BITS),
-    m_refreshRate(DEFAULT_REFRESH_RATE)
-{
+DirectDraw::DirectDraw() {
     TRACE("DirectDraw::DirectDraw");
 }
 

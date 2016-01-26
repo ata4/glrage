@@ -9,6 +9,7 @@ public:
     TombRaiderPatcher();
     virtual bool applicable(const std::string& fileName);
     virtual void apply();
+
 private:
     void applyCrashPatches();
     void applyGraphicPatches();

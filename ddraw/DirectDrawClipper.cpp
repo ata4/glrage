@@ -5,11 +5,11 @@
 namespace ddraw {
 
 DirectDrawClipper::DirectDrawClipper() {
-
+    TRACE("DirectDrawClipper::DirectDrawClipper");
 }
 
 DirectDrawClipper::~DirectDrawClipper() {
-
+    TRACE("DirectDrawClipper::~DirectDrawClipper");
 }
 
 /*** IUnknown methods ***/

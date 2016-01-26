@@ -26,6 +26,7 @@ public:
     void uniformMatrix4fv(const std::string& name, GLsizei count, GLboolean transpose, const GLfloat* value);
 
     std::string infoLog();
+
 private:
     std::map<std::string, GLint> m_attributeLocations;
     std::map<std::string, GLint> m_uniformLocations;

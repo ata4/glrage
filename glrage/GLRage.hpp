@@ -2,9 +2,6 @@
 
 #include "ContextImpl.hpp"
 
-#include <Windows.h>
-#include <cstdint>
-
 using glrage::Context;
 
 #ifdef GLR_EXPORTS

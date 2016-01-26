@@ -51,12 +51,12 @@ private:
     const uint32_t DEFAULT_BITS = 16;
     const uint32_t DEFAULT_REFRESH_RATE = 60;
 
-    Context& m_context;
+    Context& m_context = GLRageGetContext();
     SurfaceRenderer m_renderer;
-    uint32_t m_width;
-    uint32_t m_height;
-    uint32_t m_refreshRate;
-    uint32_t m_bits;
+    uint32_t m_width = DEFAULT_WIDTH;
+    uint32_t m_height = DEFAULT_HEIGHT;
+    uint32_t m_refreshRate = DEFAULT_REFRESH_RATE;
+    uint32_t m_bits = DEFAULT_BITS;
 };
 
 }

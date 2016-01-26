@@ -13,6 +13,7 @@ public:
     GLenum target() {
         return m_target;
     }
+
 private:
     GLenum m_target;
 };

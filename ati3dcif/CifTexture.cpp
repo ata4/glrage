@@ -11,8 +11,9 @@ using glrage::GLUtils;
 
 namespace cif {
 
-CifTexture::CifTexture() : Texture(GL_TEXTURE_2D) {
-}
+CifTexture::CifTexture() :
+    Texture(GL_TEXTURE_2D)
+{ }
 
 CifTexture::~CifTexture() {
 }

@@ -6,8 +6,8 @@
 namespace glrage {
 
 WipeoutPatcher::WipeoutPatcher() :
-    RuntimePatcher("Wipeout") {
-}
+    RuntimePatcher("Wipeout")
+{ }
 
 bool WipeoutPatcher::applicable(const std::string& fileName) {
     return fileName == m_config.getString("patch_exe", "wipeout");

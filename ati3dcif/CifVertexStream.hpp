@@ -46,7 +46,7 @@ private:
 
     C3D_EVERTEX m_vertexType;
     C3D_EPRIM m_primType;
-    size_t m_vertexBufferSize;
+    size_t m_vertexBufferSize = 0;
     VertexArrayBuffer m_vertexBuffer;
     VertexArray m_vtcFormat;
     std::vector<C3D_VTCF> m_vtcBuffer;

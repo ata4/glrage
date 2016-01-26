@@ -11,12 +11,7 @@ using glrage::GLUtils;
 
 namespace ddraw {
 
-SurfaceRenderer::SurfaceRenderer() :
-    m_config("DirectDraw"),
-    m_surfaceTexture(GL_TEXTURE_2D),
-    m_width(0),
-    m_height(0)
-{
+SurfaceRenderer::SurfaceRenderer() {
     // configure buffer
     m_surfaceBuffer.bind();
     m_surfaceBuffer.data(0, nullptr, GL_STATIC_DRAW);

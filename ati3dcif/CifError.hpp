@@ -15,6 +15,7 @@ public:
     CifError(const std::string& message);
     C3D_EC getErrorCode() const;
     const char* getErrorName() const;
+
 private:
     C3D_EC m_errorCode;
 };

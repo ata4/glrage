@@ -15,7 +15,7 @@ public:
     virtual ULONG WINAPI Release();
 
 private:
-    volatile ULONG m_refCount;
+    volatile ULONG m_refCount = 1;
 };
 
 }

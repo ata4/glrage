@@ -12,6 +12,7 @@ public:
     int32_t getInt(const std::string& name, const int32_t defaultValue);
     float getFloat(const std::string& name, const float defaultValue);
     bool getBool(const std::string& name, const bool defaultValue);
+
 private:
     static std::string m_configPath;
     std::string m_section;

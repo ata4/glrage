@@ -19,14 +19,7 @@ using glrage::GLUtils;
 
 namespace cif {
 
-CifRenderer::CifRenderer() :
-    m_context(GLRageGetContext()),
-    m_config("ATI3DCIF"),
-    m_palette(nullptr),
-    m_alphaSrc(C3D_EASRC_ONE),
-    m_alphaDst(C3D_EADST_ZERO),
-    m_tmap(0)
-{
+CifRenderer::CifRenderer() {
     // bind sampler
     m_sampler.bind(0);
 
@@ -37,7 +30,7 @@ CifRenderer::CifRenderer() :
     }
 
     // compile and link shaders and configure program
-    std::string basePath = GLRageGetContext().getBasePath();
+    std::string basePath = m_context.getBasePath();
     m_program.attach(VertexShader().fromFile(basePath + "\\shaders\\ati3dcif.vsh"));
     m_program.attach(FragmentShader().fromFile(basePath + "\\shaders\\ati3dcif.fsh"));
     m_program.link();

@@ -14,6 +14,7 @@ public:
     ~CifTexture();
     void load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette);
     C3D_COLOR& chromaKey();
+
 private:
     C3D_COLOR m_chromaKey;
 };

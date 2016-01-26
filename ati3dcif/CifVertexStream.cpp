@@ -9,9 +9,7 @@ using glrage::GLUtils;
 
 namespace cif {
 
-CifVertexStream::CifVertexStream() :
-    m_vertexBufferSize(0)
-{
+CifVertexStream::CifVertexStream() {
     // bind vertex buffer
     m_vertexBuffer.bind();
 

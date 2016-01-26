@@ -2,7 +2,7 @@
 
 namespace ddraw {
 
-Unknown::Unknown() : m_refCount(1) {
+Unknown::Unknown() {
 }
 
 Unknown::~Unknown() {

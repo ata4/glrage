@@ -15,8 +15,7 @@ namespace glrage {
 
 TombRaiderPatcher::TombRaiderPatcher() :
     RuntimePatcher("Tomb Raider")
-{
-}
+{ }
 
 bool TombRaiderPatcher::applicable(const std::string& fileName) {
     if (fileName == m_config.getString("patch_exe", "tombati")) {

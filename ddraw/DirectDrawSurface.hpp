@@ -71,16 +71,16 @@ public:
     HRESULT WINAPI PageUnlock(DWORD dwFlags); // added in v2
 
 private:
-    Context& m_context;
+    Context& m_context = GLRageGetContext();
     DirectDraw& m_dd;
     SurfaceRenderer& m_renderer;
     std::vector<uint8_t> m_buffer;
     DDSURFACEDESC m_desc;
-    DirectDrawSurface* m_backBuffer;
-    DirectDrawSurface* m_depthBuffer;
-    DirectDrawClipper* m_clipper;
-    bool m_locked;
-    bool m_dirty;
+    DirectDrawSurface* m_backBuffer = nullptr;
+    DirectDrawSurface* m_depthBuffer = nullptr;
+    DirectDrawClipper* m_clipper = nullptr;
+    bool m_locked = false;
+    bool m_dirty = false;
 
     /*** Custom methods ***/
     void clear(int32_t color);

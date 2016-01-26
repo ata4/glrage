@@ -19,6 +19,7 @@ public:
 protected:
     template<class T>
     static void runPatch(const std::string& fileName);
+
     bool patch(uint32_t addr, const std::string& expected, const std::string& replacement);
     bool patch(uint32_t addr, const std::string& expected, const RuntimeData& replacement);
     bool patch(uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement);

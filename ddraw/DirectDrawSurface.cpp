@@ -8,14 +8,8 @@
 namespace ddraw {
 
 DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD, SurfaceRenderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc) :
-    m_context(GLRageGetContext()),
     m_dd(lpDD),
     m_renderer(renderer),
-    m_backBuffer(nullptr),
-    m_depthBuffer(nullptr),
-    m_clipper(nullptr),
-    m_locked(false),
-    m_dirty(false),
     m_desc(*lpDDSurfaceDesc)
 {
     TRACE("DirectDrawSurface::DirectDrawSurface");

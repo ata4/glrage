@@ -122,15 +122,15 @@ public:
     // state functions end
 
 private:
-    Context& m_context;
-    Config m_config;
+    Context& m_context = GLRageGetContext();
+    Config m_config{ "ATI3DCIF" };
     bool m_wireframe;
     TextureMap m_textures;
-    C3D_PPALETTENTRY m_palette;
+    C3D_PPALETTENTRY m_palette = nullptr;
 
-    C3D_EASRC m_alphaSrc;
-    C3D_EADST m_alphaDst;
-    C3D_HTX m_tmap;
+    C3D_EASRC m_alphaSrc = C3D_EASRC_ONE;
+    C3D_EADST m_alphaDst = C3D_EADST_ZERO;
+    C3D_HTX m_tmap = 0;
 
     ShaderProgram m_program;
     Sampler m_sampler;
