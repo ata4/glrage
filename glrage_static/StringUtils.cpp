@@ -24,8 +24,9 @@ std::string StringUtils::format(const std::string& fmt, const int maxlen, ...) {
 }
 
 void StringUtils::formatImpl(std::string& str, const std::string& fmt, const int maxlen, va_list& vl) {
-    str.reserve(maxlen);
-    vsnprintf_s(&str[0], maxlen, _TRUNCATE, fmt.c_str(), vl);
+    str.resize(maxlen);
+    int len = vsnprintf_s(&str[0], maxlen, _TRUNCATE, fmt.c_str(), vl);
+    str.resize(len);
 }
 
 std::string StringUtils::bytesToHex(const std::vector<uint8_t>& data) {
