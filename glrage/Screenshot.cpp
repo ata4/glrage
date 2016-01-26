@@ -3,6 +3,7 @@
 #include "gl_core_3_3.h"
 #include "StringUtils.hpp"
 #include "ErrorUtils.hpp"
+#include "GLRage.hpp"
 
 #include <stdexcept>
 #include <exception>
@@ -37,10 +38,11 @@ void Screenshot::captureScheduled() {
 
 void Screenshot::capture() {
     // find unused screenshot file name
+    std::string basePath = GLRageGetContext().getBasePath();
     std::string path;
     DWORD dwAttrib;
     do {
-        StringUtils::format(path, "screenshot%04d.tga", 24, m_index++);
+        StringUtils::format(path, "%s\\screenshot%04d.tga", MAX_PATH, basePath.c_str(), m_index++);
         dwAttrib = GetFileAttributes(path.c_str());
     } while (dwAttrib != INVALID_FILE_ATTRIBUTES);
 

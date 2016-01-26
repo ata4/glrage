@@ -4,8 +4,6 @@
 #include "Screenshot.hpp"
 #include "Config.hpp"
 
-#include <string>
-
 namespace glrage {
 
 class ContextImpl : public Context {
@@ -31,6 +29,7 @@ public:
     void renderBegin();
     bool isRendered();
     HWND getHWnd();
+    std::string getBasePath();
 
 private:
     // constants

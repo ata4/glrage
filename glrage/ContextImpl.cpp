@@ -6,6 +6,7 @@
 #include "wgl_ext.h"
 
 #include <mciapi.h>
+#include <Shlwapi.h>
 #include <stdexcept>
 
 #define PROP_CONTEXT "Context.this"
@@ -369,6 +370,21 @@ bool ContextImpl::isRendered() {
 
 HWND ContextImpl::getHWnd() {
     return m_hwnd;
+}
+
+std::string ContextImpl::getBasePath() {
+    char path[MAX_PATH];
+    HMODULE hModule = NULL;
+    DWORD dwFlags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+
+    if (!GetModuleHandleExA(dwFlags, reinterpret_cast<LPCSTR>(&WindowProc), &hModule)) {
+        throw std::runtime_error("Can't get module handle");
+    }
+
+    GetModuleFileName(hModule, path, sizeof(path));
+    PathRemoveFileSpec(path);
+
+    return path;
 }
 
 }

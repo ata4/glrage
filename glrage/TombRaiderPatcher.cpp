@@ -4,6 +4,7 @@
 #include "StringUtils.hpp"
 #include "ErrorUtils.hpp"
 #include "Logger.hpp"
+#include "GLRage.hpp"
 
 #include <map>
 #include <string>
@@ -523,7 +524,8 @@ void TombRaiderPatcher::applyLogicPatches() {
 }
 
 void TombRaiderPatcher::applyLocalePatches() {
-    std::string localePath = "locale\\";
+    std::string basePath = GLRageGetContext().getBasePath();
+    std::string localePath = basePath + "\\locale\\";
 
     // load locale file
     std::string locale = m_config.getString("patch_localization_locale", "en_GB");
