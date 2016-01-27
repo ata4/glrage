@@ -336,7 +336,7 @@ BOOL TombRaiderHooks::musicPlay(int16_t trackID) {
     // configure time format
     MCI_SET_PARMS setParms;
     setParms.dwTimeFormat = MCI_FORMAT_TMSF;
-    if (mciSendCommand(*m_tombMciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT,
+    if (mciSendCommandA(*m_tombMciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT,
         reinterpret_cast<DWORD_PTR>(&setParms))) {
         return FALSE;
     }
@@ -353,7 +353,7 @@ BOOL TombRaiderHooks::musicPlay(int16_t trackID) {
         dwFlags |= MCI_TO;
     }
 
-    if (mciSendCommand(*m_tombMciDeviceID, MCI_PLAY, dwFlags,
+    if (mciSendCommandA(*m_tombMciDeviceID, MCI_PLAY, dwFlags,
         reinterpret_cast<DWORD_PTR>(&openParms))) {
         return FALSE;
     }
@@ -372,7 +372,7 @@ BOOL TombRaiderHooks::musicStop() {
     // tracks. But we'll use MCI_STOP here, since it's expected to use an MCI
     // wrapper with nearly zero latency anyway.
     MCI_GENERIC_PARMS genParms;
-    return !mciSendCommand(*m_tombMciDeviceID, MCI_STOP, MCI_WAIT,
+    return !mciSendCommandA(*m_tombMciDeviceID, MCI_STOP, MCI_WAIT,
         reinterpret_cast<DWORD_PTR>(&genParms));
 }
 
