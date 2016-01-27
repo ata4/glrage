@@ -103,7 +103,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glrage_static.lib;glrage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;psapi.lib;glrage_static.lib;glrage.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>ati3dcif.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
