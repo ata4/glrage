@@ -39,8 +39,8 @@ void CifVertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) 
         }
 
         default:
-            throw CifError("Unsupported vertex type: "
-                + std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
+            throw CifError("Unsupported vertex type: " +
+                std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
     }
 
     glDrawArrays(GLCIF_PRIMSTRIP_MODES[m_primType], 0, numVert);
@@ -89,8 +89,8 @@ void CifVertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
         }
 
         default:
-            throw CifError("Unsupported vertex type: "
-                + std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
+            throw CifError("Unsupported vertex type: " +
+                std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
     }
 
     glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, numVert);
