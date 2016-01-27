@@ -6,7 +6,6 @@
 #include "gl_core_3_3.h"
 #include "wgl_ext.h"
 
-#include <mciapi.h>
 #include <Shlwapi.h>
 
 #include <stdexcept>
