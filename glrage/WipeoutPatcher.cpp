@@ -37,6 +37,11 @@ void WipeoutPatcher::apply() {
     if (m_config.getBool("patch_disable_title_screen", false)) {
         patch(0x46B885, "E8 B8 40 00 00", "90 90 90 90 90");
     }
+	
+	// Disable introductory video.
+	if (m_config.getBool("patch_disable_introductory_video", false)) {
+		patch(0x46B808, "E8 33 46 00 00", "90 90 90 90 90");
+	}
 }
 
 BOOL WipeoutPatcher::hookSystemParametersInfoA(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni) {

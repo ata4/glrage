@@ -297,6 +297,14 @@ void ContextImpl::setWindowSize(uint32_t width, uint32_t height) {
 
     SetWindowPos(m_hwnd, HWND_NOTOPMOST, left, top, width, height,
         SWP_SHOWWINDOW | SWP_FRAMECHANGED);
+	
+	// resize again for pixel-perfect rendering (account for border/frame)
+	RECT cRect;
+	GetClientRect(m_hwnd, &cRect);
+	auto width1 = width + (width - cRect.right);
+	auto height1 = height + (height - cRect.bottom);
+	SetWindowPos(m_hwnd, HWND_NOTOPMOST, left, top, width1, height1,
+		SWP_SHOWWINDOW | SWP_FRAMECHANGED);
 }
 
 uint32_t ContextImpl::getWindowWidth() {
