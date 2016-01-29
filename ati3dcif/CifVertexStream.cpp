@@ -64,11 +64,11 @@ void CifVertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
                 for (C3D_UINT32 i = 0; i < numVert; i += 4) {
                     m_vtcBuffer.push_back(*vListVtcf[i + 0]);
                     m_vtcBuffer.push_back(*vListVtcf[i + 1]);
-                    m_vtcBuffer.push_back(*vListVtcf[i + 2]);
+                    m_vtcBuffer.push_back(*vListVtcf[i + 3]);
 
+                    m_vtcBuffer.push_back(*vListVtcf[i + 1]);
                     m_vtcBuffer.push_back(*vListVtcf[i + 2]);
                     m_vtcBuffer.push_back(*vListVtcf[i + 3]);
-                    m_vtcBuffer.push_back(*vListVtcf[i + 0]);
                 }
 
                 numVert = m_vtcBuffer.size();
