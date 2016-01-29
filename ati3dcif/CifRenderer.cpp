@@ -69,7 +69,7 @@ void CifRenderer::renderBegin(C3D_HRC hRC) {
     // perspective when required
     float width = static_cast<float>(m_context.getDisplayWidth());
     float height = static_cast<float>(m_context.getDisplayHeight());
-    glm::mat4 projection = glm::ortho<float>(0, width, height, 0, 0, 1e6);
+    glm::mat4 projection = glm::ortho<float>(0, width, height, 0, -1e6, 1e6);
     m_program.uniformMatrix4fv("matProjection", 1, GL_FALSE, glm::value_ptr(projection));
 
     GLUtils::checkError("CifRenderer::renderBegin");
