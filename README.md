@@ -1,6 +1,6 @@
 GLRage is an OpenGL wrapper for the ATI 3D C Interface (ATI3DCIF) and DirectDraw 2. It allows to play vintage Windows 95/98 games designed for the ATI 3D Rage series on modern GPUs and Windows versions in FHD, UHD and beyond.
 
-It is based on a heavily modified version of [GLCIF](http://glcif.sourceforge.net/) that was originally tailored specifically for Tomb Raider, which has been ported to modern OpenGL and C++ with the goal to support more games.
+It is based on a heavily modified version of GLCIF that was originally tailored specifically for Tomb Raider, which has been ported to modern OpenGL and C++ with the goal to support more games.
 
 It also supports non-destructive memory patching, which allows bug fixes and enhancements while leaving the original .exe files untouched.
 
