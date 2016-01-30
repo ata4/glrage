@@ -104,12 +104,11 @@ Wipeout runs mostly stable, but there are some graphical glitches right now.
 * Preventing the game from messing with the key repeat rate and screensaver settings.
 
 #### Optional patches
-* Added option to skip the title screen.
+* Added option to skip the title screen and intro video.
 
 ### Known problems
 * Low subpixel vertex accuracy, which causes wobbly polygons in higher resolutions.
 * Some background images aren't rendered correctly.
-* Certain parts of objects, including one half of the skybox, are invisible.
 
 # Compiling
 
