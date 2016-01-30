@@ -272,5 +272,8 @@ _Pvt_Extensions
 # Automatically generated files
 glrage_static/gitversion.h
 
+# 3D Rage SDK (proprietary)
+ragesdk/
+
 # Other
 private/

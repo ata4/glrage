@@ -65,7 +65,7 @@
   <PropertyGroup>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LibraryPath>$(SolutionDir)build\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)glrage_static;$(SolutionDir)glrage;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)glrage_static;$(SolutionDir)glrage;$(SolutionDir)ragesdk;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
     <IntDir>build\$(Configuration)\</IntDir>
   </PropertyGroup>
