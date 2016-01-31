@@ -220,9 +220,11 @@ HRESULT WINAPI DirectDrawSurface::Flip(LPDIRECTDRAWSURFACE lpDDSurfaceTargetOver
         return DDERR_NOTFLIPPABLE;
     }
 
-    // don't re-upload surfaces if a renderer was active after lock() has been
-    // called
-    if (m_context.isRendered()) {
+    bool rendered = m_context.isRendered();
+
+    // don't re-upload surfaces if external rendering was active after lock() has
+    // been called, since it wouldn't be visible anyway
+    if (rendered) {
         m_dirty = false;
     }
 
@@ -241,10 +243,24 @@ HRESULT WINAPI DirectDrawSurface::Flip(LPDIRECTDRAWSURFACE lpDDSurfaceTargetOver
         m_dirty = false;
     }
     
-    // then render it
-    m_context.swapBuffers();
+    // swap buffer now if there was external rendering, otherwise the surface
+    // would overwrite it
+    if (rendered) {
+        m_context.swapBuffers();
+    }
+
+    // update viewport in case the window size has changed
     m_context.setupViewport();
+
+    // render surface
     m_renderer.render();
+
+    // swap buffer after the surface has been rendered if there was no external
+    // rendering for this frame, fixes title screens and other pure 2D operations
+    // that aren't continuously updated
+    if (!rendered) {
+        m_context.swapBuffers();
+    }
 
     return DD_OK;
 }
