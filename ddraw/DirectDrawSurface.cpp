@@ -137,25 +137,59 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect, LPDIRECTDRAWSURFACE lpD
     }
 
     if (lpDDSrcSurface) {
-        // first check if the blit will replace the entire buffer
-        bool replace = true;
+        m_dirty = true;
 
-        if (lpSrcRect && (lpSrcRect->left != 0 || lpSrcRect->right != m_desc.dwWidth || lpSrcRect->top != 0 || lpSrcRect->bottom != m_desc.dwHeight)) {
-            replace = false;
-        }
+        DirectDrawSurface* src = static_cast<DirectDrawSurface*>(lpDDSrcSurface);
 
-        if (lpDestRect && (lpDestRect->left != 0 || lpDestRect->right != m_desc.dwWidth || lpDestRect->top != 0 || lpDestRect->bottom != m_desc.dwHeight)) {
-            replace = false;
-        }
+        const int32_t sourceTop = lpSrcRect ? lpSrcRect->top : 0;
+        const int32_t sourceBottom = lpSrcRect ? lpSrcRect->bottom : src->m_desc.dwHeight;
 
-        if (replace) {
-            DirectDrawSurface* src = static_cast<DirectDrawSurface*>(lpDDSrcSurface);
+        const int32_t sourceLeft = lpSrcRect ? lpSrcRect->left : 0;
+        const int32_t sourceRight = lpSrcRect ? lpSrcRect->right : src->m_desc.dwWidth;
+
+        const int32_t targetTop = lpDestRect ? lpDestRect->top : 0;
+        const int32_t targetBottom = lpDestRect ? lpDestRect->bottom : m_desc.dwHeight;
+
+        const int32_t targetLeft = lpDestRect ? lpDestRect->left : 0;
+        const int32_t targetRight = lpDestRect ? lpDestRect->right : m_desc.dwWidth;
+
+        const int32_t sourceWidth = src->m_desc.dwWidth;
+        const int32_t sourceHeight = src->m_desc.dwHeight;
+
+        const int32_t targetWidth = m_desc.dwWidth;
+        const int32_t targetHeight = m_desc.dwHeight;
+
+        // copy buffer directly if possible
+        if (sourceLeft == 0 && targetLeft == 0 &&
+            sourceTop == 0 && targetTop == 0 &&
+            sourceRight == targetWidth && targetRight == targetWidth &&
+            sourceBottom == targetHeight && targetBottom == targetHeight) {
             m_buffer = src->m_buffer;
         } else {
-            // TODO: rectangular 2D copy
-        }
+            // nearest-neighbor bit block transfer - slightly modified code from
+            // https://stackoverflow.com/q/28566290
+            const int32_t xRatio = ((sourceRight - sourceLeft) << 16) / targetWidth;
+            const int32_t yRatio = ((sourceBottom - sourceTop) << 16) / targetHeight;
 
-        m_dirty = true;
+            // note: assumes that the source surface descriptor is the same as
+            // in the target and that dwRGBBitCount is a multiple of 8
+            const int32_t byteCount = m_desc.ddpfPixelFormat.dwRGBBitCount / 8;
+
+            for (int32_t y = targetTop; y < targetBottom; y++) {
+                int32_t y2_xsource = (((y + sourceTop) * yRatio) >> 16) * sourceWidth;
+                int32_t i_xdest = y * targetWidth;
+
+                for (int32_t x = targetLeft; x < targetRight; x++) {
+                    int32_t x2 = (((x + sourceLeft) * xRatio) >> 16);
+                    int32_t y2_x2_bytes = (y2_xsource + x2) * byteCount;
+                    int32_t i_xdest_bytes = (i_xdest + x) * byteCount;
+
+                    for (int32_t n = 0; n < byteCount; n++) {
+                        m_buffer[i_xdest_bytes + n] = src->m_buffer[y2_x2_bytes + n];
+                    }
+                }
+            }
+        }
     }
 
     // Clear primary surface in 2D mode ony. OpenGL already does the clearing
