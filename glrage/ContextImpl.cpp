@@ -117,9 +117,7 @@ void ContextImpl::attach(HWND hwnd) {
     }
 
     // apply previously applied fullscreen mode
-    if (m_fullscreen) {
-        setFullscreen(m_fullscreen);
-    }
+    setFullscreen(m_fullscreen);
 }
 
 void ContextImpl::attach() {
@@ -208,10 +206,6 @@ bool ContextImpl::isFullscreen() {
 }
 
 void ContextImpl::setFullscreen(bool fullscreen) {
-    if (m_fullscreen == fullscreen) {
-        return;
-    }
-
     m_fullscreen = fullscreen;
 
     if (!m_hwnd) {
