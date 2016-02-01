@@ -108,7 +108,6 @@ Wipeout runs mostly stable, but there are some graphical glitches right now.
 
 ### Known problems
 * Low subpixel vertex accuracy, which causes wobbly polygons in higher resolutions.
-* Some background images aren't rendered correctly.
 
 # Compiling
 
