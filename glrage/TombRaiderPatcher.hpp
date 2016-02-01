@@ -7,6 +7,7 @@ namespace glrage {
 class TombRaiderPatcher : public RuntimePatcher {
 public:
     TombRaiderPatcher();
+    virtual GameID gameID();
     virtual bool applicable(const std::string& fileName);
     virtual void apply();
 

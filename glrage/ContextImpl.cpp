@@ -389,4 +389,12 @@ std::wstring ContextImpl::getBasePath() {
     return path;
 }
 
+GameID ContextImpl::getGameID() {
+    return m_gameID;
+}
+
+void ContextImpl::setGameID(GameID gameID) {
+    m_gameID = gameID;
+}
+
 }

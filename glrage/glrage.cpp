@@ -5,6 +5,8 @@
 using glrage::RuntimePatcher;
 using glrage::ContextImpl;
 
+static ContextImpl context;
+
 const char* DLLMAIN_REASON[] {
     "DLL_PROCESS_DETACH",
     "DLL_PROCESS_ATTACH",
@@ -17,14 +19,12 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved) {
 
     switch (dwReason) {
         case DLL_PROCESS_ATTACH:
-            RuntimePatcher::patch();
+            context.setGameID(RuntimePatcher::patch());
             break;
     }
 
     return TRUE;
 }
-
-static ContextImpl context;
 
 extern "C" {
 

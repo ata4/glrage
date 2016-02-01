@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+using glrage::GameID;
+
 namespace ddraw {
 
 DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD, SurfaceRenderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc) :
@@ -461,10 +463,16 @@ HRESULT WINAPI DirectDrawSurface::Unlock(LPVOID lp) {
 
     // re-draw stand-alone back buffers immediately after unlocking (used for video sequences)
     if (m_desc.ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE && !(m_desc.ddsCaps.dwCaps & DDSCAPS_FLIP)) {
-        // duplicate even to odd lines
-        //for (uint32_t i = 0; i < m_desc.dwHeight; i += 2) {
-        //    memcpy(m_buffer + (i + 1) * m_desc.lPitch, m_buffer + i * m_desc.lPitch, m_desc.lPitch);
-        //}
+        // FMV hack for Tomb Raider
+        if (m_context.getGameID() == GameID::TombRaider) {
+            // fix black lines by copying even to odd lines
+            for (DWORD i = 0; i < m_desc.dwHeight; i += 2) {
+                auto itrEven = std::next(m_buffer.begin(), i * m_desc.lPitch);
+                auto itrOdd = std::next(m_buffer.begin(), (i + 1) * m_desc.lPitch);
+                std::copy(itrEven, std::next(itrEven, m_desc.lPitch), itrOdd);
+            }
+        }
+
         m_context.swapBuffers();
         m_context.setupViewport();
         m_renderer.upload(m_desc, m_buffer);

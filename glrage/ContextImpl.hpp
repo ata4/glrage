@@ -32,6 +32,8 @@ public:
     bool isRendered();
     HWND getHWnd();
     std::wstring getBasePath();
+    GameID getGameID();
+    void setGameID(GameID gameID);
 
 private:
     // constants
@@ -75,6 +77,9 @@ private:
     // DirectDraw display mode dimension
     int32_t m_width = 0;
     int32_t m_height = 0;
+
+    // detected game
+    GameID m_gameID = GameID::Unknown;
 };
 
 }

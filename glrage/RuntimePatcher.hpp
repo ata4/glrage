@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "GameID.hpp"
 #include "Config.hpp"
 #include "RuntimeData.hpp"
 
@@ -12,14 +13,12 @@ namespace glrage {
 class RuntimePatcher {
 public:
     RuntimePatcher(const std::string& configName);
-    static void patch();
+    static GameID patch();
+    virtual GameID gameID() = 0;
     virtual bool applicable(const std::string& fileName) = 0;
     virtual void apply() = 0;
 
 protected:
-    template<class T>
-    static void runPatch(const std::string& fileName);
-
     bool patch(uint32_t addr, const std::string& expected, const std::string& replacement);
     bool patch(uint32_t addr, const std::string& expected, const RuntimeData& replacement);
     bool patch(uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement);

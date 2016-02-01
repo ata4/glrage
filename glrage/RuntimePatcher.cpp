@@ -11,21 +11,15 @@
 #include <Shlwapi.h>
 
 #include <algorithm>
+#include <memory>
 
 namespace glrage {
-
-template<class T> static void RuntimePatcher::runPatch(const std::string& fileName) {
-    T patch = T();
-    if (patch.applicable(fileName)) {
-        patch.apply();
-    }
-}
 
 RuntimePatcher::RuntimePatcher(const std::string& configName) :
     m_config(configName, GLRageGetContext().getBasePath()) {
 }
 
-void RuntimePatcher::patch() {
+GameID RuntimePatcher::patch() {
     // get executable name
     TCHAR modulePath[MAX_PATH];
     GetModuleFileName(nullptr, modulePath, MAX_PATH);
@@ -45,9 +39,19 @@ void RuntimePatcher::patch() {
     std::string moduleFileName = std::string(StringUtils::wideToUtf8(modulePathW));
 
     // run known patches
-    runPatch<TombRaiderPatcher>(moduleFileName);
-    runPatch<AssaultRigsPatcher>(moduleFileName);
-    runPatch<WipeoutPatcher>(moduleFileName);
+    std::vector<std::shared_ptr<RuntimePatcher>> patchers;
+    patchers.push_back(std::make_shared<TombRaiderPatcher>());
+    patchers.push_back(std::make_shared<AssaultRigsPatcher>());
+    patchers.push_back(std::make_shared<WipeoutPatcher>());
+
+    for (auto& patcher : patchers) {
+        if (patcher->applicable(moduleFileName)) {
+            patcher->apply();
+            return patcher->gameID();
+        }
+    }
+
+    return GameID::Unknown;
 }
 
 bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, const std::string& replacement) {

@@ -6,6 +6,10 @@
 
 namespace glrage {
 
+GameID AssaultRigsPatcher::gameID() {
+    return GameID::AssaultRigs;
+}
+
 AssaultRigsPatcher::AssaultRigsPatcher() :
     RuntimePatcher("Assault Rigs") {
 }

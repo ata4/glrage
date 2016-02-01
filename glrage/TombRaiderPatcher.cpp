@@ -17,6 +17,10 @@ TombRaiderPatcher::TombRaiderPatcher() :
     RuntimePatcher("Tomb Raider")
 { }
 
+GameID TombRaiderPatcher::gameID() {
+    return GameID::TombRaider;
+}
+
 bool TombRaiderPatcher::applicable(const std::string& fileName) {
     if (fileName == m_config.getString("patch_exe", "tombati")) {
         m_ub = false;
