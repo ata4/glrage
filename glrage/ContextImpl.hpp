@@ -20,12 +20,12 @@ public:
     bool isFullscreen();
     void setFullscreen(bool fullscreen);
     void toggleFullscreen();
-    void setDisplaySize(uint32_t width, uint32_t height);
-    uint32_t getDisplayWidth();
-    uint32_t getDisplayHeight();
-    void setWindowSize(uint32_t width, uint32_t height);
-    uint32_t getWindowWidth();
-    uint32_t getWindowHeight();
+    void setDisplaySize(int32_t width, int32_t height);
+    int32_t getDisplayWidth();
+    int32_t getDisplayHeight();
+    void setWindowSize(int32_t width, int32_t height);
+    int32_t getWindowWidth();
+    int32_t getWindowHeight();
     void setupViewport();
     void swapBuffers();
     void renderBegin();
@@ -73,8 +73,8 @@ private:
     RECT m_tmprect{ 0 };
 
     // DirectDraw display mode dimension
-    uint32_t m_width = 0;
-    uint32_t m_height = 0;
+    int32_t m_width = 0;
+    int32_t m_height = 0;
 };
 
 }

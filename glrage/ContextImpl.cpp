@@ -43,7 +43,7 @@ void ContextImpl::init() {
     // The exact point where the application will create its window is unknown,
     // but a valid OpenGL context is required at this point, so just create a
     // dummy window for now and transfer the context later.
-    HWND m_hwndTmp = CreateWindow(L"STATIC", L"", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
+    auto m_hwndTmp = CreateWindow(L"STATIC", L"", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
         NULL, NULL, GetModuleHandle(NULL), NULL);
     ShowWindow(m_hwndTmp, SW_HIDE);
 
@@ -52,7 +52,7 @@ void ContextImpl::init() {
         ErrorUtils::error("Can't get device context", ErrorUtils::getWindowsErrorString());
     }
 
-    int pf = ChoosePixelFormat(m_hdc, &m_pfd);
+    auto pf = ChoosePixelFormat(m_hdc, &m_pfd);
     if (!pf) {
         ErrorUtils::error("Can't choose pixel format", ErrorUtils::getWindowsErrorString());
     }
@@ -101,7 +101,7 @@ void ContextImpl::attach(HWND hwnd) {
     
     // get DC of window
     m_hdc = GetDC(m_hwnd);
-    INT pf = ChoosePixelFormat(m_hdc, &m_pfd);
+    auto pf = ChoosePixelFormat(m_hdc, &m_pfd);
     if (!pf || !SetPixelFormat(m_hdc, pf, &m_pfd)) {
         ErrorUtils::error("Can't set pixel format", ErrorUtils::getWindowsErrorString());
     }
@@ -213,8 +213,8 @@ void ContextImpl::setFullscreen(bool fullscreen) {
     }
 
     // change window style
-    LONG style = GetWindowLong(m_hwnd, GWL_STYLE);
-    LONG styleEx = GetWindowLong(m_hwnd, GWL_EXSTYLE);
+    auto style = GetWindowLong(m_hwnd, GWL_STYLE);
+    auto styleEx = GetWindowLong(m_hwnd, GWL_EXSTYLE);
 
     if (m_fullscreen) {
         style &= ~STYLE_WINDOW;
@@ -248,7 +248,7 @@ void ContextImpl::toggleFullscreen() {
     setFullscreen(!m_fullscreen);
 }
 
-void ContextImpl::setDisplaySize(uint32_t width, uint32_t height) {
+void ContextImpl::setDisplaySize(int32_t width, int32_t height) {
     LOGF("Display size: %dx%d", width, height);
 
     m_width = width;
@@ -260,15 +260,15 @@ void ContextImpl::setDisplaySize(uint32_t width, uint32_t height) {
     }
 }
 
-uint32_t ContextImpl::getDisplayWidth() {
+int32_t ContextImpl::getDisplayWidth() {
     return m_width;
 }
 
-uint32_t ContextImpl::getDisplayHeight() {
+int32_t ContextImpl::getDisplayHeight() {
     return m_height;
 }
 
-void ContextImpl::setWindowSize(uint32_t width, uint32_t height) {
+void ContextImpl::setWindowSize(int32_t width, int32_t height) {
     if (!m_hwnd) {
         return;
     }
@@ -278,6 +278,7 @@ void ContextImpl::setWindowSize(uint32_t width, uint32_t height) {
     // reduce window size as long as its greater or equal to the desktop size
     auto desktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
     auto desktopHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
     while (!m_fullscreen && width >= desktopWidth && height >= desktopHeight) {
         width /= 2;
         height /= 2;
@@ -300,7 +301,7 @@ void ContextImpl::setWindowSize(uint32_t width, uint32_t height) {
         SWP_SHOWWINDOW | SWP_FRAMECHANGED);
 }
 
-uint32_t ContextImpl::getWindowWidth() {
+int32_t ContextImpl::getWindowWidth() {
     if (!m_hwnd) {
         return m_width;
     }
@@ -309,7 +310,7 @@ uint32_t ContextImpl::getWindowWidth() {
     return m_tmprect.right - m_tmprect.left;
 }
 
-uint32_t ContextImpl::getWindowHeight() {
+int32_t ContextImpl::getWindowHeight() {
     if (!m_hwnd) {
         return m_height;
     }
@@ -319,24 +320,24 @@ uint32_t ContextImpl::getWindowHeight() {
 }
 
 void ContextImpl::setupViewport() {
-    UINT vpWidth = getWindowWidth();
-    UINT vpHeight = getWindowHeight();
+    auto vpWidth = getWindowWidth();
+    auto vpHeight = getWindowHeight();
 
     // default to bottom left corner of the window
-    UINT vpX = 0;
-    UINT vpY = 0;
+    auto vpX = 0;
+    auto vpY = 0;
 
-    UINT hw = m_height * vpWidth;
-    UINT wh = m_width * vpHeight;
+    auto hw = m_height * vpWidth;
+    auto wh = m_width * vpHeight;
 
     // create viewport offset if the window has a different
     // aspect ratio than the current display mode
     if (hw > wh) {
-        UINT wMax = wh / m_height;
+        auto wMax = wh / m_height;
         vpX = (vpWidth - wMax) / 2;
         vpWidth = wMax;
     } else if (hw < wh) {
-        UINT hMax = hw / m_width;
+        auto hMax = hw / m_width;
         vpY = (vpHeight - hMax) / 2;
         vpHeight = hMax;
     }
