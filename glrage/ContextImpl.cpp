@@ -275,29 +275,28 @@ void ContextImpl::setWindowSize(uint32_t width, uint32_t height) {
 
     LOGF("Window size: %dx%d", width, height);
 
-    int32_t desktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    int32_t desktopHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-
-    // if windowed mode is active and the display mode is as large as the deskop,
-    // then divide the size into half so it won't go into fullscreen
-    if (!m_fullscreen && width == desktopWidth && height == desktopHeight) {
+    // reduce window size as long as its greater or equal to the desktop size
+    auto desktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    auto desktopHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    while (!m_fullscreen && width >= desktopWidth && height >= desktopHeight) {
         width /= 2;
         height /= 2;
     }
 
     // center window on desktop
-    int32_t left = desktopWidth / 2 - width / 2;
-    int32_t top = desktopHeight / 2 - height / 2;
+    auto left = desktopWidth / 2 - width / 2;
+    auto top = desktopHeight / 2 - height / 2;
 
-    SetWindowPos(m_hwnd, HWND_NOTOPMOST, left, top, width, height,
-        SWP_SHOWWINDOW | SWP_FRAMECHANGED);
-    
-    // resize again for pixel-perfect rendering (account for border/frame)
-    RECT cRect;
-    GetClientRect(m_hwnd, &cRect);
-    auto width1 = width + (width - cRect.right);
-    auto height1 = height + (height - cRect.bottom);
-    SetWindowPos(m_hwnd, HWND_NOTOPMOST, left, top, width1, height1,
+    // get corrected client area
+    auto style = GetWindowLong(m_hwnd, GWL_STYLE);
+    auto styleEx = GetWindowLong(m_hwnd, GWL_EXSTYLE);
+
+    RECT rect{ left, top, left + width, top + height };
+    AdjustWindowRectEx(&rect, style, FALSE, styleEx);
+
+    // resize window
+    SetWindowPos(m_hwnd, HWND_NOTOPMOST, rect.left, rect.top,
+        rect.right - rect.left, rect.bottom - rect.top,
         SWP_SHOWWINDOW | SWP_FRAMECHANGED);
 }
 
