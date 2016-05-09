@@ -1,7 +1,7 @@
 #include "ContextImpl.hpp"
+#include "ErrorUtils.hpp"
 #include "Logger.hpp"
 #include "StringUtils.hpp"
-#include "ErrorUtils.hpp"
 
 #include "gl_core_3_3.h"
 #include "wgl_ext.h"
@@ -12,17 +12,22 @@
 
 namespace glrage {
 
-static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    ContextImpl* context = reinterpret_cast<ContextImpl*>(GetProp(hwnd, ContextImpl::PROP_CONTEXT));
+static LRESULT CALLBACK WindowProc(
+    HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    ContextImpl* context = reinterpret_cast<ContextImpl*>(
+        GetProp(hwnd, ContextImpl::PROP_CONTEXT));
     return context->windowProc(hwnd, msg, wParam, lParam);
 }
 
-static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this) {
+static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this)
+{
     ContextImpl* context = reinterpret_cast<ContextImpl*>(_this);
     return context->enumWindowsProc(hwnd);
 }
 
-ContextImpl::ContextImpl() {
+ContextImpl::ContextImpl()
+{
     SetRectEmpty(&m_tmprect);
 
     // set pixel format
@@ -35,7 +40,8 @@ ContextImpl::ContextImpl() {
     m_pfd.iLayerType = PFD_MAIN_PLANE;
 }
 
-void ContextImpl::init() {
+void ContextImpl::init()
+{
     if (m_hglrc) {
         return;
     }
@@ -43,27 +49,31 @@ void ContextImpl::init() {
     // The exact point where the application will create its window is unknown,
     // but a valid OpenGL context is required at this point, so just create a
     // dummy window for now and transfer the context later.
-    auto m_hwndTmp = CreateWindow(L"STATIC", L"", WS_POPUP | WS_DISABLED, 0, 0, 1, 1,
-        NULL, NULL, GetModuleHandle(NULL), NULL);
+    auto m_hwndTmp = CreateWindow(L"STATIC", L"", WS_POPUP | WS_DISABLED, 0, 0,
+        1, 1, NULL, NULL, GetModuleHandle(NULL), NULL);
     ShowWindow(m_hwndTmp, SW_HIDE);
 
     m_hdc = GetDC(m_hwndTmp);
     if (!m_hdc) {
-        ErrorUtils::error("Can't get device context", ErrorUtils::getWindowsErrorString());
+        ErrorUtils::error(
+            "Can't get device context", ErrorUtils::getWindowsErrorString());
     }
 
     auto pf = ChoosePixelFormat(m_hdc, &m_pfd);
     if (!pf) {
-        ErrorUtils::error("Can't choose pixel format", ErrorUtils::getWindowsErrorString());
+        ErrorUtils::error(
+            "Can't choose pixel format", ErrorUtils::getWindowsErrorString());
     }
 
     if (!SetPixelFormat(m_hdc, pf, &m_pfd)) {
-        ErrorUtils::error("Can't set pixel format", ErrorUtils::getWindowsErrorString());
+        ErrorUtils::error(
+            "Can't set pixel format", ErrorUtils::getWindowsErrorString());
     }
 
     m_hglrc = wglCreateContext(m_hdc);
     if (!m_hglrc || !wglMakeCurrent(m_hdc, m_hglrc)) {
-        ErrorUtils::error("Can't create OpenGL context", ErrorUtils::getWindowsErrorString());
+        ErrorUtils::error(
+            "Can't create OpenGL context", ErrorUtils::getWindowsErrorString());
     }
 
     glClearColor(0, 0, 0, 0);
@@ -74,7 +84,8 @@ void ContextImpl::init() {
     }
 }
 
-void ContextImpl::attach(HWND hwnd) {
+void ContextImpl::attach(HWND hwnd)
+{
     if (m_hwnd) {
         return;
     }
@@ -87,8 +98,10 @@ void ContextImpl::attach(HWND hwnd) {
 
     // get window procedure pointer and replace it with custom procedure
     SetProp(m_hwnd, PROP_CONTEXT, this);
-    m_windowProc = reinterpret_cast<WNDPROC>(GetWindowLongPtr(m_hwnd, GWL_WNDPROC));
-    SetWindowLongPtr(m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
+    m_windowProc =
+        reinterpret_cast<WNDPROC>(GetWindowLongPtr(m_hwnd, GWL_WNDPROC));
+    SetWindowLongPtr(
+        m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
 
     // detach from current window
     wglMakeCurrent(NULL, NULL);
@@ -98,17 +111,19 @@ void ContextImpl::attach(HWND hwnd) {
         DestroyWindow(m_hwndTmp);
         m_hwndTmp = nullptr;
     }
-    
+
     // get DC of window
     m_hdc = GetDC(m_hwnd);
     auto pf = ChoosePixelFormat(m_hdc, &m_pfd);
     if (!pf || !SetPixelFormat(m_hdc, pf, &m_pfd)) {
-        ErrorUtils::error("Can't set pixel format", ErrorUtils::getWindowsErrorString());
+        ErrorUtils::error(
+            "Can't set pixel format", ErrorUtils::getWindowsErrorString());
     }
 
-    // set context on new window 
+    // set context on new window
     if (!m_hglrc || !wglMakeCurrent(m_hdc, m_hglrc)) {
-        ErrorUtils::error("Can't attach window to OpenGL context", ErrorUtils::getWindowsErrorString());
+        ErrorUtils::error("Can't attach window to OpenGL context",
+            ErrorUtils::getWindowsErrorString());
     }
 
     // apply previously applied window size
@@ -120,7 +135,8 @@ void ContextImpl::attach(HWND hwnd) {
     setFullscreen(m_fullscreen);
 }
 
-void ContextImpl::attach() {
+void ContextImpl::attach()
+{
     if (m_hwnd) {
         return;
     }
@@ -129,25 +145,31 @@ void ContextImpl::attach() {
     EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(this));
 }
 
-void ContextImpl::detach() {
+void ContextImpl::detach()
+{
     if (!m_hwnd) {
         return;
     }
 
     wglDeleteContext(m_hglrc);
     m_hglrc = nullptr;
-    
-    SetWindowLongPtr(m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(m_windowProc));
+
+    SetWindowLongPtr(
+        m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(m_windowProc));
     m_windowProc = nullptr;
 
     m_hwnd = nullptr;
 }
 
-LRESULT ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT
+ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
     switch (msg) {
-        // Printscreen on Windows with OpenGL doesn't work in fullscreen, so hook the
+        // Printscreen on Windows with OpenGL doesn't work in fullscreen, so
+        // hook the
         // key and implement screenshot saving to files.
-        // For some reason, VK_SNAPSHOT doesn't generate WM_KEYDOWN events but only
+        // For some reason, VK_SNAPSHOT doesn't generate WM_KEYDOWN events but
+        // only
         // WM_KEYUP. Works just as well, though.
         case WM_KEYUP:
             if (wParam == VK_SNAPSHOT) {
@@ -158,13 +180,15 @@ LRESULT ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
         // toggle fullscreen if alt + return is pressed
         case WM_SYSKEYDOWN:
-            if (wParam == VK_RETURN && lParam & 1 << 29 && !(lParam & 1 << 30)) {
+            if (wParam == VK_RETURN && lParam & 1 << 29 &&
+                !(lParam & 1 << 30)) {
                 toggleFullscreen();
                 return TRUE;
             }
             break;
 
-        // force default handling for some window messages when in windowed mode,
+        // force default handling for some window messages when in windowed
+        // mode,
         // especially important for Tomb Raider
         case WM_MOVE:
         case WM_MOVING:
@@ -182,7 +206,8 @@ LRESULT ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
     return CallWindowProc(m_windowProc, hwnd, msg, wParam, lParam);
 }
 
-BOOL ContextImpl::enumWindowsProc(HWND hwnd) {
+BOOL ContextImpl::enumWindowsProc(HWND hwnd)
+{
     // ignore invisible windows
     if (!(GetWindowLong(hwnd, GWL_STYLE) & WS_VISIBLE)) {
         return TRUE;
@@ -201,11 +226,13 @@ BOOL ContextImpl::enumWindowsProc(HWND hwnd) {
     return FALSE;
 }
 
-bool ContextImpl::isFullscreen() {
+bool ContextImpl::isFullscreen()
+{
     return m_fullscreen;
 }
 
-void ContextImpl::setFullscreen(bool fullscreen) {
+void ContextImpl::setFullscreen(bool fullscreen)
+{
     m_fullscreen = fullscreen;
 
     if (!m_hwnd) {
@@ -244,11 +271,13 @@ void ContextImpl::setFullscreen(bool fullscreen) {
     setWindowSize(width, height);
 }
 
-void ContextImpl::toggleFullscreen() {
+void ContextImpl::toggleFullscreen()
+{
     setFullscreen(!m_fullscreen);
 }
 
-void ContextImpl::setDisplaySize(int32_t width, int32_t height) {
+void ContextImpl::setDisplaySize(int32_t width, int32_t height)
+{
     LOGF("Display size: %dx%d", width, height);
 
     m_width = width;
@@ -260,15 +289,18 @@ void ContextImpl::setDisplaySize(int32_t width, int32_t height) {
     }
 }
 
-int32_t ContextImpl::getDisplayWidth() {
+int32_t ContextImpl::getDisplayWidth()
+{
     return m_width;
 }
 
-int32_t ContextImpl::getDisplayHeight() {
+int32_t ContextImpl::getDisplayHeight()
+{
     return m_height;
 }
 
-void ContextImpl::setWindowSize(int32_t width, int32_t height) {
+void ContextImpl::setWindowSize(int32_t width, int32_t height)
+{
     if (!m_hwnd) {
         return;
     }
@@ -292,7 +324,7 @@ void ContextImpl::setWindowSize(int32_t width, int32_t height) {
     auto style = GetWindowLong(m_hwnd, GWL_STYLE);
     auto styleEx = GetWindowLong(m_hwnd, GWL_EXSTYLE);
 
-    RECT rect{ left, top, left + width, top + height };
+    RECT rect{left, top, left + width, top + height};
     AdjustWindowRectEx(&rect, style, FALSE, styleEx);
 
     // resize window
@@ -301,7 +333,8 @@ void ContextImpl::setWindowSize(int32_t width, int32_t height) {
         SWP_SHOWWINDOW | SWP_FRAMECHANGED);
 }
 
-int32_t ContextImpl::getWindowWidth() {
+int32_t ContextImpl::getWindowWidth()
+{
     if (!m_hwnd) {
         return m_width;
     }
@@ -310,7 +343,8 @@ int32_t ContextImpl::getWindowWidth() {
     return m_tmprect.right - m_tmprect.left;
 }
 
-int32_t ContextImpl::getWindowHeight() {
+int32_t ContextImpl::getWindowHeight()
+{
     if (!m_hwnd) {
         return m_height;
     }
@@ -319,7 +353,8 @@ int32_t ContextImpl::getWindowHeight() {
     return m_tmprect.bottom - m_tmprect.top;
 }
 
-void ContextImpl::setupViewport() {
+void ContextImpl::setupViewport()
+{
     auto vpWidth = getWindowWidth();
     auto vpHeight = getWindowHeight();
 
@@ -345,7 +380,8 @@ void ContextImpl::setupViewport() {
     glViewport(vpX, vpY, vpWidth, vpHeight);
 }
 
-void ContextImpl::swapBuffers() {
+void ContextImpl::swapBuffers()
+{
     glFinish();
 
     try {
@@ -362,24 +398,30 @@ void ContextImpl::swapBuffers() {
     m_render = false;
 }
 
-void ContextImpl::renderBegin() {
+void ContextImpl::renderBegin()
+{
     m_render = true;
 }
 
-bool ContextImpl::isRendered() {
+bool ContextImpl::isRendered()
+{
     return m_render;
 }
 
-HWND ContextImpl::getHWnd() {
+HWND ContextImpl::getHWnd()
+{
     return m_hwnd;
 }
 
-std::wstring ContextImpl::getBasePath() {
+std::wstring ContextImpl::getBasePath()
+{
     TCHAR path[MAX_PATH];
     HMODULE hModule = NULL;
-    DWORD dwFlags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+    DWORD dwFlags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
 
-    if (!GetModuleHandleEx(dwFlags, reinterpret_cast<LPCWSTR>(&WindowProc), &hModule)) {
+    if (!GetModuleHandleEx(
+            dwFlags, reinterpret_cast<LPCWSTR>(&WindowProc), &hModule)) {
         throw std::runtime_error("Can't get module handle");
     }
 
@@ -389,12 +431,14 @@ std::wstring ContextImpl::getBasePath() {
     return path;
 }
 
-GameID ContextImpl::getGameID() {
+GameID ContextImpl::getGameID()
+{
     return m_gameID;
 }
 
-void ContextImpl::setGameID(GameID gameID) {
+void ContextImpl::setGameID(GameID gameID)
+{
     m_gameID = gameID;
 }
 
-}
+} // namespace glrage

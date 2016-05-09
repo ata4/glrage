@@ -1,25 +1,27 @@
 #include "RuntimePatcher.hpp"
-#include "TombRaiderPatcher.hpp"
 #include "AssaultRigsPatcher.hpp"
+#include "TombRaiderPatcher.hpp"
 #include "WipeoutPatcher.hpp"
 
-#include "StringUtils.hpp"
-#include "Logger.hpp"
 #include "GLRage.hpp"
+#include "Logger.hpp"
+#include "StringUtils.hpp"
 
-#include <Windows.h>
 #include <Shlwapi.h>
+#include <Windows.h>
 
 #include <algorithm>
 #include <memory>
 
 namespace glrage {
 
-RuntimePatcher::RuntimePatcher(const std::string& configName) :
-    m_config(configName, GLRageGetContext().getBasePath()) {
+RuntimePatcher::RuntimePatcher(const std::string& configName)
+    : m_config(configName, GLRageGetContext().getBasePath())
+{
 }
 
-GameID RuntimePatcher::patch() {
+GameID RuntimePatcher::patch()
+{
     // get executable name
     TCHAR modulePath[MAX_PATH];
     GetModuleFileName(nullptr, modulePath, MAX_PATH);
@@ -33,10 +35,12 @@ GameID RuntimePatcher::patch() {
     std::wstring modulePathW = modulePathTmp;
 
     // convert to lower case
-    transform(modulePathW.begin(), modulePathW.end(), modulePathW.begin(), ::towlower);
+    transform(modulePathW.begin(), modulePathW.end(), modulePathW.begin(),
+        ::towlower);
 
     // convert to UTF-8
-    std::string moduleFileName = std::string(StringUtils::wideToUtf8(modulePathW));
+    std::string moduleFileName =
+        std::string(StringUtils::wideToUtf8(modulePathW));
 
     // run known patches
     std::vector<std::shared_ptr<RuntimePatcher>> patchers;
@@ -54,18 +58,24 @@ GameID RuntimePatcher::patch() {
     return GameID::Unknown;
 }
 
-bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, const std::string& replacement) {
+bool RuntimePatcher::patch(
+    uint32_t addr, const std::string& expected, const std::string& replacement)
+{
     RuntimeData expectedData(StringUtils::hexToBytes(expected));
     RuntimeData replacementData(StringUtils::hexToBytes(replacement));
     return patch(addr, expectedData, replacementData);
 }
 
-bool RuntimePatcher::patch(uint32_t addr, const std::string& expected, const RuntimeData& replacement) {
+bool RuntimePatcher::patch(
+    uint32_t addr, const std::string& expected, const RuntimeData& replacement)
+{
     RuntimeData expectedData(StringUtils::hexToBytes(expected));
     return patch(addr, expectedData, replacement);
 }
 
-bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement) {
+bool RuntimePatcher::patch(
+    uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement)
+{
     bool result = false;
     bool restoreProtect = false;
 
@@ -92,7 +102,8 @@ bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& expected, const Run
     // read current memory to a temporary vector
     HANDLE proc = GetCurrentProcess();
     DWORD numRead = 0;
-    if (!ReadProcessMemory(proc, lpaddr, &actualData[0], size, &numRead) || numRead != size) {
+    if (!ReadProcessMemory(proc, lpaddr, &actualData[0], size, &numRead) ||
+        numRead != size) {
         goto end;
     }
 
@@ -103,13 +114,15 @@ bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& expected, const Run
 
     // write patched data to memory
     DWORD numWritten = 0;
-    if (!WriteProcessMemory(proc, lpaddr, &replacementData[0], size, &numWritten) || numWritten != size) {
+    if (!WriteProcessMemory(
+            proc, lpaddr, &replacementData[0], size, &numWritten) ||
+        numWritten != size) {
         goto end;
     }
 
     result = true;
 
-    end:
+end:
     // restore original page flags
     if (restoreProtect) {
         VirtualProtect(lpaddr, size, oldProtect, nullptr);
@@ -125,12 +138,14 @@ bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& expected, const Run
     return result;
 }
 
-bool RuntimePatcher::patch(uint32_t addr, const std::string& replacement) {
+bool RuntimePatcher::patch(uint32_t addr, const std::string& replacement)
+{
     RuntimeData replacementData(StringUtils::hexToBytes(replacement));
     return patch(addr, replacementData);
 }
 
-bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& replacement) {
+bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& replacement)
+{
     bool result = false;
     bool restoreProtect = false;
 
@@ -149,13 +164,15 @@ bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& replacement) {
 
     // write patched data to memory
     DWORD numWritten = 0;
-    if (!WriteProcessMemory(proc, lpaddr, &replacementData[0], size, &numWritten) || numWritten != size) {
+    if (!WriteProcessMemory(
+            proc, lpaddr, &replacementData[0], size, &numWritten) ||
+        numWritten != size) {
         goto end;
     }
 
     result = true;
 
-    end:
+end:
     // restore original page flags
     if (restoreProtect) {
         VirtualProtect(lpaddr, size, oldProtect, nullptr);
@@ -169,7 +186,9 @@ bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& replacement) {
     return result;
 }
 
-void RuntimePatcher::patchAddr(int32_t addrCall, const std::string& expected, void* func, uint8_t op) {
+void RuntimePatcher::patchAddr(
+    int32_t addrCall, const std::string& expected, void* func, uint8_t op)
+{
     int32_t addrFunc = reinterpret_cast<int32_t>(func);
     int32_t addrCallNew = addrFunc - addrCall - 5;
 
@@ -179,4 +198,4 @@ void RuntimePatcher::patchAddr(int32_t addrCall, const std::string& expected, vo
     patch(addrCall, expected, m_tmp);
 }
 
-}
+} // namespace glrage

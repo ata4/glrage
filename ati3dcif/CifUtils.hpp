@@ -27,10 +27,11 @@ const char* C3D_EASEL_NAMES[];
 const char* C3D_EPIXFMT_NAMES[];
 const char* C3D_ETEXFMT_NAMES[];
 
-
-class CifUtils {
+class CifUtils
+{
 public:
-    static std::string dumpRenderStateData(C3D_ERSID eRStateID, C3D_PRSDATA pRStateData);
+    static std::string dumpRenderStateData(
+        C3D_ERSID eRStateID, C3D_PRSDATA pRStateData);
 };
 
-}
+} // namespace cif

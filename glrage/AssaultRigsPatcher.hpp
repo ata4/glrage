@@ -4,7 +4,8 @@
 
 namespace glrage {
 
-class AssaultRigsPatcher : public RuntimePatcher {
+class AssaultRigsPatcher : public RuntimePatcher
+{
 public:
     AssaultRigsPatcher();
     virtual GameID gameID();
@@ -12,4 +13,4 @@ public:
     virtual void apply();
 };
 
-}
+} // namespace glrage

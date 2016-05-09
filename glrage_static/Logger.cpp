@@ -1,7 +1,7 @@
 #include "Logger.hpp"
 
-#include <string>
 #include <iostream>
+#include <string>
 
 // fix for "K32GetModuleBaseNameA not found in KERNEL32.dll" error on Vista
 #define PSAPI_VERSION 1
@@ -10,31 +10,38 @@
 bool Logger::m_verbose = false;
 LogTarget Logger::m_target = Win32Debug;
 
-void Logger::setVerbose(bool verbose) {
+void Logger::setVerbose(bool verbose)
+{
     m_verbose = verbose;
 }
 
-bool Logger::isVerbose() {
+bool Logger::isVerbose()
+{
     return m_verbose;
 }
 
-void Logger::setTarget(LogTarget target) {
+void Logger::setTarget(LogTarget target)
+{
     m_target = target;
 }
 
-LogTarget Logger::getTarget() {
+LogTarget Logger::getTarget()
+{
     return m_target;
 }
 
-void Logger::log(void* returnAddress, const std::string& message) {
+void Logger::log(void* returnAddress, const std::string& message)
+{
     log(returnAddress, message.c_str());
 }
 
-void Logger::log(void* returnAddress, const char* message) {
+void Logger::log(void* returnAddress, const char* message)
+{
     logImpl(returnAddress, message);
 }
 
-void Logger::logf(void* returnAddress, const char* message, ...) {
+void Logger::logf(void* returnAddress, const char* message, ...)
+{
     static char info[1024];
 
     va_list list;
@@ -45,7 +52,8 @@ void Logger::logf(void* returnAddress, const char* message, ...) {
     logImpl(returnAddress, info);
 }
 
-void Logger::logImpl(void* returnAddress, const char* message) {
+void Logger::logImpl(void* returnAddress, const char* message)
+{
     static char line[1024];
     static char name[MAX_PATH];
 

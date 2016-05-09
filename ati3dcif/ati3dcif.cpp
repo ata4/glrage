@@ -1,11 +1,11 @@
 #include "ati3dcif.h"
+#include "CifError.hpp"
 #include "CifRenderer.hpp"
 #include "CifUtils.hpp"
-#include "CifError.hpp"
 
+#include "ErrorUtils.hpp"
 #include "GLRage.hpp"
 #include "Logger.hpp"
-#include "ErrorUtils.hpp"
 
 #include <stdexcept>
 
@@ -17,14 +17,17 @@ static Context& context = GLRageGetContext();
 static CifRenderer* renderer = nullptr;
 static bool contextCreated = false;
 
-C3D_EC HandleException() {
+C3D_EC
+HandleException()
+{
     try {
         throw;
     } catch (const CifError& ex) {
 #ifdef _DEBUG
         ErrorUtils::warning(ex);
 #else
-        LOGF("HandleException: CIF error: %s (0x%x %s)", ex.what(), ex.getErrorCode(), ex.getErrorName());
+        LOGF("HandleException: CIF error: %s (0x%x %s)", ex.what(),
+            ex.getErrorCode(), ex.getErrorName());
 #endif
         return ex.getErrorCode();
     } catch (const std::runtime_error& ex) {
@@ -38,7 +41,8 @@ C3D_EC HandleException() {
 
 extern "C" {
 
-EXPORT(ATI3DCIF_Init, C3D_EC, (void)) {
+EXPORT(ATI3DCIF_Init, C3D_EC, (void))
+{
     TRACE("ATI3DCIF_Init()");
 
     context.init();
@@ -48,7 +52,8 @@ EXPORT(ATI3DCIF_Init, C3D_EC, (void)) {
 
     // do some cleanup in case the app forgets to call ATI3DCIF_Term
     if (renderer) {
-        LOG("ATI3DCIF_Init: Previous instance was not terminated by ATI3DCIF_Term!");
+        LOG("ATI3DCIF_Init: Previous instance was not terminated by "
+            "ATI3DCIF_Term!");
         ATI3DCIF_Term();
     }
 
@@ -61,7 +66,8 @@ EXPORT(ATI3DCIF_Init, C3D_EC, (void)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_Term, C3D_EC, (void)) {
+EXPORT(ATI3DCIF_Term, C3D_EC, (void))
+{
     TRACE("ATI3DCIF_Term()");
 
     try {
@@ -74,14 +80,15 @@ EXPORT(ATI3DCIF_Term, C3D_EC, (void)) {
     }
 
     // SDK PDF says "TRUE if successful, otherwise FALSE", but the
-    // function uses C3D_EC as return value. 
+    // function uses C3D_EC as return value.
     // In other words: TRUE = C3D_EC_GENFAIL and FALSE = C3D_EC_OK? WTF...
     // Anyway, most apps don't seem to care about the return value
     // of this function, so stick with C3D_EC_OK for now.
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_GetInfo, C3D_EC, (PC3D_3DCIFINFO p3DCIFInfo)) {
+EXPORT(ATI3DCIF_GetInfo, C3D_EC, (PC3D_3DCIFINFO p3DCIFInfo))
+{
     TRACE("ATI3DCIF_GetInfo()");
 
     // check for invalid struct
@@ -90,21 +97,27 @@ EXPORT(ATI3DCIF_GetInfo, C3D_EC, (PC3D_3DCIFINFO p3DCIFInfo)) {
     }
 
     // values from an ATI Xpert 98 with a 3D Rage Pro AGP 2x
-    p3DCIFInfo->u32FrameBuffBase = 0;        // Host pointer to frame buffer base (TODO: allocate memory?)
-    p3DCIFInfo->u32OffScreenHeap = 0;        // Host pointer to offscreen heap (TODO: allocate memory?)
+    p3DCIFInfo->u32FrameBuffBase =
+        0; // Host pointer to frame buffer base (TODO: allocate memory?)
+    p3DCIFInfo->u32OffScreenHeap =
+        0; // Host pointer to offscreen heap (TODO: allocate memory?)
     p3DCIFInfo->u32OffScreenSize = 0x4fe800; // Size of offscreen heap
     p3DCIFInfo->u32TotalRAM = 8 << 20;       // Total amount of RAM on the card
     p3DCIFInfo->u32ASICID = 0x409;           // ASIC Id. code
     p3DCIFInfo->u32ASICRevision = 0x47ff;    // ASIC revision
 
-    // older CIF versions don't have CIF caps, so check the size first 
+    // older CIF versions don't have CIF caps, so check the size first
     if (p3DCIFInfo->u32Size == 48) {
-        // note: 0x400 and 0x800 are reported in 4.10.2690 and later but are not defined in ATI3DCIF.H
-        p3DCIFInfo->u32CIFCaps1 = C3D_CAPS1_FOG | C3D_CAPS1_POINT | C3D_CAPS1_RECT
-            | C3D_CAPS1_Z_BUFFER | C3D_CAPS1_CI4_TMAP | C3D_CAPS1_CI8_TMAP
-            | C3D_CAPS1_DITHER_EN | C3D_CAPS1_ENH_PERSP | C3D_CAPS1_SCISSOR | 0x400 | 0x800;
-        p3DCIFInfo->u32CIFCaps2 = C3D_CAPS2_TEXTURE_CLAMP | C3D_CAPS2_DESTINATION_ALPHA_BLEND
-            | C3D_CAPS2_TEXTURE_TILING;
+        // note: 0x400 and 0x800 are reported in 4.10.2690 and later but are not
+        // defined in ATI3DCIF.H
+        p3DCIFInfo->u32CIFCaps1 = C3D_CAPS1_FOG | C3D_CAPS1_POINT |
+                                  C3D_CAPS1_RECT | C3D_CAPS1_Z_BUFFER |
+                                  C3D_CAPS1_CI4_TMAP | C3D_CAPS1_CI8_TMAP |
+                                  C3D_CAPS1_DITHER_EN | C3D_CAPS1_ENH_PERSP |
+                                  C3D_CAPS1_SCISSOR | 0x400 | 0x800;
+        p3DCIFInfo->u32CIFCaps2 = C3D_CAPS2_TEXTURE_CLAMP |
+                                  C3D_CAPS2_DESTINATION_ALPHA_BLEND |
+                                  C3D_CAPS2_TEXTURE_TILING;
 
         // unused caps
         p3DCIFInfo->u32CIFCaps3 = 0;
@@ -115,7 +128,8 @@ EXPORT(ATI3DCIF_GetInfo, C3D_EC, (PC3D_3DCIFINFO p3DCIFInfo)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_TextureReg, C3D_EC, (C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)) {
+EXPORT(ATI3DCIF_TextureReg, C3D_EC, (C3D_PTMAP ptmapToReg, C3D_PHTX phtmap))
+{
     TRACEF("ATI3DCIF_TextureReg(0x%p, 0x%p)", *ptmapToReg, *phtmap);
 
     try {
@@ -127,7 +141,8 @@ EXPORT(ATI3DCIF_TextureReg, C3D_EC, (C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_TextureUnreg, C3D_EC, (C3D_HTX htxToUnreg)) {
+EXPORT(ATI3DCIF_TextureUnreg, C3D_EC, (C3D_HTX htxToUnreg))
+{
     TRACEF("ATI3DCIF_TextureUnreg(0x%p)", htxToUnreg);
 
     try {
@@ -139,8 +154,11 @@ EXPORT(ATI3DCIF_TextureUnreg, C3D_EC, (C3D_HTX htxToUnreg)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_TexturePaletteCreate, C3D_EC, (C3D_ECI_TMAP_TYPE epalette, void* pPalette, C3D_PHTXPAL phtpalCreated)) {
-    TRACEF("ATI3DCIF_TexturePaletteCreate(%s, 0x%p, 0x%p)", cif::C3D_ECI_TMAP_TYPE_NAMES[epalette], pPalette, phtpalCreated);
+EXPORT(ATI3DCIF_TexturePaletteCreate, C3D_EC,
+    (C3D_ECI_TMAP_TYPE epalette, void* pPalette, C3D_PHTXPAL phtpalCreated))
+{
+    TRACEF("ATI3DCIF_TexturePaletteCreate(%s, 0x%p, 0x%p)",
+        cif::C3D_ECI_TMAP_TYPE_NAMES[epalette], pPalette, phtpalCreated);
 
     try {
         renderer->texturePaletteCreate(epalette, pPalette, phtpalCreated);
@@ -151,7 +169,8 @@ EXPORT(ATI3DCIF_TexturePaletteCreate, C3D_EC, (C3D_ECI_TMAP_TYPE epalette, void*
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_TexturePaletteDestroy, C3D_EC, (C3D_HTXPAL htxpalToDestroy)) {
+EXPORT(ATI3DCIF_TexturePaletteDestroy, C3D_EC, (C3D_HTXPAL htxpalToDestroy))
+{
     TRACEF("ATI3DCIF_TexturePaletteDestroy(0x%p)", htxpalToDestroy);
 
     try {
@@ -163,11 +182,16 @@ EXPORT(ATI3DCIF_TexturePaletteDestroy, C3D_EC, (C3D_HTXPAL htxpalToDestroy)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_TexturePaletteAnimate, C3D_EC, (C3D_HTXPAL htxpalToAnimate, C3D_UINT32 u32StartIndex, C3D_UINT32 u32NumEntries, C3D_PPALETTENTRY pclrPalette)) {
-    TRACEF("ATI3DCIF_TexturePaletteAnimate(0x%p, %d, %d, 0x%p)", htxpalToAnimate, u32StartIndex, u32NumEntries, *pclrPalette);
+EXPORT(ATI3DCIF_TexturePaletteAnimate, C3D_EC,
+    (C3D_HTXPAL htxpalToAnimate, C3D_UINT32 u32StartIndex,
+        C3D_UINT32 u32NumEntries, C3D_PPALETTENTRY pclrPalette))
+{
+    TRACEF("ATI3DCIF_TexturePaletteAnimate(0x%p, %d, %d, 0x%p)",
+        htxpalToAnimate, u32StartIndex, u32NumEntries, *pclrPalette);
 
     try {
-        renderer->texturePaletteAnimate(htxpalToAnimate, u32StartIndex, u32NumEntries, pclrPalette);
+        renderer->texturePaletteAnimate(
+            htxpalToAnimate, u32StartIndex, u32NumEntries, pclrPalette);
     } catch (...) {
         return HandleException();
     }
@@ -175,7 +199,8 @@ EXPORT(ATI3DCIF_TexturePaletteAnimate, C3D_EC, (C3D_HTXPAL htxpalToAnimate, C3D_
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_ContextCreate, C3D_HRC, (void)) {
+EXPORT(ATI3DCIF_ContextCreate, C3D_HRC, (void))
+{
     TRACE("ATI3DCIF_ContextCreate()");
 
     context.attach();
@@ -234,12 +259,13 @@ EXPORT(ATI3DCIF_ContextCreate, C3D_HRC, (void)) {
 
     contextCreated = true;
 
-    // According to ATI3DCIF.H, "only one context may be exist at a time", 
+    // According to ATI3DCIF.H, "only one context may be exist at a time",
     // so always returning 1 should be fine
-    return (C3D_HRC) 1;
+    return (C3D_HRC)1;
 }
 
-EXPORT(ATI3DCIF_ContextDestroy, C3D_EC, (C3D_HRC hRC)) {
+EXPORT(ATI3DCIF_ContextDestroy, C3D_EC, (C3D_HRC hRC))
+{
     TRACEF("ATI3DCIF_ContextDestroy(0x%p)", hRC);
 
     // can't destroy a context that wasn't created
@@ -252,10 +278,14 @@ EXPORT(ATI3DCIF_ContextDestroy, C3D_EC, (C3D_HRC hRC)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_ContextSetState, C3D_EC, (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_PRSDATA pRStateData)) {
+EXPORT(ATI3DCIF_ContextSetState, C3D_EC,
+    (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_PRSDATA pRStateData))
+{
 #ifdef DEBUG_TRACE
-    std::string stateDataStr = cif::CifUtils::dumpRenderStateData(eRStateID, pRStateData);
-    TRACEF("ATI3DCIF_ContextSetState(0x%p, %s, %s)", hRC, cif::C3D_ERSID_NAMES[eRStateID], stateDataStr.c_str());
+    std::string stateDataStr =
+        cif::CifUtils::dumpRenderStateData(eRStateID, pRStateData);
+    TRACEF("ATI3DCIF_ContextSetState(0x%p, %s, %s)", hRC,
+        cif::C3D_ERSID_NAMES[eRStateID], stateDataStr.c_str());
 #endif
 
     try {
@@ -285,10 +315,12 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC, (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_
                 renderer->tmapLight(*static_cast<C3D_PETLIGHT>(pRStateData));
                 break;
             case C3D_ERS_TMAP_PERSP_COR:
-                renderer->tmapPerspCor(*static_cast<C3D_PETPERSPCOR>(pRStateData));
+                renderer->tmapPerspCor(
+                    *static_cast<C3D_PETPERSPCOR>(pRStateData));
                 break;
             case C3D_ERS_TMAP_FILTER:
-                renderer->tmapFilter(*static_cast<C3D_PETEXFILTER>(pRStateData));
+                renderer->tmapFilter(
+                    *static_cast<C3D_PETEXFILTER>(pRStateData));
                 break;
             case C3D_ERS_TMAP_TEXOP:
                 renderer->tmapTexOp(*static_cast<C3D_PETEXOP>(pRStateData));
@@ -306,7 +338,8 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC, (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_
                 renderer->surfDrawPitch(*static_cast<C3D_PUINT32>(pRStateData));
                 break;
             case C3D_ERS_SURF_DRAW_PF:
-                renderer->surfDrawPixelFormat(*static_cast<C3D_PEPIXFMT>(pRStateData));
+                renderer->surfDrawPixelFormat(
+                    *static_cast<C3D_PEPIXFMT>(pRStateData));
                 break;
             case C3D_ERS_SURF_VPORT:
                 renderer->surfVport(*static_cast<C3D_PRECT>(pRStateData));
@@ -339,37 +372,46 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC, (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_
                 renderer->compositeSelect(*static_cast<C3D_PHTX>(pRStateData));
                 break;
             case C3D_ERS_COMPOSITE_FNC:
-                renderer->compositeFunc(*static_cast<C3D_PETEXCOMPFCN>(pRStateData));
+                renderer->compositeFunc(
+                    *static_cast<C3D_PETEXCOMPFCN>(pRStateData));
                 break;
             case C3D_ERS_COMPOSITE_FACTOR:
-                renderer->compositeFactor(*static_cast<C3D_PUINT32>(pRStateData));
+                renderer->compositeFactor(
+                    *static_cast<C3D_PUINT32>(pRStateData));
                 break;
             case C3D_ERS_COMPOSITE_FILTER:
-                renderer->compositeFilter(*static_cast<C3D_PETEXFILTER>(pRStateData));
+                renderer->compositeFilter(
+                    *static_cast<C3D_PETEXFILTER>(pRStateData));
                 break;
             case C3D_ERS_COMPOSITE_FACTOR_ALPHA:
-                renderer->compositeFactorAlphaEnable(*static_cast<C3D_PBOOL>(pRStateData));
+                renderer->compositeFactorAlphaEnable(
+                    *static_cast<C3D_PBOOL>(pRStateData));
                 break;
             case C3D_ERS_LOD_BIAS_LEVEL:
                 renderer->lodBiasLevel(*static_cast<C3D_PUINT32>(pRStateData));
                 break;
             case C3D_ERS_ALPHA_DST_TEST_ENABLE:
-                renderer->alphaDstTestEnable(*static_cast<C3D_PBOOL>(pRStateData));
+                renderer->alphaDstTestEnable(
+                    *static_cast<C3D_PBOOL>(pRStateData));
                 break;
             case C3D_ERS_ALPHA_DST_TEST_FNC:
-                renderer->alphaDstTestFunc(*static_cast<C3D_PEACMP>(pRStateData));
+                renderer->alphaDstTestFunc(
+                    *static_cast<C3D_PEACMP>(pRStateData));
                 break;
             case C3D_ERS_ALPHA_DST_WRITE_SELECT:
-                renderer->alphaDstWriteSelect(*static_cast<C3D_PEASEL>(pRStateData));
+                renderer->alphaDstWriteSelect(
+                    *static_cast<C3D_PEASEL>(pRStateData));
                 break;
             case C3D_ERS_ALPHA_DST_REFERENCE:
-                renderer->alphaDstReference(*static_cast<C3D_PUINT32>(pRStateData));
+                renderer->alphaDstReference(
+                    *static_cast<C3D_PUINT32>(pRStateData));
                 break;
             case C3D_ERS_SPECULAR_EN:
                 renderer->specularEnable(*static_cast<C3D_PBOOL>(pRStateData));
                 break;
             case C3D_ERS_ENHANCED_COLOR_RANGE_EN:
-                renderer->enhancedColorRangeEnable(*static_cast<C3D_PBOOL>(pRStateData));
+                renderer->enhancedColorRangeEnable(
+                    *static_cast<C3D_PBOOL>(pRStateData));
                 break;
         }
     } catch (...) {
@@ -379,7 +421,8 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC, (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_RenderBegin, C3D_EC, (C3D_HRC hRC)) {
+EXPORT(ATI3DCIF_RenderBegin, C3D_EC, (C3D_HRC hRC))
+{
     TRACEF("ATI3DCIF_RenderBegin(0x%p)", hRC);
 
     context.renderBegin();
@@ -393,7 +436,8 @@ EXPORT(ATI3DCIF_RenderBegin, C3D_EC, (C3D_HRC hRC)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_RenderEnd, C3D_EC, (void)) {
+EXPORT(ATI3DCIF_RenderEnd, C3D_EC, (void))
+{
     TRACE("ATI3DCIF_RenderEnd");
 
     try {
@@ -405,13 +449,16 @@ EXPORT(ATI3DCIF_RenderEnd, C3D_EC, (void)) {
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_RenderSwitch, C3D_EC, (C3D_HRC hRC)) {
+EXPORT(ATI3DCIF_RenderSwitch, C3D_EC, (C3D_HRC hRC))
+{
     TRACEF("ATI3DCIF_RenderSwitch(0x%p)", hRC);
     // function has officially never been implemented
     return C3D_EC_NOTIMPYET;
 }
 
-EXPORT(ATI3DCIF_RenderPrimStrip, C3D_EC, (C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert)) {
+EXPORT(ATI3DCIF_RenderPrimStrip, C3D_EC,
+    (C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert))
+{
     TRACEF("ATI3DCIF_RenderPrimStrip(0x%p, %d)", vStrip, u32NumVert);
 
     try {
@@ -423,7 +470,9 @@ EXPORT(ATI3DCIF_RenderPrimStrip, C3D_EC, (C3D_VSTRIP vStrip, C3D_UINT32 u32NumVe
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_RenderPrimList, C3D_EC, (C3D_VLIST vList, C3D_UINT32 u32NumVert)) {
+EXPORT(
+    ATI3DCIF_RenderPrimList, C3D_EC, (C3D_VLIST vList, C3D_UINT32 u32NumVert))
+{
     TRACEF("ATI3DCIF_RenderPrimList(0x%p, %d)", vList, u32NumVert);
 
     try {
@@ -435,9 +484,11 @@ EXPORT(ATI3DCIF_RenderPrimList, C3D_EC, (C3D_VLIST vList, C3D_UINT32 u32NumVert)
     return C3D_EC_OK;
 }
 
-EXPORT(ATI3DCIF_RenderPrimMesh, C3D_EC, (C3D_PVARRAY vMesh, C3D_PUINT32 pu32Indicies, C3D_UINT32 u32NumIndicies)) {
+EXPORT(ATI3DCIF_RenderPrimMesh, C3D_EC,
+    (C3D_PVARRAY vMesh, C3D_PUINT32 pu32Indicies, C3D_UINT32 u32NumIndicies))
+{
     TRACEF("ATI3DCIF_RenderPrimMesh(0x%p, %d)", vMesh, u32NumIndicies);
     return C3D_EC_OK;
 }
 
-}
+} // extern "C"

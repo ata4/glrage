@@ -1,11 +1,12 @@
 #pragma once
 
-#include "gl_core_3_3.h"
 #include "Object.hpp"
+#include "gl_core_3_3.h"
 
 namespace glrage {
 
-class VertexBuffer : public Object {
+class VertexBuffer : public Object
+{
 public:
     VertexBuffer(GLenum target);
     ~VertexBuffer();
@@ -20,4 +21,4 @@ private:
     GLenum m_target;
 };
 
-}
+} // namespace glrage

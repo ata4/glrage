@@ -2,9 +2,11 @@
 
 namespace glrage {
 
-class FragmentShader : public Shader {
+class FragmentShader : public Shader
+{
 public:
-    FragmentShader() : Shader(GL_FRAGMENT_SHADER) {};
+    FragmentShader()
+        : Shader(GL_FRAGMENT_SHADER){};
 };
 
-}
+} // namespace glrage

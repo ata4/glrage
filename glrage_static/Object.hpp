@@ -4,10 +4,12 @@
 
 namespace glrage {
 
-class Object {
+class Object
+{
 public:
-    virtual ~Object() {};
-    GLuint id() {
+    virtual ~Object(){};
+    GLuint id()
+    {
         return m_id;
     }
     virtual void bind() = 0;
@@ -16,4 +18,4 @@ protected:
     GLuint m_id = 0;
 };
 
-}
+} // namespace glrage

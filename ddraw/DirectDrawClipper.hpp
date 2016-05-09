@@ -1,11 +1,12 @@
 #pragma once
 
-#include "ddraw.hpp"
 #include "Unknown.hpp"
+#include "ddraw.hpp"
 
 namespace ddraw {
 
-class DirectDrawClipper : public Unknown, public IDirectDrawClipper {
+class DirectDrawClipper : public Unknown, public IDirectDrawClipper
+{
 public:
     DirectDrawClipper();
     virtual ~DirectDrawClipper();
@@ -16,7 +17,8 @@ public:
     virtual ULONG WINAPI Release();
 
     /*** IDirectDrawClipper methods ***/
-    HRESULT WINAPI GetClipList(LPRECT lpRect, LPRGNDATA lpClipList, LPDWORD lpdwSize);
+    HRESULT WINAPI GetClipList(
+        LPRECT lpRect, LPRGNDATA lpClipList, LPDWORD lpdwSize);
     HRESULT WINAPI GetHWnd(HWND* lphWnd);
     HRESULT WINAPI Initialize(LPDIRECTDRAW lpDD, DWORD dwFlags);
     HRESULT WINAPI IsClipListChanged(BOOL* lpbChanged);
@@ -28,4 +30,4 @@ private:
     RGNDATA m_clipList;
 };
 
-}
+} // namespace ddraw

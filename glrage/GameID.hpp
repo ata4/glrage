@@ -2,11 +2,12 @@
 
 namespace glrage {
 
-enum class GameID {
+enum class GameID
+{
     Unknown,
     Wipeout,
     AssaultRigs,
     TombRaider
 };
 
-}
+} // namespace glrage

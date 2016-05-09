@@ -4,7 +4,8 @@
 
 namespace glrage {
 
-class TombRaiderPatcher : public RuntimePatcher {
+class TombRaiderPatcher : public RuntimePatcher
+{
 public:
     TombRaiderPatcher();
     virtual GameID gameID();
@@ -21,4 +22,4 @@ private:
     bool m_ub;
 };
 
-}
+} // namespace glrage

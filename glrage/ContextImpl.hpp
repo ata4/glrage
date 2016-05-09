@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Config.hpp"
 #include "Context.hpp"
 #include "Screenshot.hpp"
-#include "Config.hpp"
 
 namespace glrage {
 
-class ContextImpl : public Context {
+class ContextImpl : public Context
+{
 public:
     static constexpr TCHAR* PROP_CONTEXT = L"Context.this";
 
@@ -37,11 +38,13 @@ public:
 
 private:
     // constants
-    static const LONG STYLE_WINDOW = WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPED | WS_SYSMENU;
-    static const LONG STYLE_WINDOW_EX = WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE;
+    static const LONG STYLE_WINDOW =
+        WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPED | WS_SYSMENU;
+    static const LONG STYLE_WINDOW_EX = WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE |
+                                        WS_EX_CLIENTEDGE | WS_EX_STATICEDGE;
 
     // config object
-    Config m_config{ "Context", getBasePath() };
+    Config m_config{"Context", getBasePath()};
 
     // window handle
     HWND m_hwnd = nullptr;
@@ -72,7 +75,7 @@ private:
     Screenshot m_screenshot;
 
     // temporary rectangle
-    RECT m_tmprect{ 0 };
+    RECT m_tmprect{0};
 
     // DirectDraw display mode dimension
     int32_t m_width = 0;
@@ -82,4 +85,4 @@ private:
     GameID m_gameID = GameID::Unknown;
 };
 
-}
+} // namespace glrage

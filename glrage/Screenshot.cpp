@@ -1,21 +1,22 @@
 #include "Screenshot.hpp"
 
-#include "gl_core_3_3.h"
-#include "StringUtils.hpp"
 #include "ErrorUtils.hpp"
 #include "GLRage.hpp"
+#include "StringUtils.hpp"
+#include "gl_core_3_3.h"
 
-#include <stdexcept>
+#include <cstdint>
 #include <exception>
 #include <fstream>
-#include <cstdint>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace glrage {
 
 // heavily simplified Targa header struct for raw BGR(A) data
-struct MiniTargaHeader {
+struct MiniTargaHeader
+{
     uint8_t blank1[2];
     uint8_t format;
     uint8_t blank2[9];
@@ -25,24 +26,28 @@ struct MiniTargaHeader {
     uint8_t blank3;
 };
 
-void Screenshot::schedule(bool schedule) {
+void Screenshot::schedule(bool schedule)
+{
     m_schedule = schedule;
 }
 
-void Screenshot::captureScheduled() {
+void Screenshot::captureScheduled()
+{
     if (m_schedule) {
         capture();
         m_schedule = false;
     }
 }
 
-void Screenshot::capture() {
+void Screenshot::capture()
+{
     // find unused screenshot file name
     std::wstring basePath = GLRageGetContext().getBasePath();
     std::wstring path;
     DWORD dwAttrib;
     do {
-        std::string fileName = StringUtils::format("screenshot%04d.tga", 20, m_index++);
+        std::string fileName =
+            StringUtils::format("screenshot%04d.tga", 20, m_index++);
         path = basePath + L"\\" + StringUtils::utf8ToWide(fileName);
         dwAttrib = GetFileAttributes(path.c_str());
     } while (dwAttrib != INVALID_FILE_ATTRIBUTES && m_index < 9999);
@@ -55,13 +60,14 @@ void Screenshot::capture() {
     // open screenshot file
     std::ofstream file(path, std::ofstream::binary);
     if (!file.good()) {
-        throw std::runtime_error("Can't open screenshot file '" + StringUtils::wideToUtf8(path) + "': " +
-            ErrorUtils::getSystemErrorString());
+        throw std::runtime_error("Can't open screenshot file '" +
+                                 StringUtils::wideToUtf8(path) + "': " +
+                                 ErrorUtils::getSystemErrorString());
     }
 
     // get viewport dimension
     GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport); 
+    glGetIntegerv(GL_VIEWPORT, viewport);
 
     uint32_t x = viewport[0];
     uint32_t y = viewport[1];
@@ -88,4 +94,4 @@ void Screenshot::capture() {
     file.close();
 }
 
-}
+} // namespace glrage

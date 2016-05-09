@@ -1,13 +1,14 @@
 #pragma once
 
-#include "gl_core_3_3.h"
 #include "Object.hpp"
+#include "gl_core_3_3.h"
 
 #include <string>
 
 namespace glrage {
 
-class Shader : public Object {
+class Shader : public Object
+{
 public:
     Shader(GLenum shaderType);
     ~Shader();
@@ -18,4 +19,4 @@ public:
     bool compiled();
 };
 
-}
+} // namespace glrage

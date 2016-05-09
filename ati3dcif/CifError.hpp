@@ -7,7 +7,8 @@
 
 namespace cif {
 
-class CifError : public std::runtime_error {
+class CifError : public std::runtime_error
+{
 public:
     CifError(const char* message, C3D_EC errorCode);
     CifError(const std::string& message, C3D_EC errorCode);
@@ -20,4 +21,4 @@ private:
     C3D_EC m_errorCode;
 };
 
-}
+} // namespace cif

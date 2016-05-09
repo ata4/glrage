@@ -1,16 +1,17 @@
 #pragma once
 
 #include <Windows.h>
-#include <mmeapi.h>
-#include <dsound.h>
 #include <cstdint>
+#include <dsound.h>
 #include <map>
+#include <mmeapi.h>
 
 namespace glrage {
 
 #pragma pack(push)
 #pragma pack(1)
-struct TombRaiderAudioSample {
+struct TombRaiderAudioSample
+{
     uint32_t data;
     uint16_t length;
     uint16_t bitsPerSample;
@@ -30,18 +31,24 @@ struct TombRaiderAudioSample {
 
 // Tomb Raider sub types
 typedef int32_t TombRaiderSoundInit();
-typedef BOOL TombRaiderRenderLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t a5, int8_t color);
-typedef BOOL TombRaiderRenderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
-typedef void* TombRaiderCreateOverlayText(int16_t x, int16_t y, int16_t a3, const char* text);
+typedef BOOL TombRaiderRenderLine(
+    int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t a5, int8_t color);
+typedef BOOL TombRaiderRenderCollectedItem(
+    int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
+typedef void* TombRaiderCreateOverlayText(
+    int16_t x, int16_t y, int16_t a3, const char* text);
 typedef int16_t TombRaiderSetFOV(int16_t fov);
 
-class TombRaiderHooks {
+class TombRaiderHooks
+{
 public:
     static int32_t soundInit();
     static void soundSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume);
     static void soundSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
-    static LPDIRECTSOUNDBUFFER soundPlayOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
-    static LPDIRECTSOUNDBUFFER soundPlayLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
+    static LPDIRECTSOUNDBUFFER soundPlayOneShot(
+        int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
+    static LPDIRECTSOUNDBUFFER soundPlayLoop(int32_t soundID, int32_t volume,
+        int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
     static void soundStopAll();
     static BOOL musicPlayRemap(int16_t trackID);
     static BOOL musicPlayLoop();
@@ -52,8 +59,10 @@ public:
     static BOOL keyIsPressed(int32_t keyCode);
     static BOOL renderHealthBar(int32_t health);
     static BOOL renderAirBar(int32_t air);
-    static BOOL renderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
-    static void* createFPSText(int16_t x, int16_t y, int16_t a3, const char* text);
+    static BOOL renderCollectedItem(int32_t x, int32_t y, int32_t scale,
+        int16_t itemID, int16_t brightness);
+    static void* createFPSText(
+        int16_t x, int16_t y, int16_t a3, const char* text);
     static int16_t setFOV(int16_t fov);
 
     static const int32_t DECIBEL_LUT_SIZE = 512;
@@ -90,7 +99,8 @@ public:
     static bool m_musicAlwaysLoop;
 
 private:
-    static LPDIRECTSOUNDBUFFER soundPlaySample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop);
+    static LPDIRECTSOUNDBUFFER soundPlaySample(int32_t soundID, int32_t volume,
+        int16_t pitch, uint16_t pan, bool loop);
     static int32_t convertPanToDecibel(uint16_t pan);
     static int32_t convertVolumeToDecibel(int32_t volume);
     static void renderBar(int32_t value, bool air);
@@ -102,4 +112,4 @@ private:
     static std::map<int32_t, int32_t> m_keyCodeMap;
 };
 
-}
+} // namespace glrage

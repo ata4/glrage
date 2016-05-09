@@ -1,16 +1,18 @@
 #pragma once
 
-#include "gl_core_3_3.h"
 #include "Object.hpp"
+#include "gl_core_3_3.h"
 
 namespace glrage {
 
-class VertexArray : public Object {
+class VertexArray : public Object
+{
 public:
     VertexArray();
     ~VertexArray();
     void bind();
-    void attribute(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLsizei offset);
+    void attribute(GLuint index, GLint size, GLenum type, GLboolean normalized,
+        GLsizei stride, GLsizei offset);
 };
 
-}
+} // namespace glrage

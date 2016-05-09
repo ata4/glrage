@@ -6,11 +6,13 @@
 
 namespace ddraw {
 
-class SurfaceDebugUtils {
+class SurfaceDebugUtils
+{
 public:
     static void dumpInfo(DDSURFACEDESC& desc);
-    static void dumpBuffer(DDSURFACEDESC& desc, void* buffer, const std::wstring& path);
+    static void dumpBuffer(
+        DDSURFACEDESC& desc, void* buffer, const std::wstring& path);
     static std::string getSurfaceName(DDSURFACEDESC& desc);
 };
 
-}
+} // namespace ddraw

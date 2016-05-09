@@ -1,11 +1,12 @@
 #pragma once
 
-#include <Windows.h>
 #include <Unknwnbase.h>
+#include <Windows.h>
 
 namespace ddraw {
 
-class Unknown : public IUnknown {
+class Unknown : public IUnknown
+{
 public:
     Unknown();
     virtual ~Unknown();
@@ -18,4 +19,4 @@ private:
     volatile ULONG m_refCount = 1;
 };
 
-}
+} // namespace ddraw

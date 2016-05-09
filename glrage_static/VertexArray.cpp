@@ -2,21 +2,27 @@
 
 namespace glrage {
 
-VertexArray::VertexArray() {
+VertexArray::VertexArray()
+{
     glGenVertexArrays(1, &m_id);
 }
 
-VertexArray::~VertexArray() {
+VertexArray::~VertexArray()
+{
     glDeleteVertexArrays(1, &m_id);
 }
 
-void VertexArray::bind() {
+void VertexArray::bind()
+{
     glBindVertexArray(m_id);
 }
 
-void VertexArray::attribute(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLsizei offset) {
+void VertexArray::attribute(GLuint index, GLint size, GLenum type,
+    GLboolean normalized, GLsizei stride, GLsizei offset)
+{
     glEnableVertexAttribArray(index);
-    glVertexAttribPointer(index, size, type, normalized, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribPointer(
+        index, size, type, normalized, stride, reinterpret_cast<void*>(offset));
 }
 
-}
+} // namespace glrage

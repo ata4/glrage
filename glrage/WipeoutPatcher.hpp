@@ -6,7 +6,8 @@
 
 namespace glrage {
 
-class WipeoutPatcher : public RuntimePatcher {
+class WipeoutPatcher : public RuntimePatcher
+{
 public:
     WipeoutPatcher();
     virtual GameID gameID();
@@ -14,7 +15,8 @@ public:
     virtual void apply();
 
 private:
-    static BOOL hookSystemParametersInfoA(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
+    static BOOL hookSystemParametersInfoA(
+        UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
 };
 
-}
+} // namespace glrage

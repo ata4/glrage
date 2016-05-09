@@ -3,11 +3,11 @@
 #include "CifTexture.hpp"
 #include "CifVertexStream.hpp"
 
-#include "Shader.hpp"
-#include "ShaderProgram.hpp"
-#include "Sampler.hpp"
 #include "Config.hpp"
 #include "GLRage.hpp"
+#include "Sampler.hpp"
+#include "Shader.hpp"
+#include "ShaderProgram.hpp"
 
 #include <map>
 
@@ -19,9 +19,9 @@ namespace cif {
 
 // ATI3DCIF -> OpenGL mapping tables
 static const GLenum GLCIF_DEPTH_MASK[] = {
-    GL_FALSE,   // C3D_EZMODE_OFF (ignore z)
-    GL_FALSE,   // C3D_EZMODE_TESTON (test z, but do not update the z buffer)
-    GL_TRUE     // C3D_EZMODE_TESTON_WRITEZ (test z and update the z buffer)
+    GL_FALSE, // C3D_EZMODE_OFF (ignore z)
+    GL_FALSE, // C3D_EZMODE_TESTON (test z, but do not update the z buffer)
+    GL_TRUE   // C3D_EZMODE_TESTON_WRITEZ (test z and update the z buffer)
 };
 
 static const GLenum GLCIF_DEPTH_FUNC[] = {
@@ -47,28 +47,33 @@ static const GLenum GLCIF_BLEND_FUNC[] = {
 };
 
 static const GLenum GLCIF_TEXTURE_MIN_FILTER[] = {
-    GL_NEAREST,                 // C3D_ETFILT_MINPNT_MAGPNT
-    GL_LINEAR,                  // C3D_ETFILT_MINPNT_MAG2BY2
-    GL_LINEAR,                  // C3D_ETFILT_MIN2BY2_MAG2BY2
-    GL_LINEAR_MIPMAP_LINEAR,    // C3D_ETFILT_MIPLIN_MAGPNT
-    GL_LINEAR_MIPMAP_NEAREST,   // C3D_ETFILT_MIPLIN_MAG2BY2
-    GL_LINEAR_MIPMAP_LINEAR,    // C3D_ETFILT_MIPTRI_MAG2BY2
-    GL_NEAREST                  // C3D_ETFILT_MIN2BY2_MAGPNT
+    GL_NEAREST,               // C3D_ETFILT_MINPNT_MAGPNT
+    GL_LINEAR,                // C3D_ETFILT_MINPNT_MAG2BY2
+    GL_LINEAR,                // C3D_ETFILT_MIN2BY2_MAG2BY2
+    GL_LINEAR_MIPMAP_LINEAR,  // C3D_ETFILT_MIPLIN_MAGPNT
+    GL_LINEAR_MIPMAP_NEAREST, // C3D_ETFILT_MIPLIN_MAG2BY2
+    GL_LINEAR_MIPMAP_LINEAR,  // C3D_ETFILT_MIPTRI_MAG2BY2
+    GL_NEAREST                // C3D_ETFILT_MIN2BY2_MAGPNT
 };
 
 static const GLenum GLCIF_TEXTURE_MAG_FILTER[] = {
     GL_NEAREST, // C3D_ETFILT_MINPNT_MAGPNT (pick nearest texel (pnt) min/mag)
     GL_NEAREST, // C3D_ETFILT_MINPNT_MAG2BY2 (pnt min/bi-linear mag)
     GL_LINEAR,  // C3D_ETFILT_MIN2BY2_MAG2BY2 (2x2 blend min/bi-linear mag)
-    GL_NEAREST, // C3D_ETFILT_MIPLIN_MAGPNT (1x1 blend min(between maps)/pick nearest mag)
-    GL_LINEAR,  // C3D_ETFILT_MIPLIN_MAG2BY2 (1x1 blend min(between maps)/bi-linear mag)
-    GL_LINEAR,  // C3D_ETFILT_MIPTRI_MAG2BY2 (Rage3: (2x2)x(2x2)(between maps)/bi-linear mag)
-    GL_LINEAR   // C3D_ETFILT_MIN2BY2_MAGPNT (Rage3:2x2 blend min/pick nearest mag)
+    GL_NEAREST, // C3D_ETFILT_MIPLIN_MAGPNT (1x1 blend min(between maps)/pick
+                // nearest mag)
+    GL_LINEAR,  // C3D_ETFILT_MIPLIN_MAG2BY2 (1x1 blend min(between
+                // maps)/bi-linear mag)
+    GL_LINEAR,  // C3D_ETFILT_MIPTRI_MAG2BY2 (Rage3: (2x2)x(2x2)(between
+                // maps)/bi-linear mag)
+    GL_LINEAR   // C3D_ETFILT_MIN2BY2_MAGPNT (Rage3:2x2 blend min/pick nearest
+                // mag)
 };
 
 typedef std::map<C3D_HTX, CifTexture*> TextureMap;
 
-class CifRenderer {
+class CifRenderer
+{
 public:
     CifRenderer();
     void renderBegin(C3D_HRC);
@@ -77,7 +82,8 @@ public:
     void textureUnreg(C3D_HTX);
     void texturePaletteCreate(C3D_ECI_TMAP_TYPE, void*, C3D_PHTXPAL);
     void texturePaletteDestroy(C3D_HTXPAL);
-    void texturePaletteAnimate(C3D_HTXPAL, C3D_UINT32, C3D_UINT32, C3D_PPALETTENTRY);
+    void texturePaletteAnimate(
+        C3D_HTXPAL, C3D_UINT32, C3D_UINT32, C3D_PPALETTENTRY);
     void renderPrimStrip(C3D_VSTRIP, C3D_UINT32);
     void renderPrimList(C3D_VLIST, C3D_UINT32);
 
@@ -123,7 +129,7 @@ public:
 
 private:
     Context& m_context = GLRageGetContext();
-    Config m_config{ "ATI3DCIF", m_context.getBasePath() };
+    Config m_config{"ATI3DCIF", m_context.getBasePath()};
     bool m_wireframe;
     TextureMap m_textures;
     C3D_PPALETTENTRY m_palette = nullptr;
@@ -137,4 +143,4 @@ private:
     CifVertexStream m_vertexStream;
 };
 
-}
+} // namespace cif

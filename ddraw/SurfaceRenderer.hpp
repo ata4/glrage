@@ -1,13 +1,13 @@
 #pragma once
 
-#include "ddraw.hpp"
-#include "VertexArray.hpp"
-#include "VertexArrayBuffer.hpp"
-#include "Texture.hpp"
-#include "Sampler.hpp"
-#include "ShaderProgram.hpp"
 #include "Config.hpp"
 #include "GLRage.hpp"
+#include "Sampler.hpp"
+#include "ShaderProgram.hpp"
+#include "Texture.hpp"
+#include "VertexArray.hpp"
+#include "VertexArrayBuffer.hpp"
+#include "ddraw.hpp"
 
 #include <cstdint>
 #include <vector>
@@ -21,7 +21,8 @@ using glrage::Config;
 
 namespace ddraw {
 
-class SurfaceRenderer {
+class SurfaceRenderer
+{
 public:
     SurfaceRenderer();
     void upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data);
@@ -33,7 +34,7 @@ private:
     static const GLenum TEX_TYPE = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 
     Context& m_context = GLRageGetContext();
-    Config m_config{ "DirectDraw", m_context.getBasePath() };
+    Config m_config{"DirectDraw", m_context.getBasePath()};
     uint32_t m_width = 0;
     uint32_t m_height = 0;
     VertexArray m_surfaceFormat;
@@ -43,4 +44,4 @@ private:
     ShaderProgram m_program;
 };
 
-}
+} // namespace ddraw

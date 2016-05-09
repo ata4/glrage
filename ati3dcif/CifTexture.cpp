@@ -1,6 +1,6 @@
 #include "CifTexture.hpp"
-#include "CifUtils.hpp"
 #include "CifError.hpp"
+#include "CifUtils.hpp"
 
 #include "GLUtils.hpp"
 
@@ -11,24 +11,30 @@ using glrage::GLUtils;
 
 namespace cif {
 
-CifTexture::CifTexture() :
-    Texture(GL_TEXTURE_2D)
-{ }
-
-CifTexture::~CifTexture() {
+CifTexture::CifTexture()
+    : Texture(GL_TEXTURE_2D)
+{
 }
 
-void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette) {
+CifTexture::~CifTexture()
+{
+}
+
+void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
+{
     m_chromaKey = tmap->clrTexChromaKey;
 
     // convert and generate texture for each level
-    uint32_t levels = tmap->bMipMap ? std::max(tmap->u32MaxMapXSizeLg2, tmap->u32MaxMapYSizeLg2) + 1 : 1;
+    uint32_t levels =
+        tmap->bMipMap
+            ? std::max(tmap->u32MaxMapXSizeLg2, tmap->u32MaxMapYSizeLg2) + 1
+            : 1;
     uint32_t width = 1 << tmap->u32MaxMapXSizeLg2;
     uint32_t height = 1 << tmap->u32MaxMapYSizeLg2;
     uint32_t size = width * height;
 
     for (uint32_t level = 0; level < levels; level++) {
-        //LOGF("CifTexture::load level %d (%dx%d)", level, width, height);
+        // LOGF("CifTexture::load level %d (%dx%d)", level, width, height);
 
         // convert texture data
         switch (tmap->eTexFormat) {
@@ -42,7 +48,8 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette) {
 
                 // upload texture data
                 glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, width, height, 0,
-                    GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, tmap->apvLevels[level]);
+                    GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV,
+                    tmap->apvLevels[level]);
 
                 break;
             }
@@ -55,13 +62,15 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette) {
 
             case C3D_ETF_RGB565: {
                 glTexImage2D(GL_TEXTURE_2D, level, GL_RGB, width, height, 0,
-                    GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, tmap->apvLevels[level]);
+                    GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV,
+                    tmap->apvLevels[level]);
                 break;
             }
 
             case C3D_ETF_RGB4444: {
                 glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, width, height, 0,
-                    GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4_REV, tmap->apvLevels[level]);
+                    GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4_REV,
+                    tmap->apvLevels[level]);
                 break;
             }
 
@@ -91,8 +100,10 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette) {
             }
 
             default:
-                throw CifError("Unsupported texture format: " +
-                    std::string(C3D_ETEXFMT_NAMES[tmap->eTexFormat]), C3D_EC_NOTIMPYET);
+                throw CifError(
+                    "Unsupported texture format: " +
+                        std::string(C3D_ETEXFMT_NAMES[tmap->eTexFormat]),
+                    C3D_EC_NOTIMPYET);
         }
 
         // set dimensions for next level
@@ -102,24 +113,27 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette) {
     }
 
     // FIXME: sampler object overrides these parameters
-    //if (tmap->u32Size > 68) {
+    // if (tmap->u32Size > 68) {
     //    bind();
 
     //    // set static texture parameters
     //    if (tmap->bClampS) {
-    //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+    //        GL_CLAMP_TO_EDGE);
     //    }
 
     //    if (tmap->bClampT) {
-    //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+    //        GL_CLAMP_TO_EDGE);
     //    }
     //}
 
     GLUtils::checkError("CifTexture::load");
 }
 
-C3D_COLOR& CifTexture::chromaKey() {
+C3D_COLOR& CifTexture::chromaKey()
+{
     return m_chromaKey;
 }
 
-}
+} // namespace cif

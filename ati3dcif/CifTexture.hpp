@@ -8,7 +8,8 @@ using glrage::Texture;
 
 namespace cif {
 
-class CifTexture : public Texture {
+class CifTexture : public Texture
+{
 public:
     CifTexture();
     ~CifTexture();
@@ -19,4 +20,4 @@ private:
     C3D_COLOR m_chromaKey;
 };
 
-}
+} // namespace cif

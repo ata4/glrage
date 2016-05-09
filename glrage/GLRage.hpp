@@ -14,4 +14,4 @@ extern "C" {
 
 GLRAPI Context& GLRageGetContext();
 
-}
+} // extern "C"

@@ -2,14 +2,15 @@
 #include "CifError.hpp"
 #include "CifUtils.hpp"
 
-#include "Logger.hpp"
 #include "GLUtils.hpp"
+#include "Logger.hpp"
 
 using glrage::GLUtils;
 
 namespace cif {
 
-CifVertexStream::CifVertexStream() {
+CifVertexStream::CifVertexStream()
+{
     // bind vertex buffer
     m_vertexBuffer.bind();
 
@@ -22,7 +23,8 @@ CifVertexStream::CifVertexStream() {
     GLUtils::checkError("CifVertexStream::CifVertexStream");
 }
 
-void CifVertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) {
+void CifVertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
+{
     switch (m_vertexType) {
         case C3D_EV_VTCF: {
             // bind vertex format
@@ -40,7 +42,8 @@ void CifVertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) 
 
         default:
             throw CifError("Unsupported vertex type: " +
-                std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
+                               std::string(C3D_EVERTEX_NAMES[m_vertexType]),
+                C3D_EC_NOTIMPYET);
     }
 
     glDrawArrays(GLCIF_PRIMSTRIP_MODES[m_primType], 0, numVert);
@@ -48,7 +51,8 @@ void CifVertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert) 
     GLUtils::checkError("CifVertexStream::renderPrimStrip");
 }
 
-void CifVertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
+void CifVertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
+{
     switch (m_vertexType) {
         case C3D_EV_VTCF: {
             // bind vertex format
@@ -83,14 +87,16 @@ void CifVertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
             reserve(numVert, sizeof(C3D_VTCF));
 
             // upload vertex buffer
-            m_vertexBuffer.subData(0, sizeof(C3D_VTCF) * numVert, &m_vtcBuffer[0]);
+            m_vertexBuffer.subData(
+                0, sizeof(C3D_VTCF) * numVert, &m_vtcBuffer[0]);
 
             break;
         }
 
         default:
             throw CifError("Unsupported vertex type: " +
-                std::string(C3D_EVERTEX_NAMES[m_vertexType]), C3D_EC_NOTIMPYET);
+                               std::string(C3D_EVERTEX_NAMES[m_vertexType]),
+                C3D_EC_NOTIMPYET);
     }
 
     glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, numVert);
@@ -98,33 +104,42 @@ void CifVertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert) {
     GLUtils::checkError("CifVertexStream::renderPrimList");
 }
 
-C3D_EVERTEX CifVertexStream::vertexType() {
+C3D_EVERTEX
+CifVertexStream::vertexType()
+{
     return m_vertexType;
 }
 
-C3D_EPRIM CifVertexStream::primType() {
+C3D_EPRIM
+CifVertexStream::primType()
+{
     return m_primType;
 }
 
-void CifVertexStream::primType(C3D_EPRIM primType) {
+void CifVertexStream::primType(C3D_EPRIM primType)
+{
     m_primType = primType;
 }
 
-void CifVertexStream::vertexType(C3D_EVERTEX vertexType) {
+void CifVertexStream::vertexType(C3D_EVERTEX vertexType)
+{
     m_vertexType = vertexType;
 }
 
-void CifVertexStream::reserve(C3D_UINT32 numVert, size_t vertSize) {
+void CifVertexStream::reserve(C3D_UINT32 numVert, size_t vertSize)
+{
     size_t vertexBufferSize = vertSize * numVert;
     if (vertexBufferSize > m_vertexBufferSize) {
-        LOGF("CifVertexStream::reserve: Vertex buffer resize: %d -> %d", m_vertexBufferSize, vertexBufferSize);
+        LOGF("CifVertexStream::reserve: Vertex buffer resize: %d -> %d",
+            m_vertexBufferSize, vertexBufferSize);
         m_vertexBuffer.data(vertexBufferSize, nullptr, GL_STREAM_DRAW);
         m_vertexBufferSize = vertexBufferSize;
     }
 }
 
-void CifVertexStream::bind() {
+void CifVertexStream::bind()
+{
     m_vertexBuffer.bind();
 }
 
-}
+} // namespace cif

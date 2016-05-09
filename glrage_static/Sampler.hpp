@@ -4,7 +4,8 @@
 
 namespace glrage {
 
-class Sampler : public Object {
+class Sampler : public Object
+{
 public:
     Sampler();
     ~Sampler();
@@ -14,4 +15,4 @@ public:
     void parameterf(GLenum pname, GLfloat param);
 };
 
-}
+} // namespace glrage

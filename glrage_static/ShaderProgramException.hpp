@@ -4,10 +4,17 @@
 
 namespace glrage {
 
-class ShaderProgramException : public std::runtime_error {
+class ShaderProgramException : public std::runtime_error
+{
 public:
-    ShaderProgramException(const std::string& msg) : std::runtime_error(msg) {}
-    ShaderProgramException(const char* msg) : std::runtime_error(msg) {}
+    ShaderProgramException(const std::string& msg)
+        : std::runtime_error(msg)
+    {
+    }
+    ShaderProgramException(const char* msg)
+        : std::runtime_error(msg)
+    {
+    }
 };
 
-}
+} // namespace glrage

@@ -1,14 +1,15 @@
 #pragma once
 
-#include "gl_core_3_3.h"
 #include "Object.hpp"
 #include "Shader.hpp"
+#include "gl_core_3_3.h"
 
 #include <map>
 
 namespace glrage {
 
-class ShaderProgram : public Object {
+class ShaderProgram : public Object
+{
 public:
     ShaderProgram();
     ~ShaderProgram();
@@ -21,9 +22,11 @@ public:
     GLint uniformLocation(const std::string& name);
 
     void uniform3f(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2);
-    void uniform4f(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+    void uniform4f(const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2,
+        GLfloat v3);
     void uniform1i(const std::string& name, GLint v0);
-    void uniformMatrix4fv(const std::string& name, GLsizei count, GLboolean transpose, const GLfloat* value);
+    void uniformMatrix4fv(const std::string& name, GLsizei count,
+        GLboolean transpose, const GLfloat* value);
 
     std::string infoLog();
 
@@ -32,4 +35,4 @@ private:
     std::map<std::string, GLint> m_uniformLocations;
 };
 
-}
+} // namespace glrage

@@ -9,13 +9,15 @@
 
 namespace glrage {
 
-class Context {
+class Context
+{
 public:
     virtual void init() = 0;
     virtual void attach(HWND hwnd) = 0;
     virtual void attach() = 0;
     virtual void detach() = 0;
-    virtual LRESULT windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+    virtual LRESULT windowProc(
+        HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
     virtual BOOL enumWindowsProc(HWND hwnd) = 0;
     virtual bool isFullscreen() = 0;
     virtual void setFullscreen(bool fullscreen) = 0;
@@ -36,4 +38,4 @@ public:
     virtual void setGameID(GameID gameID) = 0;
 };
 
-}
+} // namespace glrage

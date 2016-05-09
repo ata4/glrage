@@ -4,7 +4,8 @@
 
 namespace glrage {
 
-class Screenshot {
+class Screenshot
+{
 public:
     void schedule(bool schedule);
     void captureScheduled();
@@ -15,4 +16,4 @@ private:
     bool m_schedule = false;
 };
 
-}
+} // namespace glrage

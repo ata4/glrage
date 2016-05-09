@@ -4,9 +4,11 @@
 
 namespace glrage {
 
-class VertexArrayBuffer : public VertexBuffer {
+class VertexArrayBuffer : public VertexBuffer
+{
 public:
-    VertexArrayBuffer() : VertexBuffer(GL_ARRAY_BUFFER) {};
+    VertexArrayBuffer()
+        : VertexBuffer(GL_ARRAY_BUFFER){};
 };
 
-}
+} // namespace glrage

@@ -4,10 +4,11 @@
 
 namespace glrage {
 
-class GLUtils {
+class GLUtils
+{
 public:
     static const char* getErrorString(GLenum);
     static void checkError(char*);
 };
 
-}
+} // namespace glrage

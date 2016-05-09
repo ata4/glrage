@@ -4,9 +4,11 @@
 
 namespace glrage {
 
-class VertexShader : public Shader {
+class VertexShader : public Shader
+{
 public:
-    VertexShader() : Shader(GL_VERTEX_SHADER) {};
+    VertexShader()
+        : Shader(GL_VERTEX_SHADER){};
 };
 
-}
+} // namespace glrage

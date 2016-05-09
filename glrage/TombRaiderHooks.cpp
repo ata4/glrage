@@ -31,7 +31,8 @@ TombRaiderCreateOverlayText* TombRaiderHooks::m_tombCreateOverlayText = nullptr;
 TombRaiderSetFOV* TombRaiderHooks::m_tombSetFOV = nullptr;
 
 // renders the previously collected item
-TombRaiderRenderCollectedItem* TombRaiderHooks::m_tombRenderCollectedItem = nullptr;
+TombRaiderRenderCollectedItem* TombRaiderHooks::m_tombRenderCollectedItem =
+    nullptr;
 
 /** Tomb Raider var pointers **/
 
@@ -58,7 +59,8 @@ int32_t* TombRaiderHooks::m_tombDecibelLut = nullptr;
 // CD track currently played.
 int32_t* TombRaiderHooks::m_tombCDTrackID = nullptr;
 
-// CD track to play after the current one has finished. Usually for ambiance tracks.
+// CD track to play after the current one has finished. Usually for ambiance
+// tracks.
 int32_t* TombRaiderHooks::m_tombCDTrackIDLoop = nullptr;
 
 // CD loop flag. If TRUE, it re-plays m_tombCDTrackIDLoop after it finished.
@@ -91,38 +93,46 @@ HWND* TombRaiderHooks::m_tombHwnd = nullptr;
 // Keyboard hook handle.
 HHOOK* TombRaiderHooks::m_tombHhk = nullptr;
 
-int32_t TombRaiderHooks::soundInit() {
+int32_t TombRaiderHooks::soundInit()
+{
     int32_t result = m_tombSoundInit();
 
     // Improves accuracy of the dB LUT, which is used to convert the volume to
-    // hundredths of decibels (or, you know, thousandths of bels) for DirectSound
+    // hundredths of decibels (or, you know, thousandths of bels) for
+    // DirectSound
     // The difference is probably barely audible, if at all, but it's still an
     // improvement.
     for (int i = 1; i < DECIBEL_LUT_SIZE; i++) {
         // original formula, 1 dB steps
-        //m_tombDecibelLut[i] = 100 * static_cast<int32_t>(-90.0 - std::log2(1.0 / i) * -10.0 / std::log2(0.5));
+        // m_tombDecibelLut[i] = 100 * static_cast<int32_t>(-90.0 -
+        // std::log2(1.0 / i) * -10.0 / std::log2(0.5));
         // new formula, full dB precision
-        m_tombDecibelLut[i] = static_cast<int32_t>(-9000.0 - std::log2(1.0 / i) * -1000.0 / std::log2(0.5));
+        m_tombDecibelLut[i] = static_cast<int32_t>(
+            -9000.0 - std::log2(1.0 / i) * -1000.0 / std::log2(0.5));
     }
 
     return result;
 }
 
-int32_t TombRaiderHooks::convertVolumeToDecibel(int32_t volume) {
+int32_t TombRaiderHooks::convertVolumeToDecibel(int32_t volume)
+{
     // convert volume to dB using the lookup table
     return m_tombDecibelLut[(volume & 0x7FFF) >> 6];
 }
 
-int32_t TombRaiderHooks::convertPanToDecibel(uint16_t pan) {
+int32_t TombRaiderHooks::convertPanToDecibel(uint16_t pan)
+{
     // Use the panning as the rotation ranging from 0 to 0xffff, convert it to
     // radians, apply the sine function and convert it to a value in the rage
     // -256 to 256 for the volume LUT.
-    // Note that I used "DB_CONV_LUT_SIZE / 2" here, which limits the attenuation
-    // for one channel to -50 dB to prevent it from being completely silent.
+    // Note that I used "DB_CONV_LUT_SIZE / 2" here, which limits the
+    // attenuation for one channel to -50 dB to prevent it from being completely
+    // silent.
     // This is a workaround for sounds that are played directly at Lara's
     // position, which often have incorrect pannings and flip more or less
     // randomly between the channels.
-    int32_t result = static_cast<int32_t>(std::sin((pan / 32767.0) * M_PI) * (DECIBEL_LUT_SIZE / 2));
+    int32_t result = static_cast<int32_t>(
+        std::sin((pan / 32767.0) * M_PI) * (DECIBEL_LUT_SIZE / 2));
 
     if (result > 0) {
         result = -m_tombDecibelLut[DECIBEL_LUT_SIZE - result];
@@ -135,7 +145,10 @@ int32_t TombRaiderHooks::convertPanToDecibel(uint16_t pan) {
     return result;
 }
 
-LPDIRECTSOUNDBUFFER TombRaiderHooks::soundPlaySample(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop) {
+LPDIRECTSOUNDBUFFER
+TombRaiderHooks::soundPlaySample(
+    int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop)
+{
     // check if sound system is initialized
     if (!*m_tombSoundInit1 || !*m_tombSoundInit2) {
         return nullptr;
@@ -166,15 +179,22 @@ LPDIRECTSOUNDBUFFER TombRaiderHooks::soundPlaySample(int32_t soundID, int32_t vo
     return buffer;
 }
 
-LPDIRECTSOUNDBUFFER TombRaiderHooks::soundPlayOneShot(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan) {
+LPDIRECTSOUNDBUFFER
+TombRaiderHooks::soundPlayOneShot(
+    int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan)
+{
     return soundPlaySample(soundID, volume, pitch, pan, false);
 }
 
-LPDIRECTSOUNDBUFFER TombRaiderHooks::soundPlayLoop(int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7) {
+LPDIRECTSOUNDBUFFER
+TombRaiderHooks::soundPlayLoop(int32_t soundID, int32_t volume, int16_t pitch,
+    uint16_t pan, int32_t a5, int32_t a6, int32_t a7)
+{
     return soundPlaySample(soundID, volume, pitch, pan, true);
 }
 
-void TombRaiderHooks::soundStopAll() {
+void TombRaiderHooks::soundStopAll()
+{
     TRACEF("TombRaiderHooks::soundStopAll()");
 
     // check if sound system is initialized
@@ -191,7 +211,9 @@ void TombRaiderHooks::soundStopAll() {
     }
 }
 
-LRESULT TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT
+TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
+{
     if (nCode < 0) {
         goto next;
     }
@@ -225,31 +247,39 @@ LRESULT TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lPara
         return 1;
     }
 
-    next:
+next:
     return CallNextHookEx(*m_tombHhk, nCode, wParam, lParam);
 }
 
-BOOL TombRaiderHooks::keyIsPressed(int32_t keyCode) {
+BOOL TombRaiderHooks::keyIsPressed(int32_t keyCode)
+{
     int16_t keyBinding = m_tombDefaultKeyBindings[keyCode];
     uint8_t* keyStates = *m_tombKeyStates;
     return keyStates[keyBinding];
 }
 
-BOOL TombRaiderHooks::renderHealthBar(int32_t health) {
+BOOL TombRaiderHooks::renderHealthBar(int32_t health)
+{
     renderBar(health, false);
     return TRUE;
 }
 
-BOOL TombRaiderHooks::renderAirBar(int32_t air) {
+BOOL TombRaiderHooks::renderAirBar(int32_t air)
+{
     renderBar(air, true);
     return TRUE;
 }
 
-BOOL TombRaiderHooks::renderCollectedItem(int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness) {
-    return m_tombRenderCollectedItem(x, y, getOverlayScale(scale), itemID, brightness);
+BOOL TombRaiderHooks::renderCollectedItem(
+    int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness)
+{
+    return m_tombRenderCollectedItem(
+        x, y, getOverlayScale(scale), itemID, brightness);
 }
 
-void* TombRaiderHooks::createFPSText(int16_t x, int16_t y, int16_t a3, const char* text) {
+void* TombRaiderHooks::createFPSText(
+    int16_t x, int16_t y, int16_t a3, const char* text)
+{
     if (getOverlayScale() > 1) {
         x = m_fpsTextX;
         y = m_fpsTextY;
@@ -258,8 +288,10 @@ void* TombRaiderHooks::createFPSText(int16_t x, int16_t y, int16_t a3, const cha
     return m_tombCreateOverlayText(x, y, a3, text);
 }
 
-int16_t TombRaiderHooks::setFOV(int16_t fov) {
-    double aspectRatio = *m_tombRenderWidth / static_cast<double>(*m_tombRenderHeight);
+int16_t TombRaiderHooks::setFOV(int16_t fov)
+{
+    double aspectRatio =
+        *m_tombRenderWidth / static_cast<double>(*m_tombRenderHeight);
 
     // convert to radians ("fov" is in degrees mapped from 0 to 32760)
     double hFovRad = fov * M_PI / 32760;
@@ -274,9 +306,10 @@ int16_t TombRaiderHooks::setFOV(int16_t fov) {
     return m_tombSetFOV(fov);
 }
 
-BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID) {
+BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID)
+{
     TRACEF("TombRaiderHooks::musicPlayRemap(%d)", trackID);
-    
+
     // stop CD play on track ID 0
     if (trackID == 0) {
         musicStop();
@@ -294,7 +327,8 @@ BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID) {
     return musicPlay(trackID);
 }
 
-BOOL TombRaiderHooks::musicPlayLoop() {
+BOOL TombRaiderHooks::musicPlayLoop()
+{
     TRACE("TombRaiderHooks::musicPlayLoop()");
 
     // cancel if there's currently no looping track set
@@ -306,7 +340,8 @@ BOOL TombRaiderHooks::musicPlayLoop() {
     return *m_tombCDLoop;
 }
 
-BOOL TombRaiderHooks::musicPlay(int16_t trackID) {
+BOOL TombRaiderHooks::musicPlay(int16_t trackID)
+{
     TRACEF("TombRaiderHooks::musicPlay(%d)", trackID);
 
     // don't play music tracks if volume is set to 0
@@ -337,7 +372,7 @@ BOOL TombRaiderHooks::musicPlay(int16_t trackID) {
     MCI_SET_PARMS setParms;
     setParms.dwTimeFormat = MCI_FORMAT_TMSF;
     if (mciSendCommandA(*m_tombMciDeviceID, MCI_SET, MCI_SET_TIME_FORMAT,
-        reinterpret_cast<DWORD_PTR>(&setParms))) {
+            reinterpret_cast<DWORD_PTR>(&setParms))) {
         return FALSE;
     }
 
@@ -354,21 +389,23 @@ BOOL TombRaiderHooks::musicPlay(int16_t trackID) {
     }
 
     if (mciSendCommandA(*m_tombMciDeviceID, MCI_PLAY, dwFlags,
-        reinterpret_cast<DWORD_PTR>(&openParms))) {
+            reinterpret_cast<DWORD_PTR>(&openParms))) {
         return FALSE;
     }
 
     return TRUE;
 }
 
-BOOL TombRaiderHooks::musicStop() {
+BOOL TombRaiderHooks::musicStop()
+{
     TRACEF("TombRaiderHooks::musicStop()");
 
     *m_tombCDTrackID = 0;
     *m_tombCDTrackIDLoop = 0;
     *m_tombCDLoop = FALSE;
 
-    // The original code used MCI_PAUSE, probably to reduce latency when switching
+    // The original code used MCI_PAUSE, probably to reduce latency when
+    // switching
     // tracks. But we'll use MCI_STOP here, since it's expected to use an MCI
     // wrapper with nearly zero latency anyway.
     MCI_GENERIC_PARMS genParms;
@@ -376,7 +413,8 @@ BOOL TombRaiderHooks::musicStop() {
         reinterpret_cast<DWORD_PTR>(&genParms));
 }
 
-BOOL TombRaiderHooks::musicSetVolume(int16_t volume) {
+BOOL TombRaiderHooks::musicSetVolume(int16_t volume)
+{
     TRACEF("TombRaiderHooks::musicSetVolume(%d)", volume);
 
     uint32_t volumeAux = volume * 0xffff / 0xff;
@@ -386,19 +424,22 @@ BOOL TombRaiderHooks::musicSetVolume(int16_t volume) {
     return TRUE;
 }
 
-void TombRaiderHooks::soundSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume) {
+void TombRaiderHooks::soundSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume)
+{
     if (buffer) {
         buffer->SetVolume(convertVolumeToDecibel(volume));
     }
 }
 
-void TombRaiderHooks::soundSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan) {
+void TombRaiderHooks::soundSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan)
+{
     if (buffer) {
         buffer->SetPan(convertPanToDecibel(pan));
     }
 }
 
-void TombRaiderHooks::renderBar(int32_t value, bool air) {
+void TombRaiderHooks::renderBar(int32_t value, bool air)
+{
     const int32_t p1 = -100;
     const int32_t p2 = -200;
     const int32_t p3 = -300;
@@ -407,7 +448,8 @@ void TombRaiderHooks::renderBar(int32_t value, bool air) {
     const int32_t valueMax = 100;
 
     const int32_t colorBarSize = 5;
-    const int32_t colorBar[2][colorBarSize] = { { 8, 11, 8, 6, 24 }, { 32, 41, 32, 19, 21 } };
+    const int32_t colorBar[2][colorBarSize] = {
+        {8, 11, 8, 6, 24}, {32, 41, 32, 19, 21}};
 
     const int32_t colorBorder1 = 19;
     const int32_t colorBorder2 = 17;
@@ -439,7 +481,8 @@ void TombRaiderHooks::renderBar(int32_t value, bool air) {
 
     // background
     for (int32_t i = 1; i < height + 3; i++) {
-        m_tombRenderLine(left + 1, top + i, right, top + i, p1, colorBackground);
+        m_tombRenderLine(
+            left + 1, top + i, right, top + i, p1, colorBackground);
     }
 
     // top / left border
@@ -466,16 +509,19 @@ void TombRaiderHooks::renderBar(int32_t value, bool air) {
         for (int32_t i = 0; i < height; i++) {
             int32_t colorType = air ? 1 : 0;
             int32_t colorIndex = i * colorBarSize / height;
-            m_tombRenderLine(left, top + i, right, top + i, p4, colorBar[colorType][colorIndex]);
+            m_tombRenderLine(left, top + i, right, top + i, p4,
+                colorBar[colorType][colorIndex]);
         }
     }
 }
 
-int32_t TombRaiderHooks::getOverlayScale() {
+int32_t TombRaiderHooks::getOverlayScale()
+{
     return getOverlayScale(1);
 }
 
-int32_t TombRaiderHooks::getOverlayScale(int32_t base){
+int32_t TombRaiderHooks::getOverlayScale(int32_t base)
+{
     double result = static_cast<double>(*m_tombRenderWidth);
     result *= base;
     result /= 800.0;
@@ -488,4 +534,4 @@ int32_t TombRaiderHooks::getOverlayScale(int32_t base){
     return static_cast<int32_t>(std::round(result));
 }
 
-}
+} // namespace glrage

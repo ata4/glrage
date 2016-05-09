@@ -1,8 +1,8 @@
 #include "DirectDraw.hpp"
 
+#include "ErrorUtils.hpp"
 #include "GLRage.hpp"
 #include "Logger.hpp"
-#include "ErrorUtils.hpp"
 
 #include <string>
 
@@ -11,12 +11,15 @@ using glrage::ErrorUtils;
 
 static Context& context = GLRageGetContext();
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) {
-    TRACEF("DirectDraw DllMain(%p,%d)",hModule, dwReason); 
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
+{
+    TRACEF("DirectDraw DllMain(%p,%d)", hModule, dwReason);
     return TRUE;
 }
 
-HRESULT WINAPI DirectDrawCreate(GUID FAR *lpGUID, LPDIRECTDRAW FAR *lplpDD, IUnknown FAR *pUnkOuter) {
+HRESULT WINAPI DirectDrawCreate(
+    GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter)
+{
     TRACEF("DirectDrawCreate");
 
     context.init();

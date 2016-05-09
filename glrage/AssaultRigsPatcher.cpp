@@ -6,21 +6,25 @@
 
 namespace glrage {
 
-GameID AssaultRigsPatcher::gameID() {
+GameID AssaultRigsPatcher::gameID()
+{
     return GameID::AssaultRigs;
 }
 
-AssaultRigsPatcher::AssaultRigsPatcher() :
-    RuntimePatcher("Assault Rigs") {
+AssaultRigsPatcher::AssaultRigsPatcher()
+    : RuntimePatcher("Assault Rigs")
+{
 }
 
-bool AssaultRigsPatcher::applicable(const std::string& fileName) {
+bool AssaultRigsPatcher::applicable(const std::string& fileName)
+{
     return fileName == m_config.getString("patch_exe", "arigs");
 }
 
-void AssaultRigsPatcher::apply() {
+void AssaultRigsPatcher::apply()
+{
     // Fix "Insufficient memory" error on systems with more than 4 GB RAM where
-    // GlobalMemoryStatus returns -1 (unless compatibility mode is activated, 
+    // GlobalMemoryStatus returns -1 (unless compatibility mode is activated,
     // which would break GLRage).
     patch(0x434B63, "0F 8E 32 01 00 00", "90 90 90 90 90 90");
 
@@ -43,12 +47,14 @@ void AssaultRigsPatcher::apply() {
         patch(0x490234, "80 02 00 00 E0 01 00 00", m_tmp);
 
         // Replace "640 BY 480" in the options with "CUSTOM".
-        patch(0x486AC0, "36 34 30 20 42 59 20 34 38 30", "43 55 53 54 4F 4D 20 20 20 20");
+        patch(0x486AC0, "36 34 30 20 42 59 20 34 38 30",
+            "43 55 53 54 4F 4D 20 20 20 20");
     }
 
-    // Disable re-initialization when losing window focus, which is unnecessary and
+    // Disable re-initialization when losing window focus, which is unnecessary
+    // and
     // pretty annoying.
     patch(0x004342F8, "0F 86 59 F4 FF FF", "90 90 90 90 90 90");
 }
 
-}
+} // namespace glrage
