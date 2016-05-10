@@ -5,13 +5,13 @@
 using glrage::Context;
 
 #ifdef GLR_EXPORTS
-#define GLRAPI __declspec(dllexport)
+#define GLRAPI extern "C" __declspec(dllexport)
 #else
-#define GLRAPI __declspec(dllimport)
+#define GLRAPI extern "C" __declspec(dllimport)
 #endif
 
-extern "C" {
+// for static libraries
+Context& GLRageGetContextStatic();
 
+// for dynamic libraries
 GLRAPI Context& GLRageGetContext();
-
-} // extern "C"

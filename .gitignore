@@ -281,7 +281,7 @@ ModelManifest.xml
 ### Project ###
 
 # Automatically generated files
-glrage_static/gitversion.h
+glrage/gitversion.h
 
 # 3D Rage SDK (proprietary)
 ragesdk/

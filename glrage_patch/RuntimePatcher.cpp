@@ -16,7 +16,7 @@
 namespace glrage {
 
 RuntimePatcher::RuntimePatcher(const std::string& configName)
-    : m_config(configName, GLRageGetContext().getBasePath())
+    : m_config(configName, GLRageGetContextStatic().getBasePath())
 {
 }
 
