@@ -6,22 +6,7 @@
 
 namespace glrage {
 
-GameID AssaultRigsPatcher::gameID()
-{
-    return GameID::AssaultRigs;
-}
-
-AssaultRigsPatcher::AssaultRigsPatcher()
-    : RuntimePatcher("Assault Rigs")
-{
-}
-
-bool AssaultRigsPatcher::applicable(const std::string& fileName)
-{
-    return fileName == m_config.getString("patch_exe", "arigs");
-}
-
-void AssaultRigsPatcher::apply()
+void AssaultRigsPatcher::apply(Config& config)
 {
     // Fix "Insufficient memory" error on systems with more than 4 GB RAM where
     // GlobalMemoryStatus returns -1 (unless compatibility mode is activated,
@@ -30,9 +15,9 @@ void AssaultRigsPatcher::apply()
 
     // HD/widescreen resolution patch. Replaces 640x480, normally the maximum
     // resolution, with the current desktop resolution.
-    if (m_config.getBool("patch_resolution", true)) {
-        int32_t width = m_config.getInt("patch_resolution_width", -1);
-        int32_t height = m_config.getInt("patch_resolution_height", -1);
+    if (config.getBool("resolution_override", true)) {
+        int32_t width = config.getInt("resolution_width", -1);
+        int32_t height = config.getInt("resolution_height", -1);
 
         if (width <= 0) {
             width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
@@ -52,8 +37,7 @@ void AssaultRigsPatcher::apply()
     }
 
     // Disable re-initialization when losing window focus, which is unnecessary
-    // and
-    // pretty annoying.
+    // and pretty annoying.
     patch(0x004342F8, "0F 86 59 F4 FF FF", "90 90 90 90 90 90");
 }
 

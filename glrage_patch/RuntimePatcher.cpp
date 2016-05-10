@@ -12,15 +12,11 @@
 
 #include <algorithm>
 #include <memory>
+#include <map>
 
 namespace glrage {
 
-RuntimePatcher::RuntimePatcher(const std::string& configName)
-    : m_config(configName, GLRageGetContextStatic().getBasePath())
-{
-}
-
-GameID RuntimePatcher::patch()
+void RuntimePatcher::patch()
 {
     // get executable name
     TCHAR modulePath[MAX_PATH];
@@ -43,19 +39,25 @@ GameID RuntimePatcher::patch()
         std::string(StringUtils::wideToUtf8(modulePathW));
 
     // run known patches
-    std::vector<std::shared_ptr<RuntimePatcher>> patchers;
-    patchers.push_back(std::make_shared<TombRaiderPatcher>());
-    patchers.push_back(std::make_shared<AssaultRigsPatcher>());
-    patchers.push_back(std::make_shared<WipeoutPatcher>());
+    // clang-format off
+    std::map<std::string, std::shared_ptr<RuntimePatcher>> patches = {
+        {"Tomb Raider",      std::make_shared<TombRaiderPatcher>(false)},
+        {"Tomb Raider Gold", std::make_shared<TombRaiderPatcher>(true)},
+        {"Assault Rigs",     std::make_shared<AssaultRigsPatcher>()},
+        {"Wipeout",          std::make_shared<WipeoutPatcher>()}
+    };
+    // clang-format on
 
-    for (auto& patcher : patchers) {
-        if (patcher->applicable(moduleFileName)) {
-            patcher->apply();
-            return patcher->gameID();
-        }
+    Context& ctx = GLRageGetContextStatic();
+    Config config(
+        ctx.getBasePath() + L"\\patches\\" + modulePathW + L".ini", "Patch");
+
+    auto patch = patches.find(config.getString("game", ""));
+    if (patch != patches.end()) {
+        patch->second->apply(config);
     }
 
-    return GameID::Unknown;
+    ctx.setGameID(moduleFileName);
 }
 
 bool RuntimePatcher::patch(

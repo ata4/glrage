@@ -5,22 +5,7 @@
 
 namespace glrage {
 
-WipeoutPatcher::WipeoutPatcher()
-    : RuntimePatcher("Wipeout")
-{
-}
-
-GameID WipeoutPatcher::gameID()
-{
-    return GameID::Wipeout;
-}
-
-bool WipeoutPatcher::applicable(const std::string& fileName)
-{
-    return fileName == m_config.getString("patch_exe", "wipeout");
-}
-
-void WipeoutPatcher::apply()
+void WipeoutPatcher::apply(Config& config)
 {
     // Wipeout 95 apparently has a bug in the keyboard handling, which sometimes
     // produces random crashes when a key is pressed for a prolonged period of
@@ -44,12 +29,12 @@ void WipeoutPatcher::apply()
     patch(0x46AFB3, "00", "01");
 
     // Disable unskippable title screen, saves a few seconds of wait time.
-    if (m_config.getBool("patch_disable_title_screen", false)) {
+    if (config.getBool("disable_title_screen", false)) {
         patch(0x46B885, "E8 B8 40 00 00", "90 90 90 90 90");
     }
 
     // Disable introductory video.
-    if (m_config.getBool("patch_disable_introductory_video", false)) {
+    if (config.getBool("disable_introductory_video", false)) {
         patch(0x46B808, "E8 33 46 00 00", "90 90 90 90 90");
     }
 }

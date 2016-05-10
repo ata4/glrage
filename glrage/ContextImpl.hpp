@@ -33,8 +33,9 @@ public:
     bool isRendered();
     HWND getHWnd();
     std::wstring getBasePath();
-    GameID getGameID();
-    void setGameID(GameID gameID);
+    std::wstring getConfigPath();
+    std::string getGameID();
+    void setGameID(const std::string& gameID);
 
 private:
     // constants
@@ -44,7 +45,7 @@ private:
                                         WS_EX_CLIENTEDGE | WS_EX_STATICEDGE;
 
     // config object
-    Config m_config{"Context", getBasePath()};
+    Config m_config{getConfigPath(), "Context"};
 
     // window handle
     HWND m_hwnd = nullptr;
@@ -82,7 +83,7 @@ private:
     int32_t m_height = 0;
 
     // detected game
-    GameID m_gameID = GameID::Unknown;
+    std::string m_gameID = "unknown";
 };
 
 } // namespace glrage

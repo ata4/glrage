@@ -9,10 +9,7 @@ namespace glrage {
 class WipeoutPatcher : public RuntimePatcher
 {
 public:
-    WipeoutPatcher();
-    virtual GameID gameID();
-    virtual bool applicable(const std::string& fileName);
-    virtual void apply();
+    virtual void apply(Config& config);
 
 private:
     static BOOL hookSystemParametersInfoA(

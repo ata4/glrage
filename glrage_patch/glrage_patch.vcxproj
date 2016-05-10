@@ -26,6 +26,12 @@
     <ClCompile Include="TombRaiderPatcher.cpp" />
     <ClCompile Include="WipeoutPatcher.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="patches\arigs.ini" />
+    <None Include="patches\tombati.ini" />
+    <None Include="patches\tombub.ini" />
+    <None Include="patches\wipeout.ini" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{929A012F-008C-426C-AE1C-DC31C9BC3A6B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -81,6 +87,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y $(ProjectDir)patches\* $(SolutionDir)build\$(Configuration)\patches\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -97,6 +106,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y $(ProjectDir)patches\* $(SolutionDir)build\$(Configuration)\patches\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

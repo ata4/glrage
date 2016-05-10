@@ -13,43 +13,23 @@
 
 namespace glrage {
 
-TombRaiderPatcher::TombRaiderPatcher()
-    : RuntimePatcher("Tomb Raider")
+TombRaiderPatcher::TombRaiderPatcher(bool ub)
+    : m_ub(ub)
 {
 }
 
-GameID TombRaiderPatcher::gameID()
-{
-    return GameID::TombRaider;
-}
-
-bool TombRaiderPatcher::applicable(const std::string& fileName)
-{
-    if (fileName == m_config.getString("patch_exe", "tombati")) {
-        m_ub = false;
-        return true;
-    }
-
-    if (fileName == m_config.getString("patch_exe_ub", "tombub")) {
-        m_ub = true;
-        return true;
-    }
-
-    return false;
-}
-
-void TombRaiderPatcher::apply()
+void TombRaiderPatcher::apply(Config& config)
 {
     // mandatory crash patches
-    applyCrashPatches();
+    applyCrashPatches(config);
 
     // optional patches
-    applyGraphicPatches();
-    applySoundPatches();
-    applyLogicPatches();
+    applyGraphicPatches(config);
+    applySoundPatches(config);
+    applyLogicPatches(config);
 }
 
-void TombRaiderPatcher::applyCrashPatches()
+void TombRaiderPatcher::applyCrashPatches(Config& config)
 {
     // Tomb Raider ATI patch fails on later Windows versions because of a
     // missing return statement in a function.
@@ -81,14 +61,14 @@ void TombRaiderPatcher::applyCrashPatches()
     patch(m_ub ? 0x4390E3 : 0x439793, "33 C0", "90 90");
 }
 
-void TombRaiderPatcher::applyGraphicPatches()
+void TombRaiderPatcher::applyGraphicPatches(Config& config)
 {
     // The ATI version of Tomb Raider converts vertex colors to half of the
     // original brightness, which results in a dim look and turns some areas in
     // dark levels almost pitch black. This patch boosts the brightness back to
     // normal levels.
-    if (m_config.getBool("patch_brightness", true)) {
-        float brightness = m_config.getFloat("patch_brightness_value", 1.0f);
+    if (config.getBool("brightness_override", true)) {
+        float brightness = config.getFloat("brightness_value", 1.0f);
         float divisor = (1.0f / brightness) * 1024;
         float multi = 0.0625f * brightness;
 
@@ -105,11 +85,11 @@ void TombRaiderPatcher::applyGraphicPatches()
 
     // This patch allows the customization of the water color, which is rather
     // ugly on default.
-    if (m_config.getBool("patch_watercolor", true)) {
+    if (config.getBool("watercolor_override", true)) {
         float filterRed =
-            m_config.getFloat("patch_watercolor_filter_red", 0.3f);
+            config.getFloat("watercolor_filter_red", 0.3f);
         float filterGreen =
-            m_config.getFloat("patch_watercolor_filter_green", 1.0f);
+            config.getFloat("watercolor_filter_green", 1.0f);
 
         m_tmp.clear();
         m_tmp << filterRed << filterGreen;
@@ -119,9 +99,9 @@ void TombRaiderPatcher::applyGraphicPatches()
 
     // This patch replaces 800x600 with a custom resolution for widescreen
     // support and to reduce vertex artifacts due to subpixel inaccuracy.
-    if (m_config.getBool("patch_resolution", true)) {
-        int32_t width = m_config.getInt("patch_resolution_width", -1);
-        int32_t height = m_config.getInt("patch_resolution_height", -1);
+    if (config.getBool("resolution_override", true)) {
+        int32_t width = config.getInt("resolution_width", -1);
+        int32_t height = config.getInt("resolution_height", -1);
 
         if (width <= 0) {
             width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
@@ -205,8 +185,8 @@ void TombRaiderPatcher::applyGraphicPatches()
     }
 
     // Field of view customization patch.
-    if (m_config.getBool("patch_fov", true)) {
-        int32_t fov = m_config.getInt("patch_fov_value", 65);
+    if (config.getBool("fov_override", true)) {
+        int32_t fov = config.getInt("fov_value", 65);
 
         int8_t fov8 = static_cast<int8_t>(fov);
         m_tmp.clear();
@@ -222,7 +202,7 @@ void TombRaiderPatcher::applyGraphicPatches()
         patch(m_ub ? 0x41E45B : 0x41E7DB, "E0 38", m_tmp);
 
         // change the FOV mode from horizontal to vertical if enabled
-        if (m_config.getBool("patch_fov_vertical", true)) {
+        if (config.getBool("fov_vertical", true)) {
             TombRaiderHooks::m_tombSetFOV =
                 reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
 
@@ -268,10 +248,10 @@ void TombRaiderPatcher::applyGraphicPatches()
     patch(m_ub ? 0x416801 : 0x4168F1, tmpExp, tmpRep);
     patch(m_ub ? 0x4168FE : 0x4169EE, tmpExp, tmpRep);
 
-    if (m_config.getBool("patch_draw_distance", false)) {
+    if (config.getBool("draw_distance_override", false)) {
         int32_t drawDistFade =
-            m_config.getInt("patch_draw_distance_fade", 12288);
-        int32_t drawDistMax = m_config.getInt("patch_draw_distance_max", 20480);
+            config.getInt("draw_distance_fade", 12288);
+        int32_t drawDistMax = config.getInt("draw_distance_max", 20480);
 
         RuntimeData drawDistFadeData;
         drawDistFadeData << drawDistFade;
@@ -309,7 +289,7 @@ void TombRaiderPatcher::applyGraphicPatches()
     // per second and offers no interpolation, so it's impossible to render more
     // frames without either rendering duplicate frames or speeding up the game
     // time.
-    // if (m_config.getBool("patch_60fps", true)) {
+    // if (config.getBool("60fps", true)) {
     //    // render on every tick instead of every other
     //    patch(m_ub ? 0x408A91 : 0x408A84, "02", "00");
     //    // disables frame skipping, which also fixes issues with the demo mode
@@ -318,22 +298,19 @@ void TombRaiderPatcher::applyGraphicPatches()
     //}
 }
 
-void TombRaiderPatcher::applySoundPatches()
+void TombRaiderPatcher::applySoundPatches(Config& config)
 {
     // For reasons unknown, the length of a sound sample is stored in a struct
     // field as a 16 bit integer, which means that the maximum allowed length
-    // for
-    // a sound sample is be 65535 bytes. If a sample is larger, which happens
-    // quite
-    // often for Lara's speeches in her home, then there's an integer overflow
-    // and the length is wrapped to the modulo of 65535. This causes her speech
-    // to cut off, if too long. In one case ("Ah, the main hall..."), the sample
-    // is just slightly larger than 64k, which causes the game to play only the
-    // first few milliseconds of silence, hence the sample appears to be missing
-    // in the ATI patch.
+    // for a sound sample is be 65535 bytes. If a sample is larger, which
+    // happens quite often for Lara's speeches in her home, then there's an
+    // integer overflow and the length is wrapped to the modulo of 65535.
+    // This causes her speech to cut off, if too long.
+    // In one case ("Ah, the main hall..."), the sample is just slightly larger
+    // than 64k, which causes the game to play only the first few milliseconds
+    // of silence, hence the sample appears to be missing in the ATI patch.
     // This patch extracts the correct 32 bit length from the RIFF data
-    // directly,
-    // which fixes this bug.
+    // directly, which fixes this bug.
     patch(m_ub ? 0x419ED8 : 0x419FC8, "66 8B 7B 04", "8B 7E FC 90");
 
     // Pass raw pan values to the sound functions to maintain full precision.
@@ -382,7 +359,7 @@ void TombRaiderPatcher::applySoundPatches()
     // Very optional patch: change ambient track in Lost Valley from "derelict"
     // to "water", which, in my very personal opinion, is more fitting for the
     // theme of this level.
-    if (!m_ub && m_config.getBool("patch_lostvalley_ambience", false)) {
+    if (!m_ub && config.getBool("lostvalley_ambience", false)) {
         patch(0x456A1E, "39", "3A");
     }
 
@@ -417,7 +394,7 @@ void TombRaiderPatcher::applySoundPatches()
 
     // Soundtrack patch. Allows both ambient and music cues to be played via
     // MCI.
-    if (m_config.getBool("patch_soundtrack", false)) {
+    if (config.getBool("full_soundtrack", false)) {
         // hook play function (level music)
         if (m_ub) {
             patchAddr(0x438700, "66 83 3D 3C 5D",
@@ -465,13 +442,13 @@ void TombRaiderPatcher::applySoundPatches()
                 0x456400, "03 00 03 00 04 00 04 00", "3B 00 3B 00 3C 00 3C 00");
         }
     } else {
-        // without patch_soundtrack, there are only three tracks left for UB,
+        // without soundtrack, there are only three tracks left for UB,
         // which are all looping
         TombRaiderHooks::m_musicAlwaysLoop = m_ub;
     }
 }
 
-void TombRaiderPatcher::applyLogicPatches()
+void TombRaiderPatcher::applyLogicPatches(Config& config)
 {
     // This changes the first drive letter to search for the Tomb Raider CD from
     // 'C' to 'A', which allows the game to find CDs placed in the drives A: or
@@ -532,7 +509,7 @@ void TombRaiderPatcher::applyLogicPatches()
 
     // No-CD patch. Allows the game to load game files and movies from the local
     // directory instead from the CD.
-    if (m_config.getBool("patch_nocd", false)) {
+    if (config.getBool("nocd", false)) {
         // disable CD check call
         if (m_ub) {
             patch(0x41DE7F, "E8 CC E0 FF FF", "90 90 90 90 90");
@@ -571,9 +548,9 @@ void TombRaiderPatcher::applyLogicPatches()
 
     // Experimental localization patch. Replaces string pointers with pointers
     // for translations.
-    if (m_config.getBool("patch_localization", false)) {
+    if (config.getBool("localization", false)) {
         try {
-            applyLocalePatches();
+            applyLocalePatches(config);
         } catch (const std::runtime_error& ex) {
             // translation files are optional, so simply log if they're missing
             LOGF("TombRaiderPatcher::applyLogicPatches: Can't apply "
@@ -604,14 +581,14 @@ void TombRaiderPatcher::applyLogicPatches()
     // patch(0x416E17, "85 0C 00", "65 18 01");
 }
 
-void TombRaiderPatcher::applyLocalePatches()
+void TombRaiderPatcher::applyLocalePatches(Config& config)
 {
     std::wstring basePath = GLRageGetContextStatic().getBasePath();
-    std::wstring localePath = basePath + L"\\locale\\";
+    std::wstring localePath = basePath + L"\\patch\\locale\\";
 
     // load locale file
     std::string locale =
-        m_config.getString("patch_localization_locale", "en_GB");
+        config.getString("localization_locale", "en_GB");
     std::wstring langPath =
         localePath + StringUtils::utf8ToWide(locale) + L".txt";
     std::ifstream langStream(langPath);

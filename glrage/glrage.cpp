@@ -12,7 +12,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
     TRACEF("GLRage DllMain(%p,%d)", hModule, dwReason);
     switch (dwReason) {
         case DLL_PROCESS_ATTACH:
-            context.setGameID(RuntimePatcher::patch());
+            RuntimePatcher::patch();
             break;
     }
 

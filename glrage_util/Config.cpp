@@ -5,10 +5,10 @@
 
 namespace glrage {
 
-Config::Config(const std::string& section, const std::wstring& directory)
+Config::Config(const std::wstring& path, const std::string& section)
 {
+    m_configPath = path;
     m_section = section;
-    m_configPath = directory + L"\\glrage.ini";
 }
 
 std::string Config::getString(

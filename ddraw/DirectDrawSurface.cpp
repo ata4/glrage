@@ -5,8 +5,6 @@
 
 #include <algorithm>
 
-using glrage::GameID;
-
 namespace ddraw {
 
 DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD,
@@ -537,7 +535,7 @@ HRESULT WINAPI DirectDrawSurface::Unlock(LPVOID lp)
     if (m_desc.ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE &&
         !(m_desc.ddsCaps.dwCaps & DDSCAPS_FLIP)) {
         // FMV hack for Tomb Raider
-        if (m_context.getGameID() == GameID::TombRaider) {
+        if (m_context.getGameID().find("tomb") != std::string::npos) {
             // fix black lines by copying even to odd lines
             for (DWORD i = 0; i < m_desc.dwHeight; i += 2) {
                 auto itrEven = std::next(m_buffer.begin(), i * m_desc.lPitch);

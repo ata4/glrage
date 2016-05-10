@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GameID.hpp"
-
 #include <Windows.h>
 
 #include <cstdint>
@@ -34,8 +32,9 @@ public:
     virtual bool isRendered() = 0;
     virtual HWND getHWnd() = 0;
     virtual std::wstring getBasePath() = 0;
-    virtual GameID getGameID() = 0;
-    virtual void setGameID(GameID gameID) = 0;
+    virtual std::wstring getConfigPath() = 0;
+    virtual std::string getGameID() = 0;
+    virtual void setGameID(const std::string& gameID) = 0;
 };
 
 } // namespace glrage

@@ -8,7 +8,7 @@ namespace glrage {
 class Config
 {
 public:
-    Config(const std::string& section, const std::wstring& directory);
+    Config(const std::wstring& path, const std::string& section);
     std::string getString(
         const std::string& name, const std::string& defaultValue);
     int32_t getInt(const std::string& name, const int32_t defaultValue);

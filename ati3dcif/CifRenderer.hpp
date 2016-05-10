@@ -129,7 +129,7 @@ public:
 
 private:
     Context& m_context = GLRageGetContext();
-    Config m_config{"ATI3DCIF", m_context.getBasePath()};
+    Config m_config{m_context.getConfigPath(), "ATI3DCIF"};
     bool m_wireframe;
     TextureMap m_textures;
     C3D_PPALETTENTRY m_palette = nullptr;

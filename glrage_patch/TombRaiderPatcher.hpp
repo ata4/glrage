@@ -7,17 +7,15 @@ namespace glrage {
 class TombRaiderPatcher : public RuntimePatcher
 {
 public:
-    TombRaiderPatcher();
-    virtual GameID gameID();
-    virtual bool applicable(const std::string& fileName);
-    virtual void apply();
+    TombRaiderPatcher(bool ub);
+    virtual void apply(Config& config);
 
 private:
-    void applyCrashPatches();
-    void applyGraphicPatches();
-    void applySoundPatches();
-    void applyLogicPatches();
-    void applyLocalePatches();
+    void applyCrashPatches(Config& config);
+    void applyGraphicPatches(Config& config);
+    void applySoundPatches(Config& config);
+    void applyLogicPatches(Config& config);
+    void applyLocalePatches(Config& config);
 
     bool m_ub;
 };
