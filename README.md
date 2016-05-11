@@ -24,7 +24,8 @@ For the absolute minimum installation, the original Tomb Raider CD as well as th
 * [ATI patch for Tomb Raider](http://web.archive.org/web/20081208051118/http://ftp.eidos-france.fr/pub/fr/tomb_raider/patches/tombatiragepro.zip)
 * [ATI patch for Tomb Raider: Unfinished Business](http://web.archive.org/web/20081208051118/http://ftp.eidos-france.fr/pub/fr/tomb_raider/patches/tombati.zip) (executable only, requires ESCAPE DLLs included in the patch above)
 
-For a standalone installation without requiring the CD, you'll need to copy the `DATA` and `FMV` folders from the CD to the TR directory and set `patch_nocd` to `true` in the `[Tomb Raider]` section of `glrage.ini`.
+On default, Tomb Raider is patched for a standalone installation, so you'll need to copy the `DATA` and `FMV` folders from the CD to the TR directory. If you want to use the CD instead, you have to set `patch_nocd` to `false` in `tombati.ini`/`tombub.ini`.
+
 To have working music in this mode, you'll need a WinMM wrapper and audio track rips as well. To unlock the full soundtrack, you also need to set `patch_soundtrack` to `true` and have all tracks set up in the right order.
 [Here's an overview of all TR1 CD audio tracks,](https://docs.google.com/spreadsheets/d/1xQsqGF-T0oqv_TxdgAMJr31XDiJrnch5tuas6QpXzsI/) GLRage uses "Raw" if `patch_soundtrack` is enabled.
 
@@ -59,7 +60,7 @@ With the wrapper installed, following key combinations are available:
 * Increased vertex color brightness to match DOS and PSX versions. ([Screenshot 1](http://i.imgur.com/S7GP9hH.jpg) / [Screenshot 2](http://i.imgur.com/xqJflAi.jpg))
 * Changed water color from grey-blue to turquoise, similar to the PSX version. ([Screenshot](http://i.imgur.com/NpYRg9j.jpg))
 * Increased rendering distance. ([Screenshot](http://i.imgur.com/CUnIoIY.jpg), disabled on default)
-* No-CD mode. (disabled on default)
+* No-CD mode. (enabled on default)
 * Customizable field of view.
 * Full soundtrack mode, combining PC ambient tracks with PSX music tracks. (disabled on default)
 
@@ -111,8 +112,8 @@ Wipeout runs mostly stable, but there are some graphical glitches right now.
 
 # Compiling
 
-You'll need Visual Studio 2015 to compile the source files. Additionally, you will also need the [ATi 3D Rage Pro SDK 4.1](http://www.vogonsdrivers.com/getfile.php?fileid=497) and extract it to the repo's main folder,
-more specifically the ATI3DCIF.H header file inside `ragesdk/include`.
+You'll need Visual Studio 2015 to compile the source files. Additionally, you will also need the [ATi 3D Rage Pro SDK 4.1](http://www.vogonsdrivers.com/getfile.php?fileid=497) and extract it to the repo's main folder.
+You can also just extract ATI3DCIF.H header file to `ragesdk/include`, since the rest isn't required for compiling.
 
 # License
 This software is provided under GNU Lesser General Public License version 3.
