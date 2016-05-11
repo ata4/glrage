@@ -1,81 +1,38 @@
 #include "Logger.hpp"
 
-#include <iostream>
+#include <cstdio>
 #include <string>
 
-// fix for "K32GetModuleBaseNameA not found in KERNEL32.dll" error on Vista
-#define PSAPI_VERSION 1
-#include <psapi.h>
+static const size_t bufferMax = 1024;
 
-bool Logger::m_verbose = false;
-LogTarget Logger::m_target = Win32Debug;
+std::string Logger::m_buffer1;
+std::string Logger::m_buffer2;
 
-void Logger::setVerbose(bool verbose)
+void Logger::log(void* returnAddress, const std::string& function,
+        std::string format, ...)
 {
-    m_verbose = verbose;
-}
+    int size;
 
-bool Logger::isVerbose()
-{
-    return m_verbose;
-}
-
-void Logger::setTarget(LogTarget target)
-{
-    m_target = target;
-}
-
-LogTarget Logger::getTarget()
-{
-    return m_target;
-}
-
-void Logger::log(void* returnAddress, const std::string& message)
-{
-    log(returnAddress, message.c_str());
-}
-
-void Logger::log(void* returnAddress, const char* message)
-{
-    logImpl(returnAddress, message);
-}
-
-void Logger::logf(void* returnAddress, const char* message, ...)
-{
-    static char info[1024];
-
-    va_list list;
-    va_start(list, message);
-    vsnprintf_s(info, sizeof(info), _TRUNCATE, message, list);
-    va_end(list);
-
-    logImpl(returnAddress, info);
-}
-
-void Logger::logImpl(void* returnAddress, const char* message)
-{
-    static char line[1024];
-    static char name[MAX_PATH];
-
-    if (m_verbose) {
-        HMODULE handle;
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-            static_cast<LPCTSTR>(returnAddress), &handle);
-        GetModuleBaseNameA(GetCurrentProcess(), handle, name, sizeof(name));
-
-        _snprintf_s(line, sizeof(line), _TRUNCATE, "[%s %p@%d] %s\n", name,
-            returnAddress, GetCurrentThreadId(), message);
+    if (format.empty()) {
+        m_buffer1.resize(bufferMax);
+        size = sprintf_s(&m_buffer1[0], m_buffer1.capacity(), "%p %s\n",
+            returnAddress, function.c_str());
+        m_buffer1.resize(size);
     } else {
-        _snprintf_s(line, sizeof(line), _TRUNCATE, "%s\n", message);
-    }
+        m_buffer1.resize(bufferMax);
+        va_list list;
+        va_start(list, format);
+        size = vsnprintf_s(
+            &m_buffer1[0], m_buffer1.capacity(), _TRUNCATE, &format[0], list);
+        va_end(list);
+        m_buffer1.resize(size);
 
-    switch (m_target) {
-        case Console:
-            std::cout << line;
-            break;
-
-        case Win32Debug:
-            OutputDebugStringA(line);
-            break;
+        m_buffer2.resize(bufferMax);
+        size = sprintf_s(&m_buffer2[0], m_buffer2.capacity(), "%p %s: %s\n",
+            returnAddress, function.c_str(), m_buffer1.c_str());
+        m_buffer2.resize(size);
     }
+    
+
+    OutputDebugStringA(m_buffer2.c_str());
 }

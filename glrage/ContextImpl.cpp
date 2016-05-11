@@ -90,7 +90,7 @@ void ContextImpl::attach(HWND hwnd)
         return;
     }
 
-    LOGF("Attaching to HWND %p", hwnd);
+    LOG_INFO("Attaching to HWND %p", hwnd);
 
     m_hwnd = hwnd;
 
@@ -278,7 +278,7 @@ void ContextImpl::toggleFullscreen()
 
 void ContextImpl::setDisplaySize(int32_t width, int32_t height)
 {
-    LOGF("Display size: %dx%d", width, height);
+    LOG_INFO("Display size: %dx%d", width, height);
 
     m_width = width;
     m_height = height;
@@ -305,7 +305,7 @@ void ContextImpl::setWindowSize(int32_t width, int32_t height)
         return;
     }
 
-    LOGF("Window size: %dx%d", width, height);
+    LOG_INFO("Window size: %dx%d", width, height);
 
     // reduce window size as long as its greater or equal to the desktop size
     auto desktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);

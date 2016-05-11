@@ -130,8 +130,8 @@ void CifVertexStream::reserve(C3D_UINT32 numVert, size_t vertSize)
 {
     size_t vertexBufferSize = vertSize * numVert;
     if (vertexBufferSize > m_vertexBufferSize) {
-        LOGF("CifVertexStream::reserve: Vertex buffer resize: %d -> %d",
-            m_vertexBufferSize, vertexBufferSize);
+        LOG_INFO("Vertex buffer resize: %d -> %d", m_vertexBufferSize,
+            vertexBufferSize);
         m_vertexBuffer.data(vertexBufferSize, nullptr, GL_STREAM_DRAW);
         m_vertexBufferSize = vertexBufferSize;
     }

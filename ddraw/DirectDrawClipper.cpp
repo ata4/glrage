@@ -6,18 +6,19 @@ namespace ddraw {
 
 DirectDrawClipper::DirectDrawClipper()
 {
-    TRACE("DirectDrawClipper::DirectDrawClipper");
+    LOG_TRACE("");
 }
 
 DirectDrawClipper::~DirectDrawClipper()
 {
-    TRACE("DirectDrawClipper::~DirectDrawClipper");
+    LOG_TRACE("");
 }
 
 /*** IUnknown methods ***/
 HRESULT WINAPI DirectDrawClipper::QueryInterface(REFIID riid, LPVOID* ppvObj)
 {
-    TRACE("DirectDrawClipper::QueryInterface");
+    LOG_TRACE("");
+
     if (IsEqualGUID(riid, IID_IDirectDrawSurface)) {
         *ppvObj = static_cast<IDirectDrawClipper*>(this);
     } else {
@@ -30,11 +31,15 @@ HRESULT WINAPI DirectDrawClipper::QueryInterface(REFIID riid, LPVOID* ppvObj)
 
 ULONG WINAPI DirectDrawClipper::AddRef()
 {
+    LOG_TRACE("");
+
     return Unknown::AddRef();
 }
 
 ULONG WINAPI DirectDrawClipper::Release()
 {
+    LOG_TRACE("");
+
     return Unknown::Release();
 }
 
@@ -42,27 +47,31 @@ ULONG WINAPI DirectDrawClipper::Release()
 HRESULT WINAPI DirectDrawClipper::GetClipList(
     LPRECT lpRect, LPRGNDATA lpClipList, LPDWORD lpdwSize)
 {
-    TRACE("DirectDrawClipper::GetClipList");
+    LOG_TRACE("");
+
     *lpClipList = m_clipList;
     return DD_OK;
 }
 
 HRESULT WINAPI DirectDrawClipper::GetHWnd(HWND* lphWnd)
 {
-    TRACE("DirectDrawClipper::GetHWnd");
+    LOG_TRACE("");
+
     *lphWnd = m_hWnd;
     return DD_OK;
 }
 
 HRESULT WINAPI DirectDrawClipper::Initialize(LPDIRECTDRAW lpDD, DWORD dwFlags)
 {
-    TRACE("DirectDrawClipper::Initialize");
+    LOG_TRACE("");
+
     return DD_OK;
 }
 
 HRESULT WINAPI DirectDrawClipper::IsClipListChanged(BOOL* lpbChanged)
 {
-    TRACE("DirectDrawClipper::IsClipListChanged");
+    LOG_TRACE("");
+
     *lpbChanged = FALSE;
     return DD_OK;
 }
@@ -70,14 +79,16 @@ HRESULT WINAPI DirectDrawClipper::IsClipListChanged(BOOL* lpbChanged)
 HRESULT WINAPI DirectDrawClipper::SetClipList(
     LPRGNDATA lpClipList, DWORD dwFlags)
 {
-    TRACE("DirectDrawClipper::SetClipList");
+    LOG_TRACE("");
+
     m_clipList = *lpClipList;
     return DD_OK;
 }
 
 HRESULT WINAPI DirectDrawClipper::SetHWnd(DWORD dwFlags, HWND hWnd)
 {
-    TRACE("DirectDrawClipper::SetHWnd");
+    LOG_TRACE("");
+
     m_hWnd = hWnd;
     return DD_OK;
 }

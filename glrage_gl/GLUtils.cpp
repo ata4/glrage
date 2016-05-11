@@ -31,7 +31,7 @@ const char* GLUtils::getErrorString(GLenum err)
 void GLUtils::checkError(char* section)
 {
     for (GLenum err; (err = glGetError()) != GL_NO_ERROR;) {
-        LOGF("glGetError: %s (%s)", getErrorString(err), section);
+        LOG_INFO("glGetError: %s (%s)", getErrorString(err), section);
     }
 }
 

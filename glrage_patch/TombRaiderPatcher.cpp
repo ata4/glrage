@@ -553,9 +553,7 @@ void TombRaiderPatcher::applyLogicPatches()
             applyLocalePatches();
         } catch (const std::runtime_error& ex) {
             // translation files are optional, so simply log if they're missing
-            LOGF("TombRaiderPatcher::applyLogicPatches: Can't apply "
-                 "translation patch: %s",
-                ex.what());
+            LOG_INFO("Can't apply translation patch: %s", ex.what());
         }
     }
 
@@ -635,9 +633,8 @@ void TombRaiderPatcher::applyLocalePatches()
             if (valueIndex == 0) {
                 stringIndex = value;
                 if (stringMap.find(stringIndex) == stringMap.end()) {
-                    LOGF("TombRaiderPatcher::applyLocalePatches: Missing "
-                         "translation for %d '%s'",
-                        stringIndex, string.c_str());
+                    LOG_INFO("Missing translation for %d '%s'", stringIndex,
+                        string.c_str());
                     break;
                 }
 

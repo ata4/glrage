@@ -26,8 +26,8 @@ HandleException()
 #ifdef _DEBUG
         ErrorUtils::warning(ex);
 #else
-        LOGF("HandleException: CIF error: %s (0x%x %s)", ex.what(),
-            ex.getErrorCode(), ex.getErrorName());
+        LOG_INFO("CIF error: %s (0x%x %s)", ex.what(), ex.getErrorCode(),
+            ex.getErrorName());
 #endif
         return ex.getErrorCode();
     } catch (const std::runtime_error& ex) {
@@ -43,7 +43,7 @@ extern "C" {
 
 EXPORT(ATI3DCIF_Init, C3D_EC, (void))
 {
-    TRACE("ATI3DCIF_Init()");
+    LOG_TRACE("");
 
     context.init();
     context.attach();
@@ -52,8 +52,7 @@ EXPORT(ATI3DCIF_Init, C3D_EC, (void))
 
     // do some cleanup in case the app forgets to call ATI3DCIF_Term
     if (renderer) {
-        LOG("ATI3DCIF_Init: Previous instance was not terminated by "
-            "ATI3DCIF_Term!");
+        LOG_INFO("Previous instance was not terminated by ATI3DCIF_Term!");
         ATI3DCIF_Term();
     }
 
@@ -68,7 +67,7 @@ EXPORT(ATI3DCIF_Init, C3D_EC, (void))
 
 EXPORT(ATI3DCIF_Term, C3D_EC, (void))
 {
-    TRACE("ATI3DCIF_Term()");
+    LOG_TRACE("");
 
     try {
         if (renderer) {
@@ -89,7 +88,7 @@ EXPORT(ATI3DCIF_Term, C3D_EC, (void))
 
 EXPORT(ATI3DCIF_GetInfo, C3D_EC, (PC3D_3DCIFINFO p3DCIFInfo))
 {
-    TRACE("ATI3DCIF_GetInfo()");
+    LOG_TRACE("");
 
     // check for invalid struct
     if (!p3DCIFInfo || p3DCIFInfo->u32Size > 48) {
@@ -130,7 +129,7 @@ EXPORT(ATI3DCIF_GetInfo, C3D_EC, (PC3D_3DCIFINFO p3DCIFInfo))
 
 EXPORT(ATI3DCIF_TextureReg, C3D_EC, (C3D_PTMAP ptmapToReg, C3D_PHTX phtmap))
 {
-    TRACEF("ATI3DCIF_TextureReg(0x%p, 0x%p)", *ptmapToReg, *phtmap);
+    LOG_TRACE("0x%p, 0x%p", *ptmapToReg, *phtmap);
 
     try {
         renderer->textureReg(ptmapToReg, phtmap);
@@ -143,7 +142,7 @@ EXPORT(ATI3DCIF_TextureReg, C3D_EC, (C3D_PTMAP ptmapToReg, C3D_PHTX phtmap))
 
 EXPORT(ATI3DCIF_TextureUnreg, C3D_EC, (C3D_HTX htxToUnreg))
 {
-    TRACEF("ATI3DCIF_TextureUnreg(0x%p)", htxToUnreg);
+    LOG_TRACE("0x%p", htxToUnreg);
 
     try {
         renderer->textureUnreg(htxToUnreg);
@@ -157,8 +156,8 @@ EXPORT(ATI3DCIF_TextureUnreg, C3D_EC, (C3D_HTX htxToUnreg))
 EXPORT(ATI3DCIF_TexturePaletteCreate, C3D_EC,
     (C3D_ECI_TMAP_TYPE epalette, void* pPalette, C3D_PHTXPAL phtpalCreated))
 {
-    TRACEF("ATI3DCIF_TexturePaletteCreate(%s, 0x%p, 0x%p)",
-        cif::C3D_ECI_TMAP_TYPE_NAMES[epalette], pPalette, phtpalCreated);
+    LOG_TRACE("%s, 0x%p, 0x%p", cif::C3D_ECI_TMAP_TYPE_NAMES[epalette],
+        pPalette, phtpalCreated);
 
     try {
         renderer->texturePaletteCreate(epalette, pPalette, phtpalCreated);
@@ -171,7 +170,7 @@ EXPORT(ATI3DCIF_TexturePaletteCreate, C3D_EC,
 
 EXPORT(ATI3DCIF_TexturePaletteDestroy, C3D_EC, (C3D_HTXPAL htxpalToDestroy))
 {
-    TRACEF("ATI3DCIF_TexturePaletteDestroy(0x%p)", htxpalToDestroy);
+    LOG_TRACE("0x%p", htxpalToDestroy);
 
     try {
         renderer->texturePaletteDestroy(htxpalToDestroy);
@@ -186,8 +185,8 @@ EXPORT(ATI3DCIF_TexturePaletteAnimate, C3D_EC,
     (C3D_HTXPAL htxpalToAnimate, C3D_UINT32 u32StartIndex,
         C3D_UINT32 u32NumEntries, C3D_PPALETTENTRY pclrPalette))
 {
-    TRACEF("ATI3DCIF_TexturePaletteAnimate(0x%p, %d, %d, 0x%p)",
-        htxpalToAnimate, u32StartIndex, u32NumEntries, *pclrPalette);
+    LOG_TRACE("0x%p, %d, %d, 0x%p", htxpalToAnimate, u32StartIndex,
+        u32NumEntries, *pclrPalette);
 
     try {
         renderer->texturePaletteAnimate(
@@ -201,7 +200,7 @@ EXPORT(ATI3DCIF_TexturePaletteAnimate, C3D_EC,
 
 EXPORT(ATI3DCIF_ContextCreate, C3D_HRC, (void))
 {
-    TRACE("ATI3DCIF_ContextCreate()");
+    LOG_TRACE("");
 
     context.attach();
 
@@ -266,7 +265,7 @@ EXPORT(ATI3DCIF_ContextCreate, C3D_HRC, (void))
 
 EXPORT(ATI3DCIF_ContextDestroy, C3D_EC, (C3D_HRC hRC))
 {
-    TRACEF("ATI3DCIF_ContextDestroy(0x%p)", hRC);
+    LOG_TRACE("0x%p", hRC);
 
     // can't destroy a context that wasn't created
     if (!contextCreated) {
@@ -284,8 +283,8 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC,
 #ifdef DEBUG_TRACE
     std::string stateDataStr =
         cif::CifUtils::dumpRenderStateData(eRStateID, pRStateData);
-    TRACEF("ATI3DCIF_ContextSetState(0x%p, %s, %s)", hRC,
-        cif::C3D_ERSID_NAMES[eRStateID], stateDataStr.c_str());
+    LOG_TRACE("0x%p, %s, %s", hRC, cif::C3D_ERSID_NAMES[eRStateID],
+        stateDataStr.c_str());
 #endif
 
     try {
@@ -423,7 +422,7 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC,
 
 EXPORT(ATI3DCIF_RenderBegin, C3D_EC, (C3D_HRC hRC))
 {
-    TRACEF("ATI3DCIF_RenderBegin(0x%p)", hRC);
+    LOG_TRACE("0x%p", hRC);
 
     context.renderBegin();
 
@@ -438,7 +437,7 @@ EXPORT(ATI3DCIF_RenderBegin, C3D_EC, (C3D_HRC hRC))
 
 EXPORT(ATI3DCIF_RenderEnd, C3D_EC, (void))
 {
-    TRACE("ATI3DCIF_RenderEnd");
+    LOG_TRACE("");
 
     try {
         renderer->renderEnd();
@@ -451,7 +450,7 @@ EXPORT(ATI3DCIF_RenderEnd, C3D_EC, (void))
 
 EXPORT(ATI3DCIF_RenderSwitch, C3D_EC, (C3D_HRC hRC))
 {
-    TRACEF("ATI3DCIF_RenderSwitch(0x%p)", hRC);
+    LOG_TRACE("0x%p", hRC);
     // function has officially never been implemented
     return C3D_EC_NOTIMPYET;
 }
@@ -459,7 +458,7 @@ EXPORT(ATI3DCIF_RenderSwitch, C3D_EC, (C3D_HRC hRC))
 EXPORT(ATI3DCIF_RenderPrimStrip, C3D_EC,
     (C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert))
 {
-    TRACEF("ATI3DCIF_RenderPrimStrip(0x%p, %d)", vStrip, u32NumVert);
+    LOG_TRACE("0x%p, %d", vStrip, u32NumVert);
 
     try {
         renderer->renderPrimStrip(vStrip, u32NumVert);
@@ -473,7 +472,7 @@ EXPORT(ATI3DCIF_RenderPrimStrip, C3D_EC,
 EXPORT(
     ATI3DCIF_RenderPrimList, C3D_EC, (C3D_VLIST vList, C3D_UINT32 u32NumVert))
 {
-    TRACEF("ATI3DCIF_RenderPrimList(0x%p, %d)", vList, u32NumVert);
+    LOG_TRACE("0x%p, %d", vList, u32NumVert);
 
     try {
         renderer->renderPrimList(vList, u32NumVert);
@@ -487,7 +486,8 @@ EXPORT(
 EXPORT(ATI3DCIF_RenderPrimMesh, C3D_EC,
     (C3D_PVARRAY vMesh, C3D_PUINT32 pu32Indicies, C3D_UINT32 u32NumIndicies))
 {
-    TRACEF("ATI3DCIF_RenderPrimMesh(0x%p, %d)", vMesh, u32NumIndicies);
+    LOG_TRACE("0x%p, %d", vMesh, u32NumIndicies);
+
     return C3D_EC_OK;
 }
 

@@ -149,6 +149,8 @@ LPDIRECTSOUNDBUFFER
 TombRaiderHooks::soundPlaySample(
     int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan, bool loop)
 {
+    LOG_TRACE("%d %d %d %d %d", soundID, volume, pitch, pan, loop);
+
     // check if sound system is initialized
     if (!*m_tombSoundInit1 || !*m_tombSoundInit2) {
         return nullptr;
@@ -183,6 +185,8 @@ LPDIRECTSOUNDBUFFER
 TombRaiderHooks::soundPlayOneShot(
     int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan)
 {
+    LOG_TRACE("%d, %d, %d, %d", soundID, volume, pitch, pan);
+
     return soundPlaySample(soundID, volume, pitch, pan, false);
 }
 
@@ -190,12 +194,15 @@ LPDIRECTSOUNDBUFFER
 TombRaiderHooks::soundPlayLoop(int32_t soundID, int32_t volume, int16_t pitch,
     uint16_t pan, int32_t a5, int32_t a6, int32_t a7)
 {
+    LOG_TRACE(
+        "%d, %d, %d, %d, %d, %d, %d", soundID, volume, pitch, pan, a5, a6, a7);
+
     return soundPlaySample(soundID, volume, pitch, pan, true);
 }
 
 void TombRaiderHooks::soundStopAll()
 {
-    TRACEF("TombRaiderHooks::soundStopAll()");
+    LOG_TRACE("");
 
     // check if sound system is initialized
     if (!*m_tombSoundInit1 || !*m_tombSoundInit2) {
@@ -214,6 +221,8 @@ void TombRaiderHooks::soundStopAll()
 LRESULT
 TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
 {
+    LOG_TRACE("%d, %d, %d", nCode, wParam, lParam);
+
     if (nCode < 0) {
         goto next;
     }
@@ -308,7 +317,7 @@ int16_t TombRaiderHooks::setFOV(int16_t fov)
 
 BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID)
 {
-    TRACEF("TombRaiderHooks::musicPlayRemap(%d)", trackID);
+    LOG_TRACE("%d", trackID);
 
     // stop CD play on track ID 0
     if (trackID == 0) {
@@ -329,7 +338,7 @@ BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID)
 
 BOOL TombRaiderHooks::musicPlayLoop()
 {
-    TRACE("TombRaiderHooks::musicPlayLoop()");
+    LOG_TRACE("");
 
     // cancel if there's currently no looping track set
     if (*m_tombCDLoop && *m_tombCDTrackIDLoop > 0) {
@@ -342,7 +351,7 @@ BOOL TombRaiderHooks::musicPlayLoop()
 
 BOOL TombRaiderHooks::musicPlay(int16_t trackID)
 {
-    TRACEF("TombRaiderHooks::musicPlay(%d)", trackID);
+    LOG_TRACE("%d", trackID);
 
     // don't play music tracks if volume is set to 0
     if (!*m_tombCDVolume) {
@@ -398,7 +407,7 @@ BOOL TombRaiderHooks::musicPlay(int16_t trackID)
 
 BOOL TombRaiderHooks::musicStop()
 {
-    TRACEF("TombRaiderHooks::musicStop()");
+    LOG_TRACE("");
 
     *m_tombCDTrackID = 0;
     *m_tombCDTrackIDLoop = 0;
@@ -415,7 +424,7 @@ BOOL TombRaiderHooks::musicStop()
 
 BOOL TombRaiderHooks::musicSetVolume(int16_t volume)
 {
-    TRACEF("TombRaiderHooks::musicSetVolume(%d)", volume);
+    LOG_TRACE("%d", volume);
 
     uint32_t volumeAux = volume * 0xffff / 0xff;
     volumeAux |= volumeAux << 16;

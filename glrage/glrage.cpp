@@ -10,7 +10,8 @@ static RuntimePatcherMain patcher;
 
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
 {
-    TRACEF("GLRage DllMain(%p,%d)", hModule, dwReason);
+    LOG_TRACE("%p,%d", hInst, dwReason);
+
     switch (dwReason) {
         case DLL_PROCESS_ATTACH:
             patcher.patch();

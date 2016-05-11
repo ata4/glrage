@@ -81,10 +81,10 @@ end:
     }
 
     if (!result) {
-        LOGF("Patch at 0x%x with %d bytes failed!", addr, size);
-        LOG("Expected: " + StringUtils::bytesToHex(expectedData));
-        LOG("Actual:   " + StringUtils::bytesToHex(actualData));
-        LOG("Patch:    " + StringUtils::bytesToHex(replacementData));
+        LOG_INFO("Patch at 0x%x with %d bytes failed!", addr, size);
+        LOG_INFO("Expected: " + StringUtils::bytesToHex(expectedData));
+        LOG_INFO("Actual:   " + StringUtils::bytesToHex(actualData));
+        LOG_INFO("Patch:    " + StringUtils::bytesToHex(replacementData));
     }
 
     return result;
@@ -131,8 +131,8 @@ end:
     }
 
     if (!result) {
-        LOGF("Patch at 0x%x with %d bytes failed!", addr, size);
-        LOG("Patch:    " + StringUtils::bytesToHex(replacementData));
+        LOG_INFO("Patch at 0x%x with %d bytes failed!", addr, size);
+        LOG_INFO("Patch:    " + StringUtils::bytesToHex(replacementData));
     }
 
     return result;

@@ -1,49 +1,25 @@
 #pragma once
 
 #include <Windows.h>
-#include <cstdint>
 #include <intrin.h>
+
 #include <string>
 
-#ifdef DEBUG_LOG
-#define LOG(msg) Logger::log(_ReturnAddress(), msg)
-#define LOGF(...) Logger::logf(_ReturnAddress(), __VA_ARGS__)
-#else
-#define LOG(msg)
-#define LOGF(...)
-#endif
+#define LOG_INFO(...) Logger::log(_ReturnAddress(), __FUNCTION__, __VA_ARGS__)
 
-#ifdef DEBUG_TRACE
-#define TRACE(msg) LOG(msg)
-#define TRACEF(...) LOGF(__VA_ARGS__)
+#ifdef LOG_TRACE_ENABLED
+#define LOG_TRACE(...) Logger::log(_ReturnAddress(), __FUNCTION__, __VA_ARGS__)
 #else
-#define TRACE(msg)
-#define TRACEF(...)
+#define LOG_TRACE(...)
 #endif
-
-enum LogTarget
-{
-    Console,
-    Win32Debug
-};
 
 class Logger
 {
 public:
-    static void setVerbose(bool verbose);
-    static bool isVerbose();
-    static void setTarget(LogTarget target);
-    static LogTarget getTarget();
-    static void log(void* returnAddress, const std::string& message);
-    static void log(void* returnAddress, const char* message);
-    static void logf(void* returnAddress, const char* message, ...);
+    static void log(void* returnAddress, const std::string& function,
+        std::string format, ...);
 
 private:
-    static void logImpl(void* returnAddress, const char*);
-    static bool m_verbose;
-    static LogTarget m_target;
-    // static char m_name[MAX_PATH];
-    // static TCHAR m_namew[MAX_PATH];
-    // static char m_info[1024];
-    // static char m_line[1024];
+    static std::string m_buffer1;
+    static std::string m_buffer2;
 };

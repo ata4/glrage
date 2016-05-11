@@ -65,8 +65,7 @@ GLint ShaderProgram::attributeLocation(const std::string& name)
 
     GLint location = glGetAttribLocation(m_id, name.c_str());
     if (location == -1) {
-        LOG("ShaderProgram::attributeLocation: Shader attribute not found: " +
-            name);
+        LOG_INFO("Shader attribute not found: " + name);
     }
 
     m_attributeLocations[name] = location;
@@ -83,8 +82,7 @@ GLint ShaderProgram::uniformLocation(const std::string& name)
 
     GLint location = glGetUniformLocation(m_id, name.c_str());
     if (location == -1) {
-        LOG("ShaderProgram::uniformLocation: Shader uniform not found: " +
-            name);
+        LOG_INFO("Shader uniform not found: " + name);
     }
 
     m_uniformLocations[name] = location;

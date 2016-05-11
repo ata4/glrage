@@ -13,14 +13,15 @@ static Context& context = GLRageGetContext();
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 {
-    TRACEF("DirectDraw DllMain(%p,%d)", hModule, dwReason);
+    LOG_TRACE("%p,%d", hModule, dwReason);
+
     return TRUE;
 }
 
 HRESULT WINAPI DirectDrawCreate(
     GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter)
 {
-    TRACEF("DirectDrawCreate");
+    LOG_TRACE("%p, %p, %p", lpGUID, lplpDD, pUnkOuter);
 
     context.init();
     context.attach();

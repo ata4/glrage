@@ -92,7 +92,7 @@ void CifRenderer::renderEnd()
 
 void CifRenderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
 {
-    // LOGF("CifRenderer::textureReg fmt=%d, xlg2=%d, ylg2=%d, mip=%d",
+    // LOG_TRACE("fmt=%d, xlg2=%d, ylg2=%d, mip=%d",
     //    ptmapToReg->eTexFormat, ptmapToReg->u32MaxMapXSizeLg2,
     //    ptmapToReg->u32MaxMapYSizeLg2, ptmapToReg->bMipMap);
 
@@ -111,7 +111,7 @@ void CifRenderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
 
 void CifRenderer::textureUnreg(C3D_HTX htxToUnreg)
 {
-    // LOGF("CifRenderer::textureUnreg id=%d", id);
+    // LOG_TRACE("id=%d", id);
 
     TextureMap::iterator it = m_textures.find(htxToUnreg);
     if (it == m_textures.end()) {

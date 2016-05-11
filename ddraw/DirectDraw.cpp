@@ -8,18 +8,18 @@ namespace ddraw {
 
 DirectDraw::DirectDraw()
 {
-    TRACE("DirectDraw::DirectDraw");
+    LOG_TRACE("");
 }
 
 DirectDraw::~DirectDraw()
 {
-    TRACE("DirectDraw::~DirectDraw");
+    LOG_TRACE("");
 }
 
 /*** IUnknown methods ***/
 HRESULT WINAPI DirectDraw::QueryInterface(REFIID riid, LPVOID* ppvObj)
 {
-    TRACE("DirectDraw::QueryInterface");
+    LOG_TRACE("");
 
     if (IsEqualGUID(riid, IID_IDirectDraw)) {
         *ppvObj = static_cast<IDirectDraw*>(this);
@@ -35,18 +35,22 @@ HRESULT WINAPI DirectDraw::QueryInterface(REFIID riid, LPVOID* ppvObj)
 
 ULONG WINAPI DirectDraw::AddRef()
 {
+    LOG_TRACE("");
+
     return Unknown::AddRef();
 }
 
 ULONG WINAPI DirectDraw::Release()
 {
+    LOG_TRACE("");
+
     return Unknown::Release();
 }
 
 /*** IDirectDraw methods ***/
 HRESULT WINAPI DirectDraw::Compact()
 {
-    TRACE("DirectDraw::Compact");
+    LOG_TRACE("");
 
     return DD_OK;
 }
@@ -54,7 +58,7 @@ HRESULT WINAPI DirectDraw::Compact()
 HRESULT WINAPI DirectDraw::CreateClipper(
     DWORD dwFlags, LPDIRECTDRAWCLIPPER* lplpDDClipper, IUnknown* pUnkOuter)
 {
-    TRACE("DirectDraw::CreateClipper");
+    LOG_TRACE("");
 
     *lplpDDClipper = new DirectDrawClipper();
 
@@ -65,7 +69,7 @@ HRESULT WINAPI DirectDraw::CreatePalette(DWORD dwFlags,
     LPPALETTEENTRY lpDDColorArray, LPDIRECTDRAWPALETTE* lplpDDPalette,
     IUnknown* pUnkOuter)
 {
-    TRACE("DirectDraw::CreatePalette");
+    LOG_TRACE("");
 
     return DDERR_UNSUPPORTED;
 }
@@ -73,7 +77,7 @@ HRESULT WINAPI DirectDraw::CreatePalette(DWORD dwFlags,
 HRESULT WINAPI DirectDraw::CreateSurface(LPDDSURFACEDESC lpDDSurfaceDesc,
     LPDIRECTDRAWSURFACE* lplpDDSurface, IUnknown* pUnkOuter)
 {
-    TRACE("DirectDraw::CreateSurface");
+    LOG_TRACE("");
 
     *lplpDDSurface = new DirectDrawSurface(*this, m_renderer, lpDDSurfaceDesc);
 
@@ -83,7 +87,7 @@ HRESULT WINAPI DirectDraw::CreateSurface(LPDDSURFACEDESC lpDDSurfaceDesc,
 HRESULT WINAPI DirectDraw::DuplicateSurface(
     LPDIRECTDRAWSURFACE lpDDSurface, LPDIRECTDRAWSURFACE* lplpDupDDSurface)
 {
-    TRACE("DirectDraw::DuplicateSurface");
+    LOG_TRACE("");
 
     return DDERR_UNSUPPORTED;
 }
@@ -92,7 +96,7 @@ HRESULT WINAPI DirectDraw::EnumDisplayModes(DWORD dwFlags,
     LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext,
     LPDDENUMMODESCALLBACK lpEnumModesCallback)
 {
-    TRACE("DirectDraw::EnumDisplayModes");
+    LOG_TRACE("");
 
     if (lpDDSurfaceDesc) {
         // just give what the app wants
@@ -114,14 +118,14 @@ HRESULT WINAPI DirectDraw::EnumSurfaces(DWORD dwFlags,
     LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext,
     LPDDENUMSURFACESCALLBACK lpEnumSurfacesCallback)
 {
-    TRACE("DirectDraw::EnumSurfaces");
+    LOG_TRACE("");
 
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDraw::FlipToGDISurface()
 {
-    TRACE("DirectDraw::FlipToGDISurface");
+    LOG_TRACE("");
 
     return DDERR_UNSUPPORTED;
 }
@@ -129,7 +133,7 @@ HRESULT WINAPI DirectDraw::FlipToGDISurface()
 HRESULT WINAPI DirectDraw::GetCaps(
     LPDDCAPS lpDDDriverCaps, LPDDCAPS lpDDHELCaps)
 {
-    TRACE("DirectDraw::GetCaps");
+    LOG_TRACE("");
 
     LPDDCAPS ps[2] = {lpDDDriverCaps, lpDDHELCaps};
     for (uint32_t i = 0; i < 2; i++) {
@@ -149,7 +153,7 @@ HRESULT WINAPI DirectDraw::GetCaps(
 
 HRESULT WINAPI DirectDraw::GetDisplayMode(LPDDSURFACEDESC lpDDSurfaceDesc)
 {
-    TRACE("DirectDraw::GetDisplayMode");
+    LOG_TRACE("");
 
     LPDDSURFACEDESC desc = lpDDSurfaceDesc;
 
@@ -171,21 +175,21 @@ HRESULT WINAPI DirectDraw::GetDisplayMode(LPDDSURFACEDESC lpDDSurfaceDesc)
 
 HRESULT WINAPI DirectDraw::GetFourCCCodes(LPDWORD lpNumCodes, LPDWORD lpCodes)
 {
-    TRACE("DirectDraw::GetFourCCCodes");
+    LOG_TRACE("");
 
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDraw::GetGDISurface(LPDIRECTDRAWSURFACE* lplpGDIDDSSurface)
 {
-    TRACE("DirectDraw::GetGDISurface");
+    LOG_TRACE("");
 
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDraw::GetMonitorFrequency(LPDWORD lpdwFrequency)
 {
-    TRACE("DirectDraw::GetMonitorFrequency");
+    LOG_TRACE("");
 
     if (lpdwFrequency) {
         *lpdwFrequency = m_refreshRate;
@@ -196,14 +200,14 @@ HRESULT WINAPI DirectDraw::GetMonitorFrequency(LPDWORD lpdwFrequency)
 
 HRESULT WINAPI DirectDraw::GetScanLine(LPDWORD lpdwScanLine)
 {
-    TRACE("DirectDraw::GetScanLine");
+    LOG_TRACE("");
 
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDraw::GetVerticalBlankStatus(LPBOOL lpbIsInVB)
 {
-    TRACE("DirectDraw::GetVerticalBlankStatus");
+    LOG_TRACE("");
 
     if (lpbIsInVB) {
         *lpbIsInVB = TRUE;
@@ -214,14 +218,14 @@ HRESULT WINAPI DirectDraw::GetVerticalBlankStatus(LPBOOL lpbIsInVB)
 
 HRESULT WINAPI DirectDraw::Initialize(GUID* lpGUID)
 {
-    TRACE("DirectDraw::Initialize");
+    LOG_TRACE("");
 
     return DD_OK;
 }
 
 HRESULT WINAPI DirectDraw::RestoreDisplayMode()
 {
-    TRACE("DirectDraw::RestoreDisplayMode");
+    LOG_TRACE("");
 
     // nothing to do, desktop display is never touched
     return DD_OK;
@@ -229,7 +233,7 @@ HRESULT WINAPI DirectDraw::RestoreDisplayMode()
 
 HRESULT WINAPI DirectDraw::SetCooperativeLevel(HWND hWnd, DWORD dwFlags)
 {
-    TRACE("DirectDraw::SetCooperativeLevel");
+    LOG_TRACE("");
 
     m_context.setFullscreen(dwFlags & DDSCL_FULLSCREEN);
 
@@ -239,14 +243,14 @@ HRESULT WINAPI DirectDraw::SetCooperativeLevel(HWND hWnd, DWORD dwFlags)
 HRESULT WINAPI DirectDraw::SetDisplayMode(
     DWORD dwWidth, DWORD dwHeight, DWORD dwBPP)
 {
-    TRACE("DirectDraw::SetDisplayMode");
+    LOG_TRACE("");
 
     return SetDisplayMode(dwWidth, dwHeight, dwBPP, DEFAULT_REFRESH_RATE, 0);
 }
 
 HRESULT WINAPI DirectDraw::WaitForVerticalBlank(DWORD dwFlags, HANDLE hEvent)
 {
-    TRACE("DirectDraw::WaitForVerticalBlank");
+    LOG_TRACE("");
 
     return DD_OK;
 }
@@ -255,7 +259,7 @@ HRESULT WINAPI DirectDraw::WaitForVerticalBlank(DWORD dwFlags, HANDLE hEvent)
 HRESULT WINAPI DirectDraw::SetDisplayMode(DWORD dwWidth, DWORD dwHeight,
     DWORD dwBPP, DWORD dwRefreshRate, DWORD dwFlags)
 {
-    TRACE("DirectDraw2::SetDisplayMode");
+    LOG_TRACE("");
 
     m_width = dwWidth;
     m_height = dwHeight;
@@ -270,7 +274,7 @@ HRESULT WINAPI DirectDraw::SetDisplayMode(DWORD dwWidth, DWORD dwHeight,
 HRESULT WINAPI DirectDraw::GetAvailableVidMem(
     LPDDSCAPS lpDDSCaps, LPDWORD lpdwTotal, LPDWORD lpdwFree)
 {
-    TRACE("DirectDraw2::GetAvailableVidMem");
+    LOG_TRACE("");
 
     // just return 8 MiB, which is plenty for mid-90s hardware
     *lpdwTotal = *lpdwFree = 8 << 20;

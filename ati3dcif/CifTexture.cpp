@@ -34,7 +34,7 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
     uint32_t size = width * height;
 
     for (uint32_t level = 0; level < levels; level++) {
-        // LOGF("CifTexture::load level %d (%dx%d)", level, width, height);
+        // LOG_INFO("level %d (%dx%d)", level, width, height);
 
         // convert texture data
         switch (tmap->eTexFormat) {

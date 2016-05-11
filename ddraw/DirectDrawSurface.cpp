@@ -13,7 +13,7 @@ DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD,
     , m_renderer(renderer)
     , m_desc(*lpDDSurfaceDesc)
 {
-    TRACE("DirectDrawSurface::DirectDrawSurface");
+    LOG_TRACE("");
 
     m_dd.AddRef();
 
@@ -46,8 +46,7 @@ DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD,
 
     // attach back buffer if defined
     if (m_desc.dwFlags & DDSD_BACKBUFFERCOUNT && m_desc.dwBackBufferCount > 0) {
-        LOG("DirectDrawSurface::DirectDrawSurface: found DDSD_BACKBUFFERCOUNT, "
-            "creating back buffer");
+        LOG_INFO("found DDSD_BACKBUFFERCOUNT, creating back buffer");
 
         DDSURFACEDESC backBufferDesc = m_desc;
         backBufferDesc.ddsCaps.dwCaps |= DDSCAPS_BACKBUFFER | DDSCAPS_FLIP;
@@ -64,7 +63,7 @@ DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD,
 
 DirectDrawSurface::~DirectDrawSurface()
 {
-    TRACE("DirectDrawSurface::~DirectDrawSurface");
+    LOG_TRACE("");
 
     if (m_backBuffer) {
         m_backBuffer->Release();
@@ -86,7 +85,8 @@ DirectDrawSurface::~DirectDrawSurface()
 /*** IUnknown methods ***/
 HRESULT WINAPI DirectDrawSurface::QueryInterface(REFIID riid, LPVOID* ppvObj)
 {
-    TRACE("DirectDrawSurface::QueryInterface");
+    LOG_TRACE("");
+
     if (IsEqualGUID(riid, IID_IDirectDrawSurface)) {
         *ppvObj = static_cast<IDirectDrawSurface*>(this);
     } else if (IsEqualGUID(riid, IID_IDirectDrawSurface2)) {
@@ -101,11 +101,15 @@ HRESULT WINAPI DirectDrawSurface::QueryInterface(REFIID riid, LPVOID* ppvObj)
 
 ULONG WINAPI DirectDrawSurface::AddRef()
 {
+    LOG_TRACE("");
+
     return Unknown::AddRef();
 }
 
 ULONG WINAPI DirectDrawSurface::Release()
 {
+    LOG_TRACE("");
+
     return Unknown::Release();
 }
 
@@ -113,7 +117,7 @@ ULONG WINAPI DirectDrawSurface::Release()
 HRESULT WINAPI DirectDrawSurface::AddAttachedSurface(
     LPDIRECTDRAWSURFACE lpDDSAttachedSurface)
 {
-    TRACE("DirectDrawSurface::AddAttachedSurface");
+    LOG_TRACE("");
 
     if (!lpDDSAttachedSurface) {
         return DDERR_INVALIDOBJECT;
@@ -136,7 +140,8 @@ HRESULT WINAPI DirectDrawSurface::AddAttachedSurface(
 
 HRESULT WINAPI DirectDrawSurface::AddOverlayDirtyRect(LPRECT lpRect)
 {
-    TRACE("DirectDrawSurface::AddOverlayDirtyRect");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
@@ -144,7 +149,7 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
     LPDIRECTDRAWSURFACE lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwFlags,
     LPDDBLTFX lpDDBltFx)
 {
-    TRACE("DirectDrawSurface::Blt");
+    LOG_TRACE("");
 
     // can't blit while locked
     if (m_locked) {
@@ -237,7 +242,7 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
 HRESULT WINAPI DirectDrawSurface::BltBatch(
     LPDDBLTBATCH lpDDBltBatch, DWORD dwCount, DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface::BltBatch");
+    LOG_TRACE("");
 
     // can't blit while locked
     if (m_locked) {
@@ -250,7 +255,7 @@ HRESULT WINAPI DirectDrawSurface::BltBatch(
 HRESULT WINAPI DirectDrawSurface::BltFast(DWORD dwX, DWORD dwY,
     LPDIRECTDRAWSURFACE lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwTrans)
 {
-    TRACE("DirectDrawSurface::BltFast");
+    LOG_TRACE("");
 
     // can't blit while locked
     if (m_locked) {
@@ -263,28 +268,31 @@ HRESULT WINAPI DirectDrawSurface::BltFast(DWORD dwX, DWORD dwY,
 HRESULT WINAPI DirectDrawSurface::DeleteAttachedSurface(
     DWORD dwFlags, LPDIRECTDRAWSURFACE lpDDSurface)
 {
-    TRACE("DirectDrawSurface::DeleteAttachedSurface");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::EnumAttachedSurfaces(
     LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpEnumSurfacesCallback)
 {
-    TRACE("DirectDrawSurface::EnumAttachedSurfaces");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::EnumOverlayZOrders(
     DWORD dwFlags, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpfnCallback)
 {
-    TRACE("DirectDrawSurface::EnumOverlayZOrders");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::Flip(
     LPDIRECTDRAWSURFACE lpDDSurfaceTargetOverride, DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface::Flip");
+    LOG_TRACE("");
 
     // check if the surface can be flipped
     if (!(m_desc.ddsCaps.dwCaps & DDSCAPS_FLIP) ||
@@ -342,7 +350,7 @@ HRESULT WINAPI DirectDrawSurface::Flip(
 HRESULT WINAPI DirectDrawSurface::GetAttachedSurface(
     LPDDSCAPS lpDDSCaps, LPDIRECTDRAWSURFACE* lplpDDAttachedSurface)
 {
-    TRACE("DirectDrawSurface::GetAttachedSurface");
+    LOG_TRACE("");
 
     if (lpDDSCaps->dwCaps & DDSCAPS_BACKBUFFER) {
         *lplpDDAttachedSurface = m_backBuffer;
@@ -359,19 +367,21 @@ HRESULT WINAPI DirectDrawSurface::GetAttachedSurface(
 
 HRESULT WINAPI DirectDrawSurface::GetBltStatus(DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface::GetBltStatus");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetCaps(LPDDSCAPS lpDDSCaps)
 {
-    TRACE("DirectDrawSurface::GetCaps");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetClipper(LPDIRECTDRAWCLIPPER* lplpDDClipper)
 {
-    TRACE("DirectDrawSurface::GetClipper");
+    LOG_TRACE("");
 
     *lplpDDClipper = reinterpret_cast<LPDIRECTDRAWCLIPPER>(m_clipper);
 
@@ -381,38 +391,43 @@ HRESULT WINAPI DirectDrawSurface::GetClipper(LPDIRECTDRAWCLIPPER* lplpDDClipper)
 HRESULT WINAPI DirectDrawSurface::GetColorKey(
     DWORD dwFlags, LPDDCOLORKEY lpDDColorKey)
 {
-    TRACE("DirectDrawSurface::GetColorKey");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetDC(HDC* phDC)
 {
-    TRACE("DirectDrawSurface::GetDC");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetFlipStatus(DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface::GetFlipStatus");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetOverlayPosition(LPLONG lplX, LPLONG lplY)
 {
-    TRACE("DirectDrawSurface::GetOverlayPosition");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetPalette(LPDIRECTDRAWPALETTE* lplpDDPalette)
 {
-    TRACE("DirectDrawSurface::GetPalette");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetPixelFormat(
     LPDDPIXELFORMAT lpDDPixelFormat)
 {
-    TRACE("DirectDrawSurface::GetPixelFormat");
+    LOG_TRACE("");
 
     *lpDDPixelFormat = m_desc.ddpfPixelFormat;
 
@@ -422,7 +437,7 @@ HRESULT WINAPI DirectDrawSurface::GetPixelFormat(
 HRESULT WINAPI DirectDrawSurface::GetSurfaceDesc(
     LPDDSURFACEDESC lpDDSurfaceDesc)
 {
-    TRACE("DirectDrawSurface::GetSurfaceDesc");
+    LOG_TRACE("");
 
     *lpDDSurfaceDesc = m_desc;
 
@@ -432,7 +447,7 @@ HRESULT WINAPI DirectDrawSurface::GetSurfaceDesc(
 HRESULT WINAPI DirectDrawSurface::Initialize(
     LPDIRECTDRAW lpDD, LPDDSURFACEDESC lpDDSurfaceDesc)
 {
-    TRACE("DirectDrawSurface::Initialize");
+    LOG_TRACE("");
 
     // "This method is provided for compliance with the Component Object Model
     // (COM).
@@ -444,7 +459,7 @@ HRESULT WINAPI DirectDrawSurface::Initialize(
 
 HRESULT WINAPI DirectDrawSurface::IsLost()
 {
-    TRACE("DirectDrawSurface::IsLost");
+    LOG_TRACE("");
 
     // we're never lost..
     return DD_OK;
@@ -453,8 +468,7 @@ HRESULT WINAPI DirectDrawSurface::IsLost()
 HRESULT WINAPI DirectDrawSurface::Lock(LPRECT lpDestRect,
     LPDDSURFACEDESC lpDDSurfaceDesc, DWORD dwFlags, HANDLE hEvent)
 {
-    TRACEF("DirectDrawSurface::Lock(%p, %p, %d, %p)", lpDestRect,
-        lpDDSurfaceDesc, dwFlags, hEvent);
+    LOG_TRACE("%p, %p, %d, %p", lpDestRect, lpDDSurfaceDesc, dwFlags, hEvent);
 
     // ensure that the surface is not already locked
     if (m_locked) {
@@ -475,13 +489,14 @@ HRESULT WINAPI DirectDrawSurface::Lock(LPRECT lpDestRect,
 
 HRESULT WINAPI DirectDrawSurface::ReleaseDC(HDC hDC)
 {
-    TRACE("DirectDrawSurface::ReleaseDC");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::Restore()
 {
-    TRACE("DirectDrawSurface::Restore");
+    LOG_TRACE("");
 
     // we can't lose surfaces..
     return DD_OK;
@@ -489,7 +504,7 @@ HRESULT WINAPI DirectDrawSurface::Restore()
 
 HRESULT WINAPI DirectDrawSurface::SetClipper(LPDIRECTDRAWCLIPPER lpDDClipper)
 {
-    TRACE("DirectDrawSurface::SetClipper");
+    LOG_TRACE("");
 
     m_clipper = reinterpret_cast<DirectDrawClipper*>(lpDDClipper);
 
@@ -499,25 +514,28 @@ HRESULT WINAPI DirectDrawSurface::SetClipper(LPDIRECTDRAWCLIPPER lpDDClipper)
 HRESULT WINAPI DirectDrawSurface::SetColorKey(
     DWORD dwFlags, LPDDCOLORKEY lpDDColorKey)
 {
-    TRACE("DirectDrawSurface::SetColorKey");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::SetOverlayPosition(LONG lX, LONG lY)
 {
-    TRACE("DirectDrawSurface::SetOverlayPosition");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::SetPalette(LPDIRECTDRAWPALETTE lpDDPalette)
 {
-    TRACE("DirectDrawSurface::SetPalette");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::Unlock(LPVOID lp)
 {
-    TRACE("DirectDrawSurface::Unlock");
+    LOG_TRACE("");
 
     // ensure that the surface is actually locked
     if (!m_locked) {
@@ -558,20 +576,23 @@ HRESULT WINAPI DirectDrawSurface::UpdateOverlay(LPRECT lpSrcRect,
     LPDIRECTDRAWSURFACE lpDDDestSurface, LPRECT lpDestRect, DWORD dwFlags,
     LPDDOVERLAYFX lpDDOverlayFx)
 {
-    TRACE("DirectDrawSurface::UpdateOverlay");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::UpdateOverlayDisplay(DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface::UpdateOverlayDisplay");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::UpdateOverlayZOrder(
     DWORD dwFlags, LPDIRECTDRAWSURFACE lpDDSReference)
 {
-    TRACE("DirectDrawSurface::UpdateOverlayZOrder");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
@@ -579,7 +600,8 @@ HRESULT WINAPI DirectDrawSurface::UpdateOverlayZOrder(
 HRESULT WINAPI DirectDrawSurface::AddAttachedSurface(
     LPDIRECTDRAWSURFACE2 lpDDSAttachedSurface)
 {
-    TRACE("DirectDrawSurface2::AddAttachedSurface");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
@@ -587,35 +609,39 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
     LPDIRECTDRAWSURFACE2 lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwFlags,
     LPDDBLTFX lpDDBltFx)
 {
-    TRACE("DirectDrawSurface2::Blt");
+    LOG_TRACE("DirectDrawSurface2::Blt");
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::BltFast(DWORD dwX, DWORD dwY,
     LPDIRECTDRAWSURFACE2 lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwTrans)
 {
-    TRACE("DirectDrawSurface2::BltFast");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::DeleteAttachedSurface(
     DWORD dwFlags, LPDIRECTDRAWSURFACE2 lpDDSurface)
 {
-    TRACE("DirectDrawSurface2::DeleteAttachedSurface");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::Flip(
     LPDIRECTDRAWSURFACE2 lpDDSurfaceTargetOverride, DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface2::Flip");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetAttachedSurface(
     LPDDSCAPS lpDDSCaps, LPDIRECTDRAWSURFACE2* lplpDDAttachedSurface)
 {
-    TRACE("DirectDrawSurface2::GetAttachedSurface");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
@@ -623,32 +649,37 @@ HRESULT WINAPI DirectDrawSurface::UpdateOverlay(LPRECT lpSrcRect,
     LPDIRECTDRAWSURFACE2 lpDDDestSurface, LPRECT lpDestRect, DWORD dwFlags,
     LPDDOVERLAYFX lpDDOverlayFx)
 {
-    TRACE("DirectDrawSurface2::UpdateOverlay");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::UpdateOverlayZOrder(
     DWORD dwFlags, LPDIRECTDRAWSURFACE2 lpDDSReference)
 {
-    TRACE("DirectDrawSurface2::UpdateOverlayZOrder");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::GetDDInterface(LPVOID* lplpDD)
 {
-    TRACE("DirectDrawSurface2::GetDDInterface");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::PageLock(DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface2::PageLock");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
 HRESULT WINAPI DirectDrawSurface::PageUnlock(DWORD dwFlags)
 {
-    TRACE("DirectDrawSurface2::PageUnlock");
+    LOG_TRACE("");
+
     return DDERR_UNSUPPORTED;
 }
 
