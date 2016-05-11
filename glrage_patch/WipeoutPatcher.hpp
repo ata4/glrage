@@ -9,7 +9,7 @@ namespace glrage {
 class WipeoutPatcher : public RuntimePatcher
 {
 public:
-    virtual void apply(Config& config);
+    virtual void apply();
 
 private:
     static BOOL hookSystemParametersInfoA(

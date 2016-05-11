@@ -8,14 +8,14 @@ class TombRaiderPatcher : public RuntimePatcher
 {
 public:
     TombRaiderPatcher(bool ub);
-    virtual void apply(Config& config);
+    virtual void apply();
 
 private:
-    void applyCrashPatches(Config& config);
-    void applyGraphicPatches(Config& config);
-    void applySoundPatches(Config& config);
-    void applyLogicPatches(Config& config);
-    void applyLocalePatches(Config& config);
+    void applyCrashPatches();
+    void applyGraphicPatches();
+    void applySoundPatches();
+    void applyLogicPatches();
+    void applyLocalePatches();
 
     bool m_ub;
 };

@@ -7,7 +7,7 @@ namespace glrage {
 class AssaultRigsPatcher : public RuntimePatcher
 {
 public:
-    virtual void apply(Config& config);
+    virtual void apply();
 };
 
 } // namespace glrage

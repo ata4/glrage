@@ -1,19 +1,31 @@
 #pragma once
 
+#include "Config.hpp"
+#include "RuntimeData.hpp"
+
+#include <Windows.h>
+
+#include <array>
 #include <cstdint>
 #include <string>
 #include <vector>
 
-#include "Config.hpp"
-#include "RuntimeData.hpp"
-
 namespace glrage {
+
+struct ModuleContext
+{
+    Config config{L"", "Patch"};
+    std::wstring path;
+    std::string fileName;
+    std::wstring fileNameW;
+    VS_FIXEDFILEINFO fileInfo;
+};
 
 class RuntimePatcher
 {
 public:
-    static void patch();
-    virtual void apply(Config& config) = 0;
+    virtual void apply() = 0;
+    void setContext(ModuleContext& ctx);
 
 protected:
     bool patch(uint32_t addr, const std::string& expected,
@@ -32,6 +44,7 @@ protected:
     bool patchNop(uint32_t addr, const std::string& expected);
 
     RuntimeData m_tmp;
+    ModuleContext m_ctx;
 };
 
 } // namespace glrage

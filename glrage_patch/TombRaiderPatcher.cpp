@@ -18,18 +18,18 @@ TombRaiderPatcher::TombRaiderPatcher(bool ub)
 {
 }
 
-void TombRaiderPatcher::apply(Config& config)
+void TombRaiderPatcher::apply()
 {
     // mandatory crash patches
-    applyCrashPatches(config);
+    applyCrashPatches();
 
     // optional patches
-    applyGraphicPatches(config);
-    applySoundPatches(config);
-    applyLogicPatches(config);
+    applyGraphicPatches();
+    applySoundPatches();
+    applyLogicPatches();
 }
 
-void TombRaiderPatcher::applyCrashPatches(Config& config)
+void TombRaiderPatcher::applyCrashPatches()
 {
     // Tomb Raider ATI patch fails on later Windows versions because of a
     // missing return statement in a function.
@@ -61,14 +61,14 @@ void TombRaiderPatcher::applyCrashPatches(Config& config)
     patch(m_ub ? 0x4390E3 : 0x439793, "33 C0", "90 90");
 }
 
-void TombRaiderPatcher::applyGraphicPatches(Config& config)
+void TombRaiderPatcher::applyGraphicPatches()
 {
     // The ATI version of Tomb Raider converts vertex colors to half of the
     // original brightness, which results in a dim look and turns some areas in
     // dark levels almost pitch black. This patch boosts the brightness back to
     // normal levels.
-    if (config.getBool("brightness_override", true)) {
-        float brightness = config.getFloat("brightness_value", 1.0f);
+    if (m_ctx.config.getBool("brightness_override", true)) {
+        float brightness = m_ctx.config.getFloat("brightness_value", 1.0f);
         float divisor = (1.0f / brightness) * 1024;
         float multi = 0.0625f * brightness;
 
@@ -85,11 +85,11 @@ void TombRaiderPatcher::applyGraphicPatches(Config& config)
 
     // This patch allows the customization of the water color, which is rather
     // ugly on default.
-    if (config.getBool("watercolor_override", true)) {
+    if (m_ctx.config.getBool("watercolor_override", true)) {
         float filterRed =
-            config.getFloat("watercolor_filter_red", 0.3f);
+            m_ctx.config.getFloat("watercolor_filter_red", 0.3f);
         float filterGreen =
-            config.getFloat("watercolor_filter_green", 1.0f);
+            m_ctx.config.getFloat("watercolor_filter_green", 1.0f);
 
         m_tmp.clear();
         m_tmp << filterRed << filterGreen;
@@ -99,9 +99,9 @@ void TombRaiderPatcher::applyGraphicPatches(Config& config)
 
     // This patch replaces 800x600 with a custom resolution for widescreen
     // support and to reduce vertex artifacts due to subpixel inaccuracy.
-    if (config.getBool("resolution_override", true)) {
-        int32_t width = config.getInt("resolution_width", -1);
-        int32_t height = config.getInt("resolution_height", -1);
+    if (m_ctx.config.getBool("resolution_override", true)) {
+        int32_t width = m_ctx.config.getInt("resolution_width", -1);
+        int32_t height = m_ctx.config.getInt("resolution_height", -1);
 
         if (width <= 0) {
             width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
@@ -185,8 +185,8 @@ void TombRaiderPatcher::applyGraphicPatches(Config& config)
     }
 
     // Field of view customization patch.
-    if (config.getBool("fov_override", true)) {
-        int32_t fov = config.getInt("fov_value", 65);
+    if (m_ctx.config.getBool("fov_override", true)) {
+        int32_t fov = m_ctx.config.getInt("fov_value", 65);
 
         int8_t fov8 = static_cast<int8_t>(fov);
         m_tmp.clear();
@@ -202,7 +202,7 @@ void TombRaiderPatcher::applyGraphicPatches(Config& config)
         patch(m_ub ? 0x41E45B : 0x41E7DB, "E0 38", m_tmp);
 
         // change the FOV mode from horizontal to vertical if enabled
-        if (config.getBool("fov_vertical", true)) {
+        if (m_ctx.config.getBool("fov_vertical", true)) {
             TombRaiderHooks::m_tombSetFOV =
                 reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
 
@@ -248,10 +248,10 @@ void TombRaiderPatcher::applyGraphicPatches(Config& config)
     patch(m_ub ? 0x416801 : 0x4168F1, tmpExp, tmpRep);
     patch(m_ub ? 0x4168FE : 0x4169EE, tmpExp, tmpRep);
 
-    if (config.getBool("draw_distance_override", false)) {
+    if (m_ctx.config.getBool("draw_distance_override", false)) {
         int32_t drawDistFade =
-            config.getInt("draw_distance_fade", 12288);
-        int32_t drawDistMax = config.getInt("draw_distance_max", 20480);
+            m_ctx.config.getInt("draw_distance_fade", 12288);
+        int32_t drawDistMax = m_ctx.config.getInt("draw_distance_max", 20480);
 
         RuntimeData drawDistFadeData;
         drawDistFadeData << drawDistFade;
@@ -289,7 +289,7 @@ void TombRaiderPatcher::applyGraphicPatches(Config& config)
     // per second and offers no interpolation, so it's impossible to render more
     // frames without either rendering duplicate frames or speeding up the game
     // time.
-    // if (config.getBool("60fps", true)) {
+    // if (m_ctx.config.getBool("60fps", true)) {
     //    // render on every tick instead of every other
     //    patch(m_ub ? 0x408A91 : 0x408A84, "02", "00");
     //    // disables frame skipping, which also fixes issues with the demo mode
@@ -298,7 +298,7 @@ void TombRaiderPatcher::applyGraphicPatches(Config& config)
     //}
 }
 
-void TombRaiderPatcher::applySoundPatches(Config& config)
+void TombRaiderPatcher::applySoundPatches()
 {
     // For reasons unknown, the length of a sound sample is stored in a struct
     // field as a 16 bit integer, which means that the maximum allowed length
@@ -359,7 +359,7 @@ void TombRaiderPatcher::applySoundPatches(Config& config)
     // Very optional patch: change ambient track in Lost Valley from "derelict"
     // to "water", which, in my very personal opinion, is more fitting for the
     // theme of this level.
-    if (!m_ub && config.getBool("lostvalley_ambience", false)) {
+    if (!m_ub && m_ctx.config.getBool("lostvalley_ambience", false)) {
         patch(0x456A1E, "39", "3A");
     }
 
@@ -394,7 +394,7 @@ void TombRaiderPatcher::applySoundPatches(Config& config)
 
     // Soundtrack patch. Allows both ambient and music cues to be played via
     // MCI.
-    if (config.getBool("full_soundtrack", false)) {
+    if (m_ctx.config.getBool("full_soundtrack", false)) {
         // hook play function (level music)
         if (m_ub) {
             patchAddr(0x438700, "66 83 3D 3C 5D",
@@ -448,7 +448,7 @@ void TombRaiderPatcher::applySoundPatches(Config& config)
     }
 }
 
-void TombRaiderPatcher::applyLogicPatches(Config& config)
+void TombRaiderPatcher::applyLogicPatches()
 {
     // This changes the first drive letter to search for the Tomb Raider CD from
     // 'C' to 'A', which allows the game to find CDs placed in the drives A: or
@@ -509,7 +509,7 @@ void TombRaiderPatcher::applyLogicPatches(Config& config)
 
     // No-CD patch. Allows the game to load game files and movies from the local
     // directory instead from the CD.
-    if (config.getBool("nocd", false)) {
+    if (m_ctx.config.getBool("nocd", false)) {
         // disable CD check call
         if (m_ub) {
             patch(0x41DE7F, "E8 CC E0 FF FF", "90 90 90 90 90");
@@ -548,9 +548,9 @@ void TombRaiderPatcher::applyLogicPatches(Config& config)
 
     // Experimental localization patch. Replaces string pointers with pointers
     // for translations.
-    if (config.getBool("localization", false)) {
+    if (m_ctx.config.getBool("localization", false)) {
         try {
-            applyLocalePatches(config);
+            applyLocalePatches();
         } catch (const std::runtime_error& ex) {
             // translation files are optional, so simply log if they're missing
             LOGF("TombRaiderPatcher::applyLogicPatches: Can't apply "
@@ -581,14 +581,14 @@ void TombRaiderPatcher::applyLogicPatches(Config& config)
     // patch(0x416E17, "85 0C 00", "65 18 01");
 }
 
-void TombRaiderPatcher::applyLocalePatches(Config& config)
+void TombRaiderPatcher::applyLocalePatches()
 {
     std::wstring basePath = GLRageGetContextStatic().getBasePath();
     std::wstring localePath = basePath + L"\\patch\\locale\\";
 
     // load locale file
     std::string locale =
-        config.getString("localization_locale", "en_GB");
+        m_ctx.config.getString("localization_locale", "en_GB");
     std::wstring langPath =
         localePath + StringUtils::utf8ToWide(locale) + L".txt";
     std::ifstream langStream(langPath);

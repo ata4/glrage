@@ -6,7 +6,7 @@
 
 namespace glrage {
 
-void AssaultRigsPatcher::apply(Config& config)
+void AssaultRigsPatcher::apply()
 {
     // Fix "Insufficient memory" error on systems with more than 4 GB RAM where
     // GlobalMemoryStatus returns -1 (unless compatibility mode is activated,
@@ -15,9 +15,9 @@ void AssaultRigsPatcher::apply(Config& config)
 
     // HD/widescreen resolution patch. Replaces 640x480, normally the maximum
     // resolution, with the current desktop resolution.
-    if (config.getBool("resolution_override", true)) {
-        int32_t width = config.getInt("resolution_width", -1);
-        int32_t height = config.getInt("resolution_height", -1);
+    if (m_ctx.config.getBool("resolution_override", true)) {
+        int32_t width = m_ctx.config.getInt("resolution_width", -1);
+        int32_t height = m_ctx.config.getInt("resolution_height", -1);
 
         if (width <= 0) {
             width = GetSystemMetrics(SM_CXVIRTUALSCREEN);

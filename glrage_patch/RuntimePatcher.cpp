@@ -1,63 +1,13 @@
 #include "RuntimePatcher.hpp"
-#include "AssaultRigsPatcher.hpp"
-#include "TombRaiderPatcher.hpp"
-#include "WipeoutPatcher.hpp"
 
-#include "GLRage.hpp"
 #include "Logger.hpp"
 #include "StringUtils.hpp"
 
-#include <Shlwapi.h>
-#include <Windows.h>
-
-#include <algorithm>
-#include <memory>
-#include <map>
-
 namespace glrage {
 
-void RuntimePatcher::patch()
+void RuntimePatcher::setContext(ModuleContext& ctx)
 {
-    // get executable name
-    TCHAR modulePath[MAX_PATH];
-    GetModuleFileName(nullptr, modulePath, MAX_PATH);
-
-    // extract file name
-    TCHAR* modulePathTmp = PathFindFileName(modulePath);
-
-    // remove extension
-    PathRemoveExtension(modulePathTmp);
-
-    std::wstring modulePathW = modulePathTmp;
-
-    // convert to lower case
-    transform(modulePathW.begin(), modulePathW.end(), modulePathW.begin(),
-        ::towlower);
-
-    // convert to UTF-8
-    std::string moduleFileName =
-        std::string(StringUtils::wideToUtf8(modulePathW));
-
-    // run known patches
-    // clang-format off
-    std::map<std::string, std::shared_ptr<RuntimePatcher>> patches = {
-        {"Tomb Raider",      std::make_shared<TombRaiderPatcher>(false)},
-        {"Tomb Raider Gold", std::make_shared<TombRaiderPatcher>(true)},
-        {"Assault Rigs",     std::make_shared<AssaultRigsPatcher>()},
-        {"Wipeout",          std::make_shared<WipeoutPatcher>()}
-    };
-    // clang-format on
-
-    Context& ctx = GLRageGetContextStatic();
-    Config config(
-        ctx.getBasePath() + L"\\patches\\" + modulePathW + L".ini", "Patch");
-
-    auto patch = patches.find(config.getString("game", ""));
-    if (patch != patches.end()) {
-        patch->second->apply(config);
-    }
-
-    ctx.setGameID(moduleFileName);
+    m_ctx = ctx;
 }
 
 bool RuntimePatcher::patch(

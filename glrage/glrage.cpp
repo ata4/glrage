@@ -1,18 +1,19 @@
 #include "GLRage.hpp"
 #include "Logger.hpp"
-#include "RuntimePatcher.hpp"
+#include "RuntimePatcherMain.hpp"
 
-using glrage::RuntimePatcher;
+using glrage::RuntimePatcherMain;
 using glrage::ContextImpl;
 
 static ContextImpl context;
+static RuntimePatcherMain patcher;
 
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
 {
     TRACEF("GLRage DllMain(%p,%d)", hModule, dwReason);
     switch (dwReason) {
         case DLL_PROCESS_ATTACH:
-            RuntimePatcher::patch();
+            patcher.patch();
             break;
     }
 

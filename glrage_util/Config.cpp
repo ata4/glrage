@@ -7,23 +7,43 @@ namespace glrage {
 
 Config::Config(const std::wstring& path, const std::string& section)
 {
-    m_configPath = path;
-    m_section = section;
+    setPath(path);
+    setSection(section);
+}
+
+std::wstring Config::getPath()
+{
+    return m_path;
+}
+
+void Config::setPath(const std::wstring& path)
+{
+    m_path = path;
+}
+
+std::string Config::getSection()
+{
+    return StringUtils::wideToUtf8(m_section);
+}
+
+void Config::setSection(const std::string& section)
+{
+    m_section = StringUtils::utf8ToWide(section);
 }
 
 std::string Config::getString(
     const std::string& name, const std::string& defaultValue)
 {
-    std::wstring sectionW = StringUtils::utf8ToWide(m_section);
     std::wstring nameW = StringUtils::utf8ToWide(name);
     std::wstring defaultValueW = StringUtils::utf8ToWide(defaultValue);
-    static TCHAR valueW[1024];
 
-    GetPrivateProfileString(sectionW.c_str(), nameW.c_str(),
-        defaultValueW.c_str(), valueW, sizeof(valueW) / sizeof(valueW[0]),
-        m_configPath.c_str());
+    m_value.resize(1024);
+    DWORD size = GetPrivateProfileString(m_section.c_str(), nameW.c_str(),
+        defaultValueW.c_str(), &m_value[0], m_value.capacity(),
+        m_path.c_str());
+    m_value.resize(size);
 
-    return StringUtils::wideToUtf8(valueW);
+    return StringUtils::wideToUtf8(m_value);
 }
 
 int32_t Config::getInt(const std::string& name, const int32_t defaultValue)
