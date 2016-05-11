@@ -12,7 +12,7 @@ public:
     virtual void apply();
 
 private:
-    static BOOL hookSystemParametersInfoA(
+    static BOOL WINAPI hookSystemParametersInfoA(
         UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni);
 };
 

@@ -31,10 +31,8 @@ void WipeoutPatcher::apply()
 
     if (buildDate == build_301096) {
         patch(0x7E0290, m_tmp);
-    //} else {
-        // TODO: doesn't work in older builds: video plays in background, but
-        // window won't appear and main thread is stuck in PeekMessage loop
-        //patch(0x7D0290, m_tmp);
+    } else {
+        patch(0x7D0290, m_tmp);
     }
 
     // Disable bugged alt+tab check that causes a segfault after playing the
@@ -84,7 +82,7 @@ void WipeoutPatcher::apply()
     }
 }
 
-BOOL WipeoutPatcher::hookSystemParametersInfoA(
+BOOL WINAPI WipeoutPatcher::hookSystemParametersInfoA(
     UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni)
 {
     // do nothing
