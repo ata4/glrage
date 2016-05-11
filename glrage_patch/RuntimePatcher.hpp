@@ -29,6 +29,8 @@ protected:
     void patchAddr(
         int32_t addrCall, const std::string& expected, void* func, uint8_t op);
 
+    bool patchNop(uint32_t addr, const std::string& expected);
+
     RuntimeData m_tmp;
 };
 

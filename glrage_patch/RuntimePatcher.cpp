@@ -200,4 +200,14 @@ void RuntimePatcher::patchAddr(
     patch(addrCall, expected, m_tmp);
 }
 
+bool RuntimePatcher::patchNop(uint32_t addr, const std::string& expected)
+{
+    RuntimeData expectedData(StringUtils::hexToBytes(expected));
+    std::vector<uint8_t> replacement =
+        std::vector<uint8_t>(expectedData.data());
+    std::fill(replacement.begin(), replacement.end(), 0x90);
+    RuntimeData replacementData(replacement);
+    return patch(addr, expectedData, replacementData);
+}
+
 } // namespace glrage
