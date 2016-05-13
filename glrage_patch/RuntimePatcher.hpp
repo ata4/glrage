@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Config.hpp"
 #include "RuntimeData.hpp"
+
+#include <glrage_util/Config.hpp>
 
 #include <Windows.h>
 

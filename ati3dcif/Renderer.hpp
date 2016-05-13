@@ -1,21 +1,18 @@
 #pragma once
 
-#include "CifTexture.hpp"
-#include "CifVertexStream.hpp"
+#include "Texture.hpp"
+#include "VertexStream.hpp"
 
-#include "Config.hpp"
-#include "GLRage.hpp"
-#include "Sampler.hpp"
-#include "Shader.hpp"
-#include "ShaderProgram.hpp"
+#include <glrage\GLRage.hpp>
+#include <glrage_util\Config.hpp>
+#include <glrage_gl\Sampler.hpp>
+#include <glrage_gl\Shader.hpp>
+#include <glrage_gl\ShaderProgram.hpp>
 
 #include <memory>
 #include <map>
 
-using glrage::ShaderProgram;
-using glrage::Sampler;
-using glrage::Config;
-
+namespace glrage {
 namespace cif {
 
 // ATI3DCIF -> OpenGL mapping tables
@@ -71,12 +68,12 @@ static const GLenum GLCIF_TEXTURE_MAG_FILTER[] = {
                 // mag)
 };
 
-typedef std::map<C3D_HTX, std::shared_ptr<CifTexture>> TextureMap;
+typedef std::map<C3D_HTX, std::shared_ptr<Texture>> TextureMap;
 
-class CifRenderer
+class Renderer
 {
 public:
-    CifRenderer();
+    Renderer();
     void renderBegin(C3D_HRC);
     void renderEnd();
     void textureReg(C3D_PTMAP, C3D_PHTX);
@@ -139,9 +136,10 @@ private:
     C3D_EADST m_alphaDst = C3D_EADST_ZERO;
     C3D_HTX m_tmap = 0;
 
-    ShaderProgram m_program;
-    Sampler m_sampler;
-    CifVertexStream m_vertexStream;
+    gl::ShaderProgram m_program;
+    gl::Sampler m_sampler;
+    VertexStream m_vertexStream;
 };
 
 } // namespace cif
+} // namespace glrage

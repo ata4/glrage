@@ -1,14 +1,15 @@
 #include "DirectDrawSurface.hpp"
 #include "DirectDrawClipper.hpp"
 
-#include "Logger.hpp"
+#include <glrage_util/Logger.hpp>
 
 #include <algorithm>
 
+namespace glrage {
 namespace ddraw {
 
 DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD,
-    SurfaceRenderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc)
+    Renderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc)
     : m_dd(lpDD)
     , m_renderer(renderer)
     , m_desc(*lpDDSurfaceDesc)
@@ -705,3 +706,4 @@ void DirectDrawSurface::clear(int32_t color)
 }
 
 } // namespace ddraw
+} // namespace glrage

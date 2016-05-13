@@ -1,6 +1,7 @@
 #include "Sampler.hpp"
 
 namespace glrage {
+namespace gl {
 
 Sampler::Sampler()
 {
@@ -30,4 +31,6 @@ void Sampler::parameterf(GLenum pname, GLfloat param)
 {
     glSamplerParameterf(m_id, pname, param);
 }
-}
+
+} // namespace gl
+} // namespace glrage

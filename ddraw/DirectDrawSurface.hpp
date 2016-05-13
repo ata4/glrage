@@ -2,14 +2,16 @@
 
 #include "DirectDraw.hpp"
 #include "DirectDrawClipper.hpp"
-#include "GLRage.hpp"
-#include "SurfaceRenderer.hpp"
+#include "Renderer.hpp"
 #include "Unknown.hpp"
 #include "ddraw.hpp"
+
+#include <glrage/GLRage.hpp>
 
 #include <cstdint>
 #include <vector>
 
+namespace glrage {
 namespace ddraw {
 
 class DirectDrawSurface : public Unknown,
@@ -17,7 +19,7 @@ class DirectDrawSurface : public Unknown,
                           public IDirectDrawSurface2
 {
 public:
-    DirectDrawSurface(DirectDraw& lpDD, SurfaceRenderer& renderer,
+    DirectDrawSurface(DirectDraw& lpDD, Renderer& renderer,
         LPDDSURFACEDESC lpDDSurfaceDesc);
     virtual ~DirectDrawSurface();
 
@@ -101,7 +103,7 @@ public:
 private:
     Context& m_context = GLRageGetContext();
     DirectDraw& m_dd;
-    SurfaceRenderer& m_renderer;
+    Renderer& m_renderer;
     std::vector<uint8_t> m_buffer;
     DDSURFACEDESC m_desc;
     DirectDrawSurface* m_backBuffer = nullptr;
@@ -115,3 +117,4 @@ private:
 };
 
 } // namespace ddraw
+} // namespace glrage

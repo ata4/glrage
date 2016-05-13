@@ -2,8 +2,9 @@
 #include "DirectDrawClipper.hpp"
 #include "DirectDrawSurface.hpp"
 
-#include "Logger.hpp"
+#include <glrage_util/Logger.hpp>
 
+namespace glrage {
 namespace ddraw {
 
 DirectDraw::DirectDraw()
@@ -283,3 +284,4 @@ HRESULT WINAPI DirectDraw::GetAvailableVidMem(
 }
 
 } // namespace ddraw
+} // namespace glrage

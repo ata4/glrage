@@ -1,20 +1,18 @@
-#include "SurfaceDebugUtils.hpp"
+#include "DebugUtils.hpp"
 
-#include "ErrorUtils.hpp"
-#include "Logger.hpp"
-#include "StringUtils.hpp"
+#include <glrage_util/ErrorUtils.hpp>
+#include <glrage_util/Logger.hpp>
+#include <glrage_util/StringUtils.hpp>
 
 #include <cstdint>
 #include <exception>
 #include <fstream>
 #include <vector>
 
-using glrage::StringUtils;
-using glrage::ErrorUtils;
-
+namespace glrage {
 namespace ddraw {
 
-void SurfaceDebugUtils::dumpInfo(DDSURFACEDESC& desc)
+void DebugUtils::dumpInfo(DDSURFACEDESC& desc)
 {
 #ifdef DEBUG_LOG
     LOG_INFO("start");
@@ -178,11 +176,11 @@ void SurfaceDebugUtils::dumpInfo(DDSURFACEDESC& desc)
     // DDSCAPS2_EXTENDEDFORMATPRIMARY");
     // if (desc.ddsCaps.dwCaps & DDSCAPS2_ADDITIONALPRIMARY) LOG_INFO("
     // DDSCAPS2_ADDITIONALPRIMARY");
-    LOG_INFO("SurfaceDebugUtils::dumpInfo end");
+    LOG_INFO("DebugUtils::dumpInfo end");
 #endif
 }
 
-void SurfaceDebugUtils::dumpBuffer(
+void DebugUtils::dumpBuffer(
     DDSURFACEDESC& desc, void* buffer, const std::wstring& path)
 {
     uint32_t imageSize = desc.dwWidth * desc.dwHeight;
@@ -229,7 +227,7 @@ void SurfaceDebugUtils::dumpBuffer(
     file.close();
 }
 
-std::string SurfaceDebugUtils::getSurfaceName(DDSURFACEDESC& desc)
+std::string DebugUtils::getSurfaceName(DDSURFACEDESC& desc)
 {
     if (desc.dwFlags & DDSCAPS_PRIMARYSURFACE) {
         return "Primary";
@@ -243,3 +241,4 @@ std::string SurfaceDebugUtils::getSurfaceName(DDSURFACEDESC& desc)
 }
 
 } // namespace ddraw
+} // namespace glrage

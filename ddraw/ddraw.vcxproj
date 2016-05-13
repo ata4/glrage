@@ -14,18 +14,18 @@
     <ClCompile Include="ddraw.cpp" />
     <ClCompile Include="DirectDraw.cpp" />
     <ClCompile Include="DirectDrawClipper.cpp" />
-    <ClCompile Include="SurfaceRenderer.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="DirectDrawSurface.cpp" />
-    <ClCompile Include="SurfaceDebugUtils.cpp" />
+    <ClCompile Include="DebugUtils.cpp" />
     <ClCompile Include="Unknown.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ddraw.hpp" />
     <ClInclude Include="DirectDraw.hpp" />
     <ClInclude Include="DirectDrawClipper.hpp" />
-    <ClInclude Include="SurfaceRenderer.hpp" />
+    <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="DirectDrawSurface.hpp" />
-    <ClInclude Include="SurfaceDebugUtils.hpp" />
+    <ClInclude Include="DebugUtils.hpp" />
     <ClInclude Include="Unknown.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -64,7 +64,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <IncludePath>$(SolutionDir)glrage;$(SolutionDir)glrage_gl;$(SolutionDir)glrage_util;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)build\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
     <IntDir>build\$(Configuration)\</IntDir>

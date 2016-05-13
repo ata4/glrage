@@ -1,7 +1,7 @@
 #include "RuntimePatcher.hpp"
 
-#include "Logger.hpp"
-#include "StringUtils.hpp"
+#include <glrage_util/Logger.hpp>
+#include <glrage_util/StringUtils.hpp>
 
 namespace glrage {
 

@@ -27,13 +27,13 @@
     <ClCompile Include="Unknown.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SurfaceDebugUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SurfaceRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DirectDrawClipper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,16 +47,16 @@
     <ClInclude Include="Unknown.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SurfaceDebugUtils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SurfaceRenderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DirectDrawClipper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ddraw.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

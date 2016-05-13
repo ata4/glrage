@@ -1,6 +1,7 @@
 #include "Shader.hpp"
 
 namespace glrage {
+namespace gl {
 
 class FragmentShader : public Shader
 {
@@ -9,4 +10,5 @@ public:
         : Shader(GL_FRAGMENT_SHADER){};
 };
 
+} // namespace gl
 } // namespace glrage

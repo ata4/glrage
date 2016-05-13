@@ -83,7 +83,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GLUtils.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="gl_core_3_3.c" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -94,7 +94,7 @@
     <ClCompile Include="wgl_ext.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GLUtils.hpp" />
+    <ClInclude Include="Utils.hpp" />
     <ClInclude Include="gl_core_3_3.h" />
     <ClInclude Include="Object.hpp" />
     <ClInclude Include="FragmentShader.hpp" />

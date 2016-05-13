@@ -1,6 +1,7 @@
 #include "VertexArray.hpp"
 
 namespace glrage {
+namespace gl {
 
 VertexArray::VertexArray()
 {
@@ -25,4 +26,5 @@ void VertexArray::attribute(GLuint index, GLint size, GLenum type,
         index, size, type, normalized, stride, reinterpret_cast<void*>(offset));
 }
 
+} // namespace gl
 } // namespace glrage

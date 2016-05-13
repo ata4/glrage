@@ -12,19 +12,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ati3dcif.cpp" />
-    <ClCompile Include="CifError.cpp" />
-    <ClCompile Include="CifTexture.cpp" />
-    <ClCompile Include="CifUtils.cpp" />
-    <ClCompile Include="CifRenderer.cpp" />
-    <ClCompile Include="CifVertexStream.cpp" />
+    <ClCompile Include="Error.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="VertexStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ati3dcif.h" />
-    <ClInclude Include="CifTexture.hpp" />
-    <ClInclude Include="CifError.hpp" />
-    <ClInclude Include="CifUtils.hpp" />
-    <ClInclude Include="CifRenderer.hpp" />
-    <ClInclude Include="CifVertexStream.hpp" />
+    <ClInclude Include="Texture.hpp" />
+    <ClInclude Include="Error.hpp" />
+    <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="VertexStream.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -65,7 +65,7 @@
   <PropertyGroup>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LibraryPath>$(SolutionDir)build\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)glrage;$(SolutionDir)glrage_gl;$(SolutionDir)glrage_util;$(SolutionDir)ragesdk;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
     <IntDir>build\$(Configuration)\</IntDir>
   </PropertyGroup>

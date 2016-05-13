@@ -1,9 +1,9 @@
 #include "GLRage.hpp"
-#include "Logger.hpp"
-#include "RuntimePatcherMain.hpp"
 
-using glrage::RuntimePatcherMain;
-using glrage::ContextImpl;
+#include <glrage_util/Logger.hpp>
+#include <glrage_patch/RuntimePatcherMain.hpp>
+
+namespace glrage {
 
 static ContextImpl context;
 static RuntimePatcherMain patcher;
@@ -30,3 +30,5 @@ GLRAPI Context& GLRageGetContext()
 {
     return context;
 }
+
+} // namespace glrage

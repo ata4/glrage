@@ -4,9 +4,10 @@
 
 #include <string>
 
+namespace glrage {
 namespace ddraw {
 
-class SurfaceDebugUtils
+class DebugUtils
 {
 public:
     static void dumpInfo(DDSURFACEDESC& desc);
@@ -16,3 +17,4 @@ public:
 };
 
 } // namespace ddraw
+} // namespace glrage

@@ -3,6 +3,7 @@
 #include "Unknown.hpp"
 #include "ddraw.hpp"
 
+namespace glrage {
 namespace ddraw {
 
 class DirectDrawClipper : public Unknown, public IDirectDrawClipper
@@ -31,3 +32,4 @@ private:
 };
 
 } // namespace ddraw
+} // namespace glrage

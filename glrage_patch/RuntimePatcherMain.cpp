@@ -3,9 +3,9 @@
 #include "TombRaiderPatcher.hpp"
 #include "WipeoutPatcher.hpp"
 
-#include "ErrorUtils.hpp"
-#include "GLRage.hpp"
-#include "StringUtils.hpp"
+#include <glrage/GLRage.hpp>
+#include <glrage_util/ErrorUtils.hpp>
+#include <glrage_util/StringUtils.hpp>
 
 #include <Shlwapi.h>
 #include <Windows.h>

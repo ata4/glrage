@@ -1,10 +1,11 @@
 #include "ContextImpl.hpp"
-#include "ErrorUtils.hpp"
-#include "Logger.hpp"
-#include "StringUtils.hpp"
 
-#include "gl_core_3_3.h"
-#include "wgl_ext.h"
+#include <glrage_util/ErrorUtils.hpp>
+#include <glrage_util/Logger.hpp>
+#include <glrage_util/StringUtils.hpp>
+
+#include <glrage_gl/gl_core_3_3.h>
+#include <glrage_gl/wgl_ext.h>
 
 #include <Shlwapi.h>
 

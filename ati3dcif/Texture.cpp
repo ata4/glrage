@@ -1,27 +1,26 @@
-#include "CifTexture.hpp"
-#include "CifError.hpp"
-#include "CifUtils.hpp"
+#include "Texture.hpp"
+#include "Error.hpp"
+#include "Utils.hpp"
 
-#include "GLUtils.hpp"
+#include <glrage_gl/Utils.hpp>
 
 #include <algorithm>
 #include <vector>
 #include <cstdint>
 
-using glrage::GLUtils;
-
+namespace glrage {
 namespace cif {
 
-CifTexture::CifTexture()
-    : Texture(GL_TEXTURE_2D)
+Texture::Texture()
+    : gl::Texture(GL_TEXTURE_2D)
 {
 }
 
-CifTexture::~CifTexture()
+Texture::~Texture()
 {
 }
 
-void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
+void Texture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
 {
     m_chromaKey = tmap->clrTexChromaKey;
 
@@ -99,7 +98,7 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
             }
 
             default:
-                throw CifError(
+                throw Error(
                     "Unsupported texture format: " +
                         std::string(C3D_ETEXFMT_NAMES[tmap->eTexFormat]),
                     C3D_EC_NOTIMPYET);
@@ -127,12 +126,13 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
     //    }
     //}
 
-    GLUtils::checkError("CifTexture::load");
+    gl::Utils::checkError("Texture::load");
 }
 
-C3D_COLOR& CifTexture::chromaKey()
+C3D_COLOR& Texture::chromaKey()
 {
     return m_chromaKey;
 }
 
 } // namespace cif
+} // namespace glrage

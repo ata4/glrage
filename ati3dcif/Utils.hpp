@@ -4,6 +4,7 @@
 
 #include <string>
 
+namespace glrage {
 namespace cif {
 
 const char* C3D_EC_NAMES[];
@@ -27,7 +28,7 @@ const char* C3D_EASEL_NAMES[];
 const char* C3D_EPIXFMT_NAMES[];
 const char* C3D_ETEXFMT_NAMES[];
 
-class CifUtils
+class Utils
 {
 public:
     static std::string dumpRenderStateData(
@@ -35,3 +36,4 @@ public:
 };
 
 } // namespace cif
+} // namespace glrage

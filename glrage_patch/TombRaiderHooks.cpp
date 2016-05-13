@@ -1,6 +1,6 @@
 #include "TombRaiderHooks.hpp"
 
-#include "Logger.hpp"
+#include <glrage_util\Logger.hpp>
 
 #include <cmath>
 

@@ -1,12 +1,14 @@
 #pragma once
 
-#include "GLRage.hpp"
-#include "SurfaceRenderer.hpp"
+#include "Renderer.hpp"
 #include "Unknown.hpp"
 #include "ddraw.hpp"
 
+#include <glrage/GLRage.hpp>
+
 #include <cstdint>
 
+namespace glrage {
 namespace ddraw {
 
 class DirectDraw : public Unknown, public IDirectDraw, public IDirectDraw2
@@ -63,7 +65,7 @@ private:
     const uint32_t DEFAULT_REFRESH_RATE = 60;
 
     Context& m_context = GLRageGetContext();
-    SurfaceRenderer m_renderer;
+    Renderer m_renderer;
     uint32_t m_width = DEFAULT_WIDTH;
     uint32_t m_height = DEFAULT_HEIGHT;
     uint32_t m_refreshRate = DEFAULT_REFRESH_RATE;
@@ -71,3 +73,4 @@ private:
 };
 
 } // namespace ddraw
+} // namespace glrage

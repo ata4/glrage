@@ -3,6 +3,7 @@
 #include "ShaderProgramException.hpp"
 
 namespace glrage {
+namespace gl {
 
 ShaderProgram::ShaderProgram()
 {
@@ -135,4 +136,5 @@ std::string ShaderProgram::infoLog()
     return infoLogString;
 }
 
+} // namespace gl
 } // namespace glrage

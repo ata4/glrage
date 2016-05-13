@@ -3,6 +3,7 @@
 #include <Unknwnbase.h>
 #include <Windows.h>
 
+namespace glrage {
 namespace ddraw {
 
 class Unknown : public IUnknown
@@ -20,3 +21,4 @@ private:
 };
 
 } // namespace ddraw
+} // namespace glrage

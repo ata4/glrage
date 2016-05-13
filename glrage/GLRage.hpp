@@ -2,7 +2,7 @@
 
 #include "ContextImpl.hpp"
 
-using glrage::Context;
+namespace glrage {
 
 #ifdef GLR_EXPORTS
 #define GLRAPI extern "C" __declspec(dllexport)
@@ -15,3 +15,5 @@ Context& GLRageGetContextStatic();
 
 // for dynamic libraries
 GLRAPI Context& GLRageGetContext();
+
+} // namespace glrage

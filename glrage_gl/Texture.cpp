@@ -1,6 +1,7 @@
 #include "Texture.hpp"
 
 namespace glrage {
+namespace gl {
 
 Texture::Texture(GLenum target)
     : m_target(target)
@@ -17,4 +18,6 @@ void Texture::bind()
 {
     glBindTexture(m_target, m_id);
 }
-}
+
+} // namespace gl
+} // namespace glrage

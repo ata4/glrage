@@ -3,6 +3,7 @@
 #include "Shader.hpp"
 
 namespace glrage {
+namespace gl {
 
 class VertexShader : public Shader
 {
@@ -11,4 +12,5 @@ public:
         : Shader(GL_VERTEX_SHADER){};
 };
 
+} // namespace gl
 } // namespace glrage

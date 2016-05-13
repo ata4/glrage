@@ -1,5 +1,6 @@
 #include "Unknown.hpp"
 
+namespace glrage {
 namespace ddraw {
 
 Unknown::Unknown()
@@ -36,3 +37,4 @@ ULONG WINAPI Unknown::Release()
 }
 
 } // namespace ddraw
+} // namespace glrage

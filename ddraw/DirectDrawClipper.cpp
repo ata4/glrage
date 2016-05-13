@@ -1,7 +1,8 @@
 #include "DirectDrawClipper.hpp"
 
-#include "Logger.hpp"
+#include <glrage_util/Logger.hpp>
 
+namespace glrage {
 namespace ddraw {
 
 DirectDrawClipper::DirectDrawClipper()
@@ -94,3 +95,4 @@ HRESULT WINAPI DirectDrawClipper::SetHWnd(DWORD dwFlags, HWND hWnd)
 }
 
 } // namespace ddraw
+} // namespace glrage

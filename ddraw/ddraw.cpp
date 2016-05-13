@@ -1,13 +1,13 @@
 #include "DirectDraw.hpp"
 
-#include "ErrorUtils.hpp"
-#include "GLRage.hpp"
-#include "Logger.hpp"
+#include <glrage/GLRage.hpp>
+#include <glrage_util/ErrorUtils.hpp>
+#include <glrage_util/Logger.hpp>
 
 #include <string>
 
-using ddraw::DirectDraw;
-using glrage::ErrorUtils;
+namespace glrage {
+namespace ddraw {
 
 static Context& context = GLRageGetContext();
 
@@ -37,3 +37,6 @@ HRESULT WINAPI DirectDrawCreate(
 
     return DD_OK;
 }
+
+} // namespace ddraw
+} // namespace glrage

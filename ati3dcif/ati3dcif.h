@@ -18,4 +18,4 @@ return_type WINAPI function_name parameters
 #endif
 
 // include actual ATI3DCIF.H from 3D Rage SDK
-#include <include\ATI3DCIF.H>
+#include <ragesdk\include\ATI3DCIF.H>

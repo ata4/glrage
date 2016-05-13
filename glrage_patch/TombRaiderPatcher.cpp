@@ -1,10 +1,10 @@
 #include "TombRaiderPatcher.hpp"
 #include "TombRaiderHooks.hpp"
 
-#include "ErrorUtils.hpp"
-#include "GLRage.hpp"
-#include "Logger.hpp"
-#include "StringUtils.hpp"
+#include <glrage\GLRage.hpp>
+#include <glrage_util\ErrorUtils.hpp>
+#include <glrage_util\Logger.hpp>
+#include <glrage_util\StringUtils.hpp>
 
 #include <fstream>
 #include <map>

@@ -4,6 +4,7 @@
 #include "gl_core_3_3.h"
 
 namespace glrage {
+namespace gl {
 
 class Texture : public Object
 {
@@ -20,4 +21,5 @@ private:
     GLenum m_target;
 };
 
+} // namespace gl
 } // namespace glrage

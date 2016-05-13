@@ -1,10 +1,10 @@
-#include "CifRenderer.hpp"
-#include "CifError.hpp"
-#include "CifUtils.hpp"
+#include "Renderer.hpp"
+#include "Error.hpp"
+#include "Utils.hpp"
 
-#include "FragmentShader.hpp"
-#include "GLUtils.hpp"
-#include "VertexShader.hpp"
+#include <glrage_gl/FragmentShader.hpp>
+#include <glrage_gl/Utils.hpp>
+#include <glrage_gl/VertexShader.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -13,13 +13,10 @@
 // Disable VC "new behavior" warning regarding the array initializer
 #pragma warning(disable : 4351)
 
-using glrage::VertexShader;
-using glrage::FragmentShader;
-using glrage::GLUtils;
-
+namespace glrage {
 namespace cif {
 
-CifRenderer::CifRenderer()
+Renderer::Renderer()
 {
     // bind sampler
     m_sampler.bind(0);
@@ -33,9 +30,9 @@ CifRenderer::CifRenderer()
     // compile and link shaders and configure program
     std::wstring basePath = m_context.getBasePath();
     m_program.attach(
-        VertexShader().fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
+        gl::VertexShader().fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
     m_program.attach(
-        FragmentShader().fromFile(basePath + L"\\shaders\\ati3dcif.fsh"));
+        gl::FragmentShader().fromFile(basePath + L"\\shaders\\ati3dcif.fsh"));
     m_program.link();
     m_program.fragmentData("fragColor");
     m_program.bind();
@@ -51,10 +48,10 @@ CifRenderer::CifRenderer()
     // cache frequently used config values
     m_wireframe = m_config.getBool("wireframe", false);
 
-    GLUtils::checkError("CifRenderer::CifRenderer");
+    gl::Utils::checkError("Renderer::Renderer");
 }
 
-void CifRenderer::renderBegin(C3D_HRC hRC)
+void Renderer::renderBegin(C3D_HRC hRC)
 {
     glEnable(GL_BLEND);
 
@@ -79,10 +76,10 @@ void CifRenderer::renderBegin(C3D_HRC hRC)
     m_program.uniformMatrix4fv(
         "matProjection", 1, GL_FALSE, glm::value_ptr(projection));
 
-    GLUtils::checkError("CifRenderer::renderBegin");
+    gl::Utils::checkError("Renderer::renderBegin");
 }
 
-void CifRenderer::renderEnd()
+void Renderer::renderEnd()
 {
     // restore polygon mode
     if (m_wireframe) {
@@ -90,13 +87,13 @@ void CifRenderer::renderEnd()
     }
 }
 
-void CifRenderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
+void Renderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
 {
     // LOG_TRACE("fmt=%d, xlg2=%d, ylg2=%d, mip=%d",
     //    ptmapToReg->eTexFormat, ptmapToReg->u32MaxMapXSizeLg2,
     //    ptmapToReg->u32MaxMapYSizeLg2, ptmapToReg->bMipMap);
 
-    std::shared_ptr<CifTexture> texture = std::make_shared<CifTexture>();
+    std::shared_ptr<Texture> texture = std::make_shared<Texture>();
     texture->bind();
     texture->load(ptmapToReg, m_palette);
 
@@ -106,16 +103,16 @@ void CifRenderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
     // store in texture map
     m_textures[*phtmap] = texture;
 
-    GLUtils::checkError("CifRenderer::textureReg");
+    gl::Utils::checkError("Renderer::textureReg");
 }
 
-void CifRenderer::textureUnreg(C3D_HTX htxToUnreg)
+void Renderer::textureUnreg(C3D_HTX htxToUnreg)
 {
     // LOG_TRACE("id=%d", id);
 
     TextureMap::iterator it = m_textures.find(htxToUnreg);
     if (it == m_textures.end()) {
-        throw CifError("Invalid texture handle", C3D_EC_BADPARAM);
+        throw Error("Invalid texture handle", C3D_EC_BADPARAM);
     }
 
     // unbind texture if it's current
@@ -124,11 +121,11 @@ void CifRenderer::textureUnreg(C3D_HTX htxToUnreg)
         m_tmap = 0;
     }
 
-    std::shared_ptr<CifTexture> texture = it->second;
+    std::shared_ptr<Texture> texture = it->second;
     m_textures.erase(htxToUnreg);
 }
 
-void CifRenderer::texturePaletteCreate(
+void Renderer::texturePaletteCreate(
     C3D_ECI_TMAP_TYPE epalette, void* pPalette, C3D_PHTXPAL phtpalCreated)
 {
     switch (epalette) {
@@ -138,13 +135,13 @@ void CifRenderer::texturePaletteCreate(
         }
 
         default:
-            throw CifError("Unsupported palette type: " +
+            throw Error("Unsupported palette type: " +
                                std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]),
                 C3D_EC_NOTIMPYET);
     }
 }
 
-void CifRenderer::texturePaletteDestroy(C3D_HTXPAL htxpalToDestroy)
+void Renderer::texturePaletteDestroy(C3D_HTXPAL htxpalToDestroy)
 {
     if (m_palette) {
         delete m_palette;
@@ -152,51 +149,51 @@ void CifRenderer::texturePaletteDestroy(C3D_HTXPAL htxpalToDestroy)
     }
 }
 
-void CifRenderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate,
+void Renderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate,
     C3D_UINT32 u32StartIndex, C3D_UINT32 u32NumEntries,
     C3D_PPALETTENTRY pclrPalette)
 {
-    throw CifError("CifRenderer::texturePaletteAnimate: Not implemented",
+    throw Error("Renderer::texturePaletteAnimate: Not implemented",
         C3D_EC_NOTIMPYET);
 }
 
-void CifRenderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert)
+void Renderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert)
 {
     m_vertexStream.renderPrimStrip(vStrip, u32NumVert);
 }
 
-void CifRenderer::renderPrimList(C3D_VLIST vList, C3D_UINT32 u32NumVert)
+void Renderer::renderPrimList(C3D_VLIST vList, C3D_UINT32 u32NumVert)
 {
     m_vertexStream.renderPrimList(vList, u32NumVert);
 }
 
-void CifRenderer::fogColor(C3D_COLOR color)
+void Renderer::fogColor(C3D_COLOR color)
 {
     // TODO
 }
 
-void CifRenderer::vertexType(C3D_EVERTEX type)
+void Renderer::vertexType(C3D_EVERTEX type)
 {
     m_vertexStream.vertexType(type);
 }
 
-void CifRenderer::primType(C3D_EPRIM type)
+void Renderer::primType(C3D_EPRIM type)
 {
     m_vertexStream.primType(type);
 }
 
-void CifRenderer::solidColor(C3D_COLOR color)
+void Renderer::solidColor(C3D_COLOR color)
 {
     m_program.uniform4f("solidColor", color.r / 255.0f, color.g / 255.0f,
         color.b / 255.0f, color.a / 255.0f);
 }
 
-void CifRenderer::shadeMode(C3D_ESHADE mode)
+void Renderer::shadeMode(C3D_ESHADE mode)
 {
     m_program.uniform1i("shadeMode", mode);
 }
 
-void CifRenderer::tmapEnable(C3D_BOOL enable)
+void Renderer::tmapEnable(C3D_BOOL enable)
 {
     m_program.uniform1i("tmapEn", enable);
     if (enable) {
@@ -206,7 +203,7 @@ void CifRenderer::tmapEnable(C3D_BOOL enable)
     }
 }
 
-void CifRenderer::tmapSelect(C3D_HTX handle)
+void Renderer::tmapSelect(C3D_HTX handle)
 {
     m_tmap = handle;
 
@@ -219,11 +216,11 @@ void CifRenderer::tmapSelect(C3D_HTX handle)
     // check if handle is correct
     TextureMap::iterator it = m_textures.find(m_tmap);
     if (it == m_textures.end()) {
-        throw CifError("Invalid texture handle", C3D_EC_BADPARAM);
+        throw Error("Invalid texture handle", C3D_EC_BADPARAM);
     }
 
     // get texture object and bind it
-    std::shared_ptr<CifTexture> texture = it->second;
+    std::shared_ptr<Texture> texture = it->second;
     texture->bind();
 
     // send chroma key color to shader
@@ -232,17 +229,17 @@ void CifRenderer::tmapSelect(C3D_HTX handle)
         "chromaKey", ck.r / 255.0f, ck.g / 255.0f, ck.b / 255.0f);
 }
 
-void CifRenderer::tmapLight(C3D_ETLIGHT mode)
+void Renderer::tmapLight(C3D_ETLIGHT mode)
 {
     m_program.uniform1i("tmapLight", mode);
 }
 
-void CifRenderer::tmapPerspCor(C3D_ETPERSPCOR mode)
+void Renderer::tmapPerspCor(C3D_ETPERSPCOR mode)
 {
     // TODO
 }
 
-void CifRenderer::tmapFilter(C3D_ETEXFILTER filter)
+void Renderer::tmapFilter(C3D_ETEXFILTER filter)
 {
     m_sampler.parameteri(
         GL_TEXTURE_MAG_FILTER, GLCIF_TEXTURE_MAG_FILTER[filter]);
@@ -250,61 +247,61 @@ void CifRenderer::tmapFilter(C3D_ETEXFILTER filter)
         GL_TEXTURE_MIN_FILTER, GLCIF_TEXTURE_MIN_FILTER[filter]);
 }
 
-void CifRenderer::tmapTexOp(C3D_ETEXOP op)
+void Renderer::tmapTexOp(C3D_ETEXOP op)
 {
     m_program.uniform1i("texOp", op);
 }
 
-void CifRenderer::alphaSrc(C3D_EASRC func)
+void Renderer::alphaSrc(C3D_EASRC func)
 {
     m_alphaSrc = func;
     glBlendFunc(GLCIF_BLEND_FUNC[m_alphaSrc], GLCIF_BLEND_FUNC[m_alphaDst]);
 }
 
-void CifRenderer::alphaDst(C3D_EADST func)
+void Renderer::alphaDst(C3D_EADST func)
 {
     m_alphaDst = func;
     glBlendFunc(GLCIF_BLEND_FUNC[m_alphaSrc], GLCIF_BLEND_FUNC[m_alphaDst]);
 }
 
-void CifRenderer::surfDrawPtr(C3D_PVOID ptr)
+void Renderer::surfDrawPtr(C3D_PVOID ptr)
 {
     // TODO
 }
 
-void CifRenderer::surfDrawPitch(C3D_UINT32 pitch)
+void Renderer::surfDrawPitch(C3D_UINT32 pitch)
 {
     // TODO
 }
 
-void CifRenderer::surfDrawPixelFormat(C3D_EPIXFMT format)
+void Renderer::surfDrawPixelFormat(C3D_EPIXFMT format)
 {
     // TODO
 }
 
-void CifRenderer::surfVport(C3D_RECT vport)
+void Renderer::surfVport(C3D_RECT vport)
 {
     // TODO
 }
 
-void CifRenderer::fogEnable(C3D_BOOL enable)
+void Renderer::fogEnable(C3D_BOOL enable)
 {
     // TODO
 }
 
-void CifRenderer::ditherEnable(C3D_BOOL enable)
+void Renderer::ditherEnable(C3D_BOOL enable)
 {
     // TODO
 }
 
-void CifRenderer::zCmpFunc(C3D_EZCMP func)
+void Renderer::zCmpFunc(C3D_EZCMP func)
 {
     if (func < C3D_EZCMP_MAX) {
         glDepthFunc(GLCIF_DEPTH_FUNC[func]);
     }
 }
 
-void CifRenderer::zMode(C3D_EZMODE mode)
+void Renderer::zMode(C3D_EZMODE mode)
 {
     glDepthMask(GLCIF_DEPTH_MASK[mode]);
 
@@ -315,84 +312,85 @@ void CifRenderer::zMode(C3D_EZMODE mode)
     }
 }
 
-void CifRenderer::surfZPtr(C3D_PVOID ptr)
+void Renderer::surfZPtr(C3D_PVOID ptr)
 {
     // TODO
 }
 
-void CifRenderer::surfZPitch(C3D_UINT32 pitch)
+void Renderer::surfZPitch(C3D_UINT32 pitch)
 {
     // TODO
 }
 
-void CifRenderer::surfScissor(C3D_RECT scissor)
+void Renderer::surfScissor(C3D_RECT scissor)
 {
     // TODO
 }
 
-void CifRenderer::compositeEnable(C3D_BOOL enable)
+void Renderer::compositeEnable(C3D_BOOL enable)
 {
     // TODO
 }
 
-void CifRenderer::compositeSelect(C3D_HTX select)
+void Renderer::compositeSelect(C3D_HTX select)
 {
     // TODO
 }
 
-void CifRenderer::compositeFunc(C3D_ETEXCOMPFCN func)
+void Renderer::compositeFunc(C3D_ETEXCOMPFCN func)
 {
     // TODO
 }
 
-void CifRenderer::compositeFactor(C3D_UINT32 fact)
+void Renderer::compositeFactor(C3D_UINT32 fact)
 {
     // TODO
 }
 
-void CifRenderer::compositeFilter(C3D_ETEXFILTER filter)
+void Renderer::compositeFilter(C3D_ETEXFILTER filter)
 {
     // TODO
 }
 
-void CifRenderer::compositeFactorAlphaEnable(C3D_BOOL enable)
+void Renderer::compositeFactorAlphaEnable(C3D_BOOL enable)
 {
     // TODO
 }
 
-void CifRenderer::lodBiasLevel(C3D_UINT32 level)
+void Renderer::lodBiasLevel(C3D_UINT32 level)
 {
     // TODO
 }
 
-void CifRenderer::alphaDstTestEnable(C3D_BOOL enable)
+void Renderer::alphaDstTestEnable(C3D_BOOL enable)
 {
     // TODO
 }
 
-void CifRenderer::alphaDstTestFunc(C3D_EACMP func)
+void Renderer::alphaDstTestFunc(C3D_EACMP func)
 {
     // TODO
 }
 
-void CifRenderer::alphaDstWriteSelect(C3D_EASEL mode)
+void Renderer::alphaDstWriteSelect(C3D_EASEL mode)
 {
     // TODO
 }
 
-void CifRenderer::alphaDstReference(C3D_UINT32 ref)
+void Renderer::alphaDstReference(C3D_UINT32 ref)
 {
     // TODO
 }
 
-void CifRenderer::specularEnable(C3D_BOOL enable)
+void Renderer::specularEnable(C3D_BOOL enable)
 {
     // TODO
 }
 
-void CifRenderer::enhancedColorRangeEnable(C3D_BOOL enable)
+void Renderer::enhancedColorRangeEnable(C3D_BOOL enable)
 {
     // TODO
 }
 
 } // namespace cif
+} // namespace glrage

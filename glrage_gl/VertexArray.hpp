@@ -4,6 +4,7 @@
 #include "gl_core_3_3.h"
 
 namespace glrage {
+namespace gl {
 
 class VertexArray : public Object
 {
@@ -15,4 +16,5 @@ public:
         GLsizei stride, GLsizei offset);
 };
 
+} // namespace gl
 } // namespace glrage

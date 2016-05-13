@@ -6,6 +6,7 @@
 #include <string>
 
 namespace glrage {
+namespace gl {
 
 class Shader : public Object
 {
@@ -19,4 +20,5 @@ public:
     bool compiled();
 };
 
+} // namespace gl
 } // namespace glrage

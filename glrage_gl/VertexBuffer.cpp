@@ -1,6 +1,7 @@
 #include "VertexBuffer.hpp"
 
 namespace glrage {
+namespace gl {
 
 VertexBuffer::VertexBuffer(GLenum target)
     : m_target(target)
@@ -45,4 +46,5 @@ GLint VertexBuffer::parameter(GLenum pname)
     return params;
 }
 
+} // namespace gl
 } // namespace glrage

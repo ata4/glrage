@@ -1,9 +1,10 @@
 #include "Screenshot.hpp"
 
-#include "ErrorUtils.hpp"
 #include "GLRage.hpp"
-#include "StringUtils.hpp"
-#include "gl_core_3_3.h"
+
+#include <glrage_util/ErrorUtils.hpp>
+#include <glrage_util/StringUtils.hpp>
+#include <glrage_gl/gl_core_3_3.h>
 
 #include <cstdint>
 #include <exception>

@@ -1,20 +1,19 @@
 #include "ati3dcif.h"
-#include "CifError.hpp"
-#include "CifRenderer.hpp"
-#include "CifUtils.hpp"
+#include "Error.hpp"
+#include "Renderer.hpp"
+#include "Utils.hpp"
 
-#include "ErrorUtils.hpp"
-#include "GLRage.hpp"
-#include "Logger.hpp"
+#include <glrage\GLRage.hpp>
+#include <glrage_util\ErrorUtils.hpp>
+#include <glrage_util\Logger.hpp>
 
 #include <stdexcept>
 
-using cif::CifRenderer;
-using cif::CifError;
-using glrage::ErrorUtils;
+namespace glrage {
+namespace cif {
 
 static Context& context = GLRageGetContext();
-static CifRenderer* renderer = nullptr;
+static Renderer* renderer = nullptr;
 static bool contextCreated = false;
 
 C3D_EC
@@ -22,7 +21,7 @@ HandleException()
 {
     try {
         throw;
-    } catch (const CifError& ex) {
+    } catch (const Error& ex) {
 #ifdef _DEBUG
         ErrorUtils::warning(ex);
 #else
@@ -57,7 +56,7 @@ EXPORT(ATI3DCIF_Init, C3D_EC, (void))
     }
 
     try {
-        renderer = new CifRenderer();
+        renderer = new Renderer();
     } catch (...) {
         return HandleException();
     }
@@ -282,7 +281,7 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC,
 {
 #ifdef DEBUG_TRACE
     std::string stateDataStr =
-        cif::CifUtils::dumpRenderStateData(eRStateID, pRStateData);
+        cif::Utils::dumpRenderStateData(eRStateID, pRStateData);
     LOG_TRACE("0x%p, %s, %s", hRC, cif::C3D_ERSID_NAMES[eRStateID],
         stateDataStr.c_str());
 #endif
@@ -492,3 +491,6 @@ EXPORT(ATI3DCIF_RenderPrimMesh, C3D_EC,
 }
 
 } // extern "C"
+
+} // namespace cif
+} // namespace glrage

@@ -3,6 +3,7 @@
 #include "Object.hpp"
 
 namespace glrage {
+namespace gl {
 
 class Sampler : public Object
 {
@@ -15,4 +16,5 @@ public:
     void parameterf(GLenum pname, GLfloat param);
 };
 
+} // namespace gl
 } // namespace glrage

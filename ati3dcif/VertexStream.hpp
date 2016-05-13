@@ -2,14 +2,12 @@
 
 #include "ati3dcif.h"
 
-#include "VertexArray.hpp"
-#include "VertexArrayBuffer.hpp"
+#include <glrage_gl\VertexArray.hpp>
+#include <glrage_gl\VertexArrayBuffer.hpp>
 
 #include <vector>
 
-using glrage::VertexArrayBuffer;
-using glrage::VertexArray;
-
+namespace glrage {
 namespace cif {
 
 // for RenderPrimList
@@ -30,10 +28,10 @@ static const GLenum GLCIF_PRIMSTRIP_MODES[] = {
     GL_POINTS          // C3D_EPRIM_POINT
 };
 
-class CifVertexStream
+class VertexStream
 {
 public:
-    CifVertexStream();
+    VertexStream();
     void renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert);
     void renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert);
     C3D_EVERTEX vertexType();
@@ -48,9 +46,10 @@ private:
     C3D_EVERTEX m_vertexType;
     C3D_EPRIM m_primType;
     size_t m_vertexBufferSize = 0;
-    VertexArrayBuffer m_vertexBuffer;
-    VertexArray m_vtcFormat;
+    gl::VertexArrayBuffer m_vertexBuffer;
+    gl::VertexArray m_vtcFormat;
     std::vector<C3D_VTCF> m_vtcBuffer;
 };
 
 } // namespace cif
+} // namespace glrage

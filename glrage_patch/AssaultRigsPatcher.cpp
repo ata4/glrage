@@ -1,6 +1,6 @@
 #include "AssaultRigsPatcher.hpp"
 
-#include "Config.hpp"
+#include <glrage_util\Config.hpp>
 
 #include <Windows.h>
 

@@ -1,16 +1,13 @@
-#include "SurfaceRenderer.hpp"
+#include "Renderer.hpp"
 
-#include "FragmentShader.hpp"
-#include "GLUtils.hpp"
-#include "VertexShader.hpp"
+#include <glrage_gl/FragmentShader.hpp>
+#include <glrage_gl/Utils.hpp>
+#include <glrage_gl/VertexShader.hpp>
 
-using glrage::VertexShader;
-using glrage::FragmentShader;
-using glrage::GLUtils;
-
+namespace glrage {
 namespace ddraw {
 
-SurfaceRenderer::SurfaceRenderer()
+Renderer::Renderer()
 {
     // configure buffer
     m_surfaceBuffer.bind();
@@ -33,16 +30,16 @@ SurfaceRenderer::SurfaceRenderer()
     // configure shaders
     std::wstring basePath = m_context.getBasePath();
     m_program.attach(
-        VertexShader().fromFile(basePath + L"\\shaders\\ddraw.vsh"));
+        gl::VertexShader().fromFile(basePath + L"\\shaders\\ddraw.vsh"));
     m_program.attach(
-        FragmentShader().fromFile(basePath + L"\\shaders\\ddraw.fsh"));
+        gl::FragmentShader().fromFile(basePath + L"\\shaders\\ddraw.fsh"));
     m_program.link();
     m_program.fragmentData("fragColor");
 
-    GLUtils::checkError("DirectDrawRenderer::DirectDrawRenderer");
+    gl::Utils::checkError("DirectDrawRenderer::DirectDrawRenderer");
 }
 
-void SurfaceRenderer::upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data)
+void Renderer::upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data)
 {
     m_surfaceTexture.bind();
 
@@ -58,7 +55,7 @@ void SurfaceRenderer::upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data)
     }
 }
 
-void SurfaceRenderer::render()
+void Renderer::render()
 {
     m_program.bind();
     m_surfaceBuffer.bind();
@@ -95,7 +92,8 @@ void SurfaceRenderer::render()
         glEnable(GL_DEPTH_TEST);
     }
 
-    GLUtils::checkError("SurfaceRenderer::render");
+    gl::Utils::checkError("Renderer::render");
 }
 
 } // namespace ddraw
+} // namespace glrage

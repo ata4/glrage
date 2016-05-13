@@ -2,17 +2,16 @@
 
 #include "ati3dcif.h"
 
-#include "Texture.hpp"
+#include <glrage_gl\Texture.hpp>
 
-using glrage::Texture;
-
+namespace glrage {
 namespace cif {
 
-class CifTexture : public Texture
+class Texture : public gl::Texture
 {
 public:
-    CifTexture();
-    ~CifTexture();
+    Texture();
+    ~Texture();
     void load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette);
     C3D_COLOR& chromaKey();
 
@@ -21,3 +20,4 @@ private:
 };
 
 } // namespace cif
+} // namespace glrage

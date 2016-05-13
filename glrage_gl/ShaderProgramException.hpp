@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 namespace glrage {
+namespace gl {
 
 class ShaderProgramException : public std::runtime_error
 {
@@ -17,4 +18,5 @@ public:
     }
 };
 
+} // namespace gl
 } // namespace glrage

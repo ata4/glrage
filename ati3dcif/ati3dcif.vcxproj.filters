@@ -21,19 +21,19 @@
     <ClCompile Include="ati3dcif.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CifTexture.cpp">
+    <ClCompile Include="Error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CifRenderer.cpp">
+    <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CifUtils.cpp">
+    <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CifVertexStream.cpp">
+    <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CifError.cpp">
+    <ClCompile Include="VertexStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,19 +41,19 @@
     <ClInclude Include="ati3dcif.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CifTexture.hpp">
+    <ClInclude Include="Error.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CifRenderer.hpp">
+    <ClInclude Include="Renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CifUtils.hpp">
+    <ClInclude Include="Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CifVertexStream.hpp">
+    <ClInclude Include="Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CifError.hpp">
+    <ClInclude Include="VertexStream.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,6 +7,7 @@
 #include <map>
 
 namespace glrage {
+namespace gl {
 
 class ShaderProgram : public Object
 {
@@ -35,4 +36,5 @@ private:
     std::map<std::string, GLint> m_uniformLocations;
 };
 
+} // namespace gl
 } // namespace glrage

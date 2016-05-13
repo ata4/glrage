@@ -1,7 +1,8 @@
-#include "CifUtils.hpp"
+#include "Utils.hpp"
 
 #include <sstream>
 
+namespace glrage {
 namespace cif {
 
 // clang-format off
@@ -197,7 +198,7 @@ const char* C3D_ETEXFMT_NAMES[] = {
 };
 // clang-format on
 
-std::string CifUtils::dumpRenderStateData(
+std::string Utils::dumpRenderStateData(
     C3D_ERSID eRStateID, C3D_PRSDATA pRStateData)
 {
     std::stringstream ss;
@@ -347,3 +348,4 @@ std::string CifUtils::dumpRenderStateData(
 }
 
 } // namespace cif
+} // namespace glrage

@@ -1,10 +1,11 @@
-#include "GLUtils.hpp"
+#include "Utils.hpp"
 #include "Logger.hpp"
 #include "gl_core_3_3.h"
 
 namespace glrage {
+namespace gl {
 
-const char* GLUtils::getErrorString(GLenum err)
+const char* Utils::getErrorString(GLenum err)
 {
     switch (err) {
         case GL_NO_ERROR:
@@ -28,11 +29,12 @@ const char* GLUtils::getErrorString(GLenum err)
     }
 }
 
-void GLUtils::checkError(char* section)
+void Utils::checkError(char* section)
 {
     for (GLenum err; (err = glGetError()) != GL_NO_ERROR;) {
         LOG_INFO("glGetError: %s (%s)", getErrorString(err), section);
     }
 }
 
+} // namespace gl
 } // namespace glrage

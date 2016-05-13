@@ -1,7 +1,7 @@
 #include "WipeoutPatcher.hpp"
 
-#include "Config.hpp"
-#include "Logger.hpp"
+#include <glrage_util\Config.hpp>
+#include <glrage_util\Logger.hpp>
 
 namespace glrage {
 

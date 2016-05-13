@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Config.hpp"
 #include "Context.hpp"
 #include "Screenshot.hpp"
+
+#include <glrage_util/Config.hpp>
 
 namespace glrage {
 

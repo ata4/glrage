@@ -1,0 +1,43 @@
+#pragma once
+
+#include "ddraw.hpp"
+
+#include <glrage/GLRage.hpp>
+#include <glrage_gl/Sampler.hpp>
+#include <glrage_gl/ShaderProgram.hpp>
+#include <glrage_gl/Texture.hpp>
+#include <glrage_gl/VertexArray.hpp>
+#include <glrage_gl/VertexArrayBuffer.hpp>
+#include <glrage_util/Config.hpp>
+
+#include <cstdint>
+#include <vector>
+
+namespace glrage {
+namespace ddraw {
+
+class Renderer
+{
+public:
+    Renderer();
+    void upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data);
+    void render();
+
+private:
+    static const GLenum TEX_INTERNAL_FORMAT = GL_RGBA;
+    static const GLenum TEX_FORMAT = GL_BGRA;
+    static const GLenum TEX_TYPE = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+
+    Context& m_context = GLRageGetContext();
+    Config m_config{m_context.getConfigPath(), "DirectDraw"};
+    uint32_t m_width = 0;
+    uint32_t m_height = 0;
+    gl::VertexArray m_surfaceFormat;
+    gl::VertexArrayBuffer m_surfaceBuffer;
+    gl::Texture m_surfaceTexture = GL_TEXTURE_2D;
+    gl::Sampler m_sampler;
+    gl::ShaderProgram m_program;
+};
+
+} // namespace ddraw
+} // namespace glrage

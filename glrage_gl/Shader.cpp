@@ -8,6 +8,7 @@
 #include <string>
 
 namespace glrage {
+namespace gl {
 
 Shader::Shader(GLenum type)
 {
@@ -89,4 +90,5 @@ bool Shader::compiled()
     return compileStatus == GL_TRUE;
 }
 
+} // namespace gl
 } // namespace glrage
