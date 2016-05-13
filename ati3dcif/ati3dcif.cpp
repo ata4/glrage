@@ -12,7 +12,7 @@
 namespace glrage {
 namespace cif {
 
-static Context& context = GLRageGetContext();
+static Context& context = GLRage::getContext();
 static Renderer* renderer = nullptr;
 static bool contextCreated = false;
 

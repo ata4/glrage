@@ -1,12 +1,23 @@
 #include "GLRage.hpp"
 
 #include <glrage_util/Logger.hpp>
-#include <glrage_patch/RuntimePatcherMain.hpp>
 
 namespace glrage {
 
-static ContextImpl context;
-static RuntimePatcherMain patcher;
+ContextImpl GLRage::m_context;
+RuntimePatcherMain GLRage::m_patcher;
+
+GLRAPI Context& GLRage::getContext()
+{
+    return m_context;
+}
+
+GLRAPI RuntimePatcherMain& GLRage::getPatcher()
+{
+    return m_patcher;
+}
+
+} // namespace glrage
 
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
 {
@@ -14,21 +25,9 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
 
     switch (dwReason) {
         case DLL_PROCESS_ATTACH:
-            patcher.patch();
+            glrage::GLRage::getPatcher().patch();
             break;
     }
 
     return TRUE;
 }
-
-Context& GLRageGetContextStatic()
-{
-    return context;
-}
-
-GLRAPI Context& GLRageGetContext()
-{
-    return context;
-}
-
-} // namespace glrage

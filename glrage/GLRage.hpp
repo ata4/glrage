@@ -2,18 +2,26 @@
 
 #include "ContextImpl.hpp"
 
+#include <glrage_patch/RuntimePatcherMain.hpp>
+
 namespace glrage {
 
-#ifdef GLR_EXPORTS
-#define GLRAPI extern "C" __declspec(dllexport)
+#ifdef _LIB
+#define GLRAPI
+#elif defined(GLR_EXPORTS)
+#define GLRAPI __declspec(dllexport)
 #else
-#define GLRAPI extern "C" __declspec(dllimport)
+#define GLRAPI __declspec(dllimport)
 #endif
 
-// for static libraries
-Context& GLRageGetContextStatic();
+class GLRage {
+public:
+    static GLRAPI Context& getContext();
+    static GLRAPI RuntimePatcherMain& getPatcher();
 
-// for dynamic libraries
-GLRAPI Context& GLRageGetContext();
+private:
+    static ContextImpl m_context;
+    static RuntimePatcherMain m_patcher;
+};
 
 } // namespace glrage

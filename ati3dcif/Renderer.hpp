@@ -126,7 +126,7 @@ public:
     // state functions end
 
 private:
-    Context& m_context = GLRageGetContext();
+    Context& m_context = GLRage::getContext();
     Config m_config{m_context.getConfigPath(), "ATI3DCIF"};
     bool m_wireframe;
     TextureMap m_textures;

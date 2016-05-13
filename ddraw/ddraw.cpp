@@ -9,7 +9,7 @@
 namespace glrage {
 namespace ddraw {
 
-static Context& context = GLRageGetContext();
+static Context& context = GLRage::getContext();
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 {

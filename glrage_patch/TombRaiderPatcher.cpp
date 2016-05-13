@@ -581,7 +581,7 @@ void TombRaiderPatcher::applyLogicPatches()
 
 void TombRaiderPatcher::applyLocalePatches()
 {
-    std::wstring basePath = GLRageGetContextStatic().getBasePath();
+    std::wstring basePath = GLRage::getContext().getBasePath();
     std::wstring localePath = basePath + L"\\patch\\locale\\";
 
     // load locale file

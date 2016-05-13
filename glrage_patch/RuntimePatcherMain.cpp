@@ -34,7 +34,7 @@ void RuntimePatcherMain::patch()
     };
     // clang-format on
 
-    Context& ctx = GLRageGetContextStatic();
+    Context& ctx = GLRage::getContext();
     ctx.setGameID(m_ctx.fileName);
 
     // set config path based on the module file name

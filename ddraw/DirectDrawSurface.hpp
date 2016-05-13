@@ -101,7 +101,7 @@ public:
     HRESULT WINAPI PageUnlock(DWORD dwFlags);                // added in v2
 
 private:
-    Context& m_context = GLRageGetContext();
+    Context& m_context = GLRage::getContext();
     DirectDraw& m_dd;
     Renderer& m_renderer;
     std::vector<uint8_t> m_buffer;

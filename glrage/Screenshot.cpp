@@ -43,7 +43,7 @@ void Screenshot::captureScheduled()
 void Screenshot::capture()
 {
     // find unused screenshot file name
-    std::wstring basePath = GLRageGetContext().getBasePath();
+    std::wstring basePath = GLRage::getContext().getBasePath();
     std::wstring path;
     DWORD dwAttrib;
     do {

@@ -64,7 +64,7 @@ private:
     const uint32_t DEFAULT_BITS = 16;
     const uint32_t DEFAULT_REFRESH_RATE = 60;
 
-    Context& m_context = GLRageGetContext();
+    Context& m_context = GLRage::getContext();
     Renderer m_renderer;
     uint32_t m_width = DEFAULT_WIDTH;
     uint32_t m_height = DEFAULT_HEIGHT;
