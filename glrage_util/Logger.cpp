@@ -14,10 +14,10 @@ void Logger::log(void* returnAddress, const std::string& function,
     int size;
 
     if (format.empty()) {
-        m_buffer1.resize(bufferMax);
-        size = sprintf_s(&m_buffer1[0], m_buffer1.capacity(), "%p %s\n",
+        m_buffer2.resize(bufferMax);
+        size = sprintf_s(&m_buffer2[0], m_buffer2.capacity(), "%p %s\n",
             returnAddress, function.c_str());
-        m_buffer1.resize(size);
+        m_buffer2.resize(size);
     } else {
         m_buffer1.resize(bufferMax);
         va_list list;
