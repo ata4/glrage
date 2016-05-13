@@ -9,6 +9,7 @@
 #include "Shader.hpp"
 #include "ShaderProgram.hpp"
 
+#include <memory>
 #include <map>
 
 using glrage::ShaderProgram;
@@ -70,7 +71,7 @@ static const GLenum GLCIF_TEXTURE_MAG_FILTER[] = {
                 // mag)
 };
 
-typedef std::map<C3D_HTX, CifTexture*> TextureMap;
+typedef std::map<C3D_HTX, std::shared_ptr<CifTexture>> TextureMap;
 
 class CifRenderer
 {

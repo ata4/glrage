@@ -96,7 +96,7 @@ void CifRenderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
     //    ptmapToReg->eTexFormat, ptmapToReg->u32MaxMapXSizeLg2,
     //    ptmapToReg->u32MaxMapYSizeLg2, ptmapToReg->bMipMap);
 
-    CifTexture* texture = new CifTexture();
+    std::shared_ptr<CifTexture> texture = std::make_shared<CifTexture>();
     texture->bind();
     texture->load(ptmapToReg, m_palette);
 
@@ -124,9 +124,8 @@ void CifRenderer::textureUnreg(C3D_HTX htxToUnreg)
         m_tmap = 0;
     }
 
-    CifTexture* texture = it->second;
+    std::shared_ptr<CifTexture> texture = it->second;
     m_textures.erase(htxToUnreg);
-    delete texture;
 }
 
 void CifRenderer::texturePaletteCreate(
@@ -224,7 +223,7 @@ void CifRenderer::tmapSelect(C3D_HTX handle)
     }
 
     // get texture object and bind it
-    CifTexture* texture = it->second;
+    std::shared_ptr<CifTexture> texture = it->second;
     texture->bind();
 
     // send chroma key color to shader

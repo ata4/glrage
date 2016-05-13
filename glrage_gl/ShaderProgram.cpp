@@ -127,23 +127,11 @@ void ShaderProgram::uniformMatrix4fv(const std::string& name, GLsizei count,
 
 std::string ShaderProgram::infoLog()
 {
-    // get length and datat of info log entry
     GLint infoLogLength;
-    glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
-    if (!infoLogLength) {
-        return "";
-    }
-
-    GLchar* infoLogChars = new GLchar[infoLogLength + 1];
-    glGetProgramInfoLog(m_id, infoLogLength, nullptr, infoLogChars);
-
-    // convert the info log to a string
-    std::string infoLogString(infoLogChars);
-
-    // delete the char array version of the log
-    delete[] infoLogChars;
-
-    // finally, return the string version of the info log
+    std::string infoLogString;
+    infoLogString.resize(4096);
+    glGetProgramInfoLog(m_id, infoLogString.capacity(), &infoLogLength, &infoLogString[0]);
+    infoLogString.resize(infoLogLength);
     return infoLogString;
 }
 

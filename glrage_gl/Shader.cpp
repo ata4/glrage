@@ -74,23 +74,11 @@ Shader& Shader::fromString(const std::string& program)
 
 std::string Shader::infoLog()
 {
-    // get length and data of info log entry
     GLint infoLogLength;
-    glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
-    if (!infoLogLength) {
-        return "";
-    }
-
-    GLchar* infoLogChars = new GLchar[infoLogLength + 1];
-    glGetShaderInfoLog(m_id, infoLogLength, nullptr, infoLogChars);
-
-    // convert the info log to a string
-    std::string infoLogString(infoLogChars);
-
-    // delete the char array version of the log
-    delete[] infoLogChars;
-
-    // finally, return the string version of the info log
+    std::string infoLogString;
+    infoLogString.resize(4096);
+    glGetShaderInfoLog(m_id, infoLogString.size(), &infoLogLength, &infoLogString[0]);
+    infoLogString.resize(infoLogLength);
     return infoLogString;
 }
 

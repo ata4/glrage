@@ -5,6 +5,7 @@
 #include "GLUtils.hpp"
 
 #include <algorithm>
+#include <vector>
 #include <cstdint>
 
 using glrage::GLUtils;
@@ -76,7 +77,7 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
 
             case C3D_ETF_CI8: {
                 uint8_t* src = static_cast<uint8_t*>(tmap->apvLevels[level]);
-                uint8_t* dst = new uint8_t[size * 4];
+                std::vector<uint8_t> dst(size * 4);
 
                 // Resolve indices to RGBA, which requires less code and is
                 // faster than texture palettes in shaders.
@@ -92,9 +93,7 @@ void CifTexture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
 
                 // upload texture data
                 glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, width, height, 0,
-                    GL_RGBA, GL_UNSIGNED_BYTE, dst);
-
-                delete[] dst;
+                    GL_RGBA, GL_UNSIGNED_BYTE, &dst[0]);
 
                 break;
             }
