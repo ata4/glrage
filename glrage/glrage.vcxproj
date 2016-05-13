@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ContextImpl.cpp" />
+    <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="GLRage.cpp" />
     <ClCompile Include="Screenshot.cpp" />
   </ItemGroup>

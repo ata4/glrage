@@ -11,13 +11,6 @@ namespace ddraw {
 
 static Context& context = GLRage::getContext();
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
-{
-    LOG_TRACE("%p,%d", hModule, dwReason);
-
-    return TRUE;
-}
-
 HRESULT WINAPI DirectDrawCreate(
     GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter)
 {

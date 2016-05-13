@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ddraw.cpp" />
+    <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="DirectDraw.cpp" />
     <ClCompile Include="DirectDrawClipper.cpp" />
     <ClCompile Include="Renderer.cpp" />

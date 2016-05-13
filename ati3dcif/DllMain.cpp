@@ -1,4 +1,4 @@
-#include "ati3dcif.h"
+#include "ati3dcif.hpp"
 #include "Error.hpp"
 #include "Renderer.hpp"
 #include "Utils.hpp"
@@ -37,6 +37,11 @@ HandleException()
         return C3D_EC_GENFAIL;
     }
 }
+
+// export macro for CIF implementation
+#define EXPORT(function_name, return_type, parameters)      \
+function_name##_t function_name##_lib = function_name;      \
+return_type WINAPI function_name parameters
 
 extern "C" {
 

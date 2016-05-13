@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ati3dcif.h"
+#include "ati3dcif.hpp"
 
 #include <glrage_gl\VertexArray.hpp>
 #include <glrage_gl\VertexArrayBuffer.hpp>
