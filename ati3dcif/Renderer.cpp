@@ -48,7 +48,7 @@ Renderer::Renderer()
     // cache frequently used config values
     m_wireframe = m_config.getBool("wireframe", false);
 
-    gl::Utils::checkError("Renderer::Renderer");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 void Renderer::renderBegin(C3D_HRC hRC)
@@ -76,7 +76,7 @@ void Renderer::renderBegin(C3D_HRC hRC)
     m_program.uniformMatrix4fv(
         "matProjection", 1, GL_FALSE, glm::value_ptr(projection));
 
-    gl::Utils::checkError("Renderer::renderBegin");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 void Renderer::renderEnd()
@@ -103,7 +103,7 @@ void Renderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
     // store in texture map
     m_textures[*phtmap] = texture;
 
-    gl::Utils::checkError("Renderer::textureReg");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 void Renderer::textureUnreg(C3D_HTX htxToUnreg)

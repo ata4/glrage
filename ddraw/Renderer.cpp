@@ -36,7 +36,7 @@ Renderer::Renderer()
     m_program.link();
     m_program.fragmentData("fragColor");
 
-    gl::Utils::checkError("DirectDrawRenderer::DirectDrawRenderer");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 void Renderer::upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data)
@@ -92,7 +92,7 @@ void Renderer::render()
         glEnable(GL_DEPTH_TEST);
     }
 
-    gl::Utils::checkError("Renderer::render");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 } // namespace ddraw

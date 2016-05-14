@@ -19,7 +19,7 @@ VertexStream::VertexStream()
     m_vtcFormat.attribute(1, 3, GL_FLOAT, GL_FALSE, 40, 12);
     m_vtcFormat.attribute(2, 4, GL_FLOAT, GL_FALSE, 40, 24);
 
-    gl::Utils::checkError("VertexStream::VertexStream");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 void VertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
@@ -47,7 +47,7 @@ void VertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
 
     glDrawArrays(GLCIF_PRIMSTRIP_MODES[m_primType], 0, numVert);
 
-    gl::Utils::checkError("VertexStream::renderPrimStrip");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 void VertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
@@ -100,7 +100,7 @@ void VertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
 
     glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, numVert);
 
-    gl::Utils::checkError("VertexStream::renderPrimList");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 C3D_EVERTEX

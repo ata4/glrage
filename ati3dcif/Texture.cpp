@@ -126,7 +126,7 @@ void Texture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
     //    }
     //}
 
-    gl::Utils::checkError("Texture::load");
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 C3D_COLOR& Texture::chromaKey()
