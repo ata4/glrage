@@ -19,5 +19,10 @@ void Texture::bind()
     glBindTexture(m_target, m_id);
 }
 
+GLenum Texture::target()
+{
+    return m_target;
+}
+
 } // namespace gl
 } // namespace glrage

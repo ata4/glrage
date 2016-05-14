@@ -3,11 +3,11 @@
 #include "Texture.hpp"
 #include "VertexStream.hpp"
 
-#include <glrage\GLRage.hpp>
-#include <glrage_util\Config.hpp>
-#include <glrage_gl\Sampler.hpp>
-#include <glrage_gl\Shader.hpp>
-#include <glrage_gl\ShaderProgram.hpp>
+#include <glrage/GLRage.hpp>
+#include <glrage_gl/Program.hpp>
+#include <glrage_gl/Sampler.hpp>
+#include <glrage_gl/Shader.hpp>
+#include <glrage_util/Config.hpp>
 
 #include <memory>
 #include <map>
@@ -136,7 +136,7 @@ private:
     C3D_EADST m_alphaDst = C3D_EADST_ZERO;
     C3D_HTX m_tmap = 0;
 
-    gl::ShaderProgram m_program;
+    gl::Program m_program;
     gl::Sampler m_sampler;
     VertexStream m_vertexStream;
 };

@@ -2,8 +2,8 @@
 
 #include "ati3dcif.hpp"
 
-#include <glrage_gl\VertexArray.hpp>
-#include <glrage_gl\VertexArrayBuffer.hpp>
+#include <glrage_gl/VertexArray.hpp>
+#include <glrage_gl/ArrayBuffer.hpp>
 
 #include <vector>
 
@@ -46,7 +46,7 @@ private:
     C3D_EVERTEX m_vertexType;
     C3D_EPRIM m_primType;
     size_t m_vertexBufferSize = 0;
-    gl::VertexArrayBuffer m_vertexBuffer;
+    gl::ArrayBuffer m_vertexBuffer;
     gl::VertexArray m_vtcFormat;
     std::vector<C3D_VTCF> m_vtcBuffer;
 };

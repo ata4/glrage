@@ -9,11 +9,11 @@
 namespace glrage {
 namespace gl {
 
-class ShaderProgram : public Object
+class Program : public Object
 {
 public:
-    ShaderProgram();
-    ~ShaderProgram();
+    Program();
+    ~Program();
     void bind();
     void attach(Shader& shader);
     void detach(Shader& shader);

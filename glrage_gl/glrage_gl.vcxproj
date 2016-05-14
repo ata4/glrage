@@ -87,10 +87,10 @@
     <ClCompile Include="gl_core_3_3.c" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Program.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexArray.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
+    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="wgl_ext.c" />
   </ItemGroup>
   <ItemGroup>
@@ -101,12 +101,12 @@
     <ClInclude Include="Sampler.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="ShaderException.hpp" />
-    <ClInclude Include="ShaderProgram.hpp" />
-    <ClInclude Include="ShaderProgramException.hpp" />
+    <ClInclude Include="Program.hpp" />
+    <ClInclude Include="ProgramException.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="VertexArray.hpp" />
-    <ClInclude Include="VertexArrayBuffer.hpp" />
-    <ClInclude Include="VertexBuffer.hpp" />
+    <ClInclude Include="Buffer.hpp" />
+    <ClInclude Include="ArrayBuffer.hpp" />
     <ClInclude Include="VertexShader.hpp" />
     <ClInclude Include="wgl_ext.h" />
   </ItemGroup>

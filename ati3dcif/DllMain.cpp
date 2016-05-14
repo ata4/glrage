@@ -3,9 +3,9 @@
 #include "Renderer.hpp"
 #include "Utils.hpp"
 
-#include <glrage\GLRage.hpp>
-#include <glrage_util\ErrorUtils.hpp>
-#include <glrage_util\Logger.hpp>
+#include <glrage/GLRage.hpp>
+#include <glrage_util/ErrorUtils.hpp>
+#include <glrage_util/Logger.hpp>
 
 #include <stdexcept>
 

@@ -12,10 +12,7 @@ public:
     Texture(GLenum target);
     ~Texture();
     void bind();
-    GLenum target()
-    {
-        return m_target;
-    }
+    GLenum target();
 
 private:
     GLenum m_target;

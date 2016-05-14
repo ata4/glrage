@@ -6,11 +6,11 @@
 namespace glrage {
 namespace gl {
 
-class VertexBuffer : public Object
+class Buffer : public Object
 {
 public:
-    VertexBuffer(GLenum target);
-    ~VertexBuffer();
+    Buffer(GLenum target);
+    ~Buffer();
     void bind();
     void data(GLsizei size, const void* data, GLenum usage);
     void subData(GLsizei offset, GLsizei size, const void* data);

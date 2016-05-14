@@ -2,7 +2,7 @@
 
 #include "ati3dcif.hpp"
 
-#include <glrage_gl\Texture.hpp>
+#include <glrage_gl/Texture.hpp>
 
 namespace glrage {
 namespace cif {

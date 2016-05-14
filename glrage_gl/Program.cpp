@@ -1,41 +1,41 @@
-#include "ShaderProgram.hpp"
+#include "Program.hpp"
 #include "Logger.hpp"
-#include "ShaderProgramException.hpp"
+#include "ProgramException.hpp"
 
 namespace glrage {
 namespace gl {
 
-ShaderProgram::ShaderProgram()
+Program::Program()
 {
     m_id = glCreateProgram();
     if (!m_id) {
-        throw ShaderProgramException("Can't create shader program");
+        throw ProgramException("Can't create shader program");
     }
 }
 
-ShaderProgram::~ShaderProgram()
+Program::~Program()
 {
     if (m_id) {
         glDeleteProgram(m_id);
     }
 }
 
-void ShaderProgram::bind()
+void Program::bind()
 {
     glUseProgram(m_id);
 }
 
-void ShaderProgram::attach(Shader& shader)
+void Program::attach(Shader& shader)
 {
     glAttachShader(m_id, shader.id());
 }
 
-void ShaderProgram::detach(Shader& shader)
+void Program::detach(Shader& shader)
 {
     glDetachShader(m_id, shader.id());
 }
 
-void ShaderProgram::link()
+void Program::link()
 {
     // do the linking
     glLinkProgram(m_id);
@@ -48,16 +48,16 @@ void ShaderProgram::link()
         if (message.empty()) {
             message = "Shader linking failed.";
         }
-        throw ShaderProgramException(message);
+        throw ProgramException(message);
     }
 }
 
-void ShaderProgram::fragmentData(const std::string& name)
+void Program::fragmentData(const std::string& name)
 {
     glBindFragDataLocation(m_id, 0, name.c_str());
 }
 
-GLint ShaderProgram::attributeLocation(const std::string& name)
+GLint Program::attributeLocation(const std::string& name)
 {
     auto it = m_attributeLocations.find(name);
     if (it != m_attributeLocations.end()) {
@@ -74,7 +74,7 @@ GLint ShaderProgram::attributeLocation(const std::string& name)
     return location;
 }
 
-GLint ShaderProgram::uniformLocation(const std::string& name)
+GLint Program::uniformLocation(const std::string& name)
 {
     auto it = m_uniformLocations.find(name);
     if (it != m_uniformLocations.end()) {
@@ -91,7 +91,7 @@ GLint ShaderProgram::uniformLocation(const std::string& name)
     return location;
 }
 
-void ShaderProgram::uniform3f(
+void Program::uniform3f(
     const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2)
 {
     GLint loc = uniformLocation(name);
@@ -100,7 +100,7 @@ void ShaderProgram::uniform3f(
     }
 }
 
-void ShaderProgram::uniform4f(
+void Program::uniform4f(
     const std::string& name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 {
     GLint loc = uniformLocation(name);
@@ -109,7 +109,7 @@ void ShaderProgram::uniform4f(
     }
 }
 
-void ShaderProgram::uniform1i(const std::string& name, GLint v0)
+void Program::uniform1i(const std::string& name, GLint v0)
 {
     GLint loc = uniformLocation(name);
     if (loc != -1) {
@@ -117,7 +117,7 @@ void ShaderProgram::uniform1i(const std::string& name, GLint v0)
     }
 }
 
-void ShaderProgram::uniformMatrix4fv(const std::string& name, GLsizei count,
+void Program::uniformMatrix4fv(const std::string& name, GLsizei count,
     GLboolean transpose, const GLfloat* value)
 {
     GLint loc = uniformLocation(name);
@@ -126,7 +126,7 @@ void ShaderProgram::uniformMatrix4fv(const std::string& name, GLsizei count,
     }
 }
 
-std::string ShaderProgram::infoLog()
+std::string Program::infoLog()
 {
     GLint infoLogLength;
     std::string infoLogString;

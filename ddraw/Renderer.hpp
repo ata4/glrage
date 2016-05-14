@@ -3,11 +3,12 @@
 #include "ddraw.hpp"
 
 #include <glrage/GLRage.hpp>
+#include <glrage_gl/ArrayBuffer.hpp>
+#include <glrage_gl/Buffer.hpp>
+#include <glrage_gl/Program.hpp>
 #include <glrage_gl/Sampler.hpp>
-#include <glrage_gl/ShaderProgram.hpp>
 #include <glrage_gl/Texture.hpp>
 #include <glrage_gl/VertexArray.hpp>
-#include <glrage_gl/VertexArrayBuffer.hpp>
 #include <glrage_util/Config.hpp>
 
 #include <cstdint>
@@ -33,10 +34,10 @@ private:
     uint32_t m_width = 0;
     uint32_t m_height = 0;
     gl::VertexArray m_surfaceFormat;
-    gl::VertexArrayBuffer m_surfaceBuffer;
+    gl::ArrayBuffer m_surfaceBuffer;
     gl::Texture m_surfaceTexture = GL_TEXTURE_2D;
     gl::Sampler m_sampler;
-    gl::ShaderProgram m_program;
+    gl::Program m_program;
 };
 
 } // namespace ddraw

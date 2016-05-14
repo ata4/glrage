@@ -14,4 +14,4 @@
 #define BUILD_AS_DLL
 
 // include actual ATI3DCIF.H from 3D Rage SDK
-#include <ragesdk\include\ATI3DCIF.H>
+#include <ragesdk/include/ATI3DCIF.H>
