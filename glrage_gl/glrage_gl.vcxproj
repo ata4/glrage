@@ -47,10 +47,10 @@
     <IntDir>build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)glrage_util;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)glrage_util;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -97,7 +97,6 @@
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="gl_core_3_3.h" />
     <ClInclude Include="Object.hpp" />
-    <ClInclude Include="FragmentShader.hpp" />
     <ClInclude Include="Sampler.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="ShaderException.hpp" />
@@ -106,8 +105,6 @@
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="VertexArray.hpp" />
     <ClInclude Include="Buffer.hpp" />
-    <ClInclude Include="ArrayBuffer.hpp" />
-    <ClInclude Include="VertexShader.hpp" />
     <ClInclude Include="wgl_ext.h" />
   </ItemGroup>
   <ItemGroup>

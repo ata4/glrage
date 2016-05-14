@@ -1,6 +1,7 @@
 #include "Utils.hpp"
-#include "Logger.hpp"
 #include "gl_core_3_3.h"
+
+#include <glrage_util/Logger.hpp>
 
 namespace glrage {
 namespace gl {

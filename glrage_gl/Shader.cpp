@@ -1,7 +1,8 @@
 #include "Shader.hpp"
-#include "ErrorUtils.hpp"
 #include "ShaderException.hpp"
-#include "StringUtils.hpp"
+
+#include <glrage_util/ErrorUtils.hpp>
+#include <glrage_util/StringUtils.hpp>
 
 #include <fstream>
 #include <sstream>

@@ -1,13 +1,13 @@
 #include "Renderer.hpp"
 
-#include <glrage_gl/FragmentShader.hpp>
+#include <glrage_gl/Shader.hpp>
 #include <glrage_gl/Utils.hpp>
-#include <glrage_gl/VertexShader.hpp>
 
 namespace glrage {
 namespace ddraw {
 
 Renderer::Renderer()
+    : m_surfaceBuffer(GL_ARRAY_BUFFER)
 {
     // configure buffer
     m_surfaceBuffer.bind();
@@ -29,10 +29,10 @@ Renderer::Renderer()
 
     // configure shaders
     std::wstring basePath = m_context.getBasePath();
-    m_program.attach(
-        gl::VertexShader().fromFile(basePath + L"\\shaders\\ddraw.vsh"));
-    m_program.attach(
-        gl::FragmentShader().fromFile(basePath + L"\\shaders\\ddraw.fsh"));
+    m_program.attach(gl::Shader(GL_VERTEX_SHADER)
+                         .fromFile(basePath + L"\\shaders\\ddraw.vsh"));
+    m_program.attach(gl::Shader(GL_FRAGMENT_SHADER)
+                         .fromFile(basePath + L"\\shaders\\ddraw.fsh"));
     m_program.link();
     m_program.fragmentData("fragColor");
 

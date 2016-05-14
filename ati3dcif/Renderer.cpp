@@ -2,9 +2,7 @@
 #include "Error.hpp"
 #include "Utils.hpp"
 
-#include <glrage_gl/FragmentShader.hpp>
 #include <glrage_gl/Utils.hpp>
-#include <glrage_gl/VertexShader.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -29,10 +27,10 @@ Renderer::Renderer()
 
     // compile and link shaders and configure program
     std::wstring basePath = m_context.getBasePath();
-    m_program.attach(
-        gl::VertexShader().fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
-    m_program.attach(
-        gl::FragmentShader().fromFile(basePath + L"\\shaders\\ati3dcif.fsh"));
+    m_program.attach(gl::Shader(GL_VERTEX_SHADER)
+                         .fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
+    m_program.attach(gl::Shader(GL_FRAGMENT_SHADER)
+                         .fromFile(basePath + L"\\shaders\\ati3dcif.fsh"));
     m_program.link();
     m_program.fragmentData("fragColor");
     m_program.bind();

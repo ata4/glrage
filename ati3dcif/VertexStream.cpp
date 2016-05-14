@@ -9,6 +9,7 @@ namespace glrage {
 namespace cif {
 
 VertexStream::VertexStream()
+    : m_vertexBuffer(GL_ARRAY_BUFFER)
 {
     // bind vertex buffer
     m_vertexBuffer.bind();

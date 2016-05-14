@@ -1,6 +1,7 @@
 #include "Program.hpp"
-#include "Logger.hpp"
 #include "ProgramException.hpp"
+
+#include <glrage_util/Logger.hpp>
 
 namespace glrage {
 namespace gl {
