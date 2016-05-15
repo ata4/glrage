@@ -83,6 +83,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Screenshot.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="gl_core_3_3.c" />
     <ClCompile Include="Sampler.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="wgl_ext.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Screenshot.hpp" />
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="gl_core_3_3.h" />
     <ClInclude Include="Object.hpp" />

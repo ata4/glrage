@@ -1,7 +1,8 @@
 #include "DirectDrawSurface.hpp"
-#include "DirectDrawClipper.hpp"
 #include "Blitter.hpp"
+#include "DirectDrawClipper.hpp"
 
+#include <glrage_gl/Screenshot.hpp>
 #include <glrage_util/Logger.hpp>
 
 #include <algorithm>
@@ -9,8 +10,8 @@
 namespace glrage {
 namespace ddraw {
 
-DirectDrawSurface::DirectDrawSurface(DirectDraw& lpDD,
-    Renderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc)
+DirectDrawSurface::DirectDrawSurface(
+    DirectDraw& lpDD, Renderer& renderer, LPDDSURFACEDESC lpDDSurfaceDesc)
     : m_dd(lpDD)
     , m_renderer(renderer)
     , m_desc(*lpDDSurfaceDesc)
@@ -161,24 +162,8 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
     if (lpDDSrcSurface) {
         m_dirty = true;
 
-        DirectDrawSurface* src =
-            static_cast<DirectDrawSurface*>(lpDDSrcSurface);
-
-        int32_t srcWidth = src->m_desc.dwWidth;
-        int32_t srcHeight = src->m_desc.dwHeight;
-
         int32_t dstWidth = m_desc.dwWidth;
         int32_t dstHeight = m_desc.dwHeight;
-
-        int32_t depth = m_desc.ddpfPixelFormat.dwRGBBitCount / 8;
-
-        Blitter::Rect srcRect{0, 0, srcWidth, srcHeight};
-        if (lpSrcRect) {
-            srcRect.left = lpSrcRect->left;
-            srcRect.top = lpSrcRect->top;
-            srcRect.right = lpSrcRect->right;
-            srcRect.bottom = lpSrcRect->bottom;
-        }
 
         Blitter::Rect dstRect{0, 0, dstWidth, dstHeight};
         if (lpDestRect) {
@@ -188,17 +173,46 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
             dstRect.bottom = lpDestRect->bottom;
         }
 
-        Blitter::Image srcImg{srcWidth, srcHeight, depth, src->m_buffer};
-        Blitter::Image dstImg{dstWidth, dstHeight, depth, m_buffer};
+        DirectDrawSurface* src =
+            static_cast<DirectDrawSurface*>(lpDDSrcSurface);
 
-        Blitter::blit(srcImg, srcRect, dstImg, dstRect);
-    }
+        int32_t depth = m_desc.ddpfPixelFormat.dwRGBBitCount / 8;
 
-    // Clear primary surface in 2D mode ony. OpenGL already does the clearing
-    // on hardware in 3D, so it would be a waste of CPU time.
-    if (m_context.isRendered() &&
-        m_desc.ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
-        return DD_OK;
+        if (src->m_desc.ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
+            // This is a somewhat ugly and slow hack to get a rescaled and
+            // converted copy of the framebuffer for the surface, which is
+            // required to display the in-game menu of Tomb Raider correctly.
+            GLint width;
+            GLint height;
+            std::vector<uint8_t> buffer;
+
+            gl::Screenshot::capture(buffer, width, height, depth, GL_BGRA,
+                GL_UNSIGNED_SHORT_1_5_5_5_REV, true);
+
+            Blitter::Rect srcRect{0, 0, width, height};
+
+            Blitter::Image srcImg{width, height, depth, buffer};
+            Blitter::Image dstImg{dstWidth, dstHeight, depth, m_buffer};
+
+            Blitter::blit(srcImg, srcRect, dstImg, dstRect);
+        } else {
+            int32_t srcWidth = src->m_desc.dwWidth;
+            int32_t srcHeight = src->m_desc.dwHeight;
+
+            Blitter::Rect srcRect{0, 0, srcWidth, srcHeight};
+
+            if (lpSrcRect) {
+                srcRect.left = lpSrcRect->left;
+                srcRect.top = lpSrcRect->top;
+                srcRect.right = lpSrcRect->right;
+                srcRect.bottom = lpSrcRect->bottom;
+            }
+
+            Blitter::Image srcImg{srcWidth, srcHeight, depth, src->m_buffer};
+            Blitter::Image dstImg{dstWidth, dstHeight, depth, m_buffer};
+
+            Blitter::blit(srcImg, srcRect, dstImg, dstRect);
+        }
     }
 
     if (dwFlags & DDBLT_COLORFILL) {
