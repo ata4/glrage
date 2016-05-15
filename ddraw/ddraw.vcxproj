@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Blitter.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="DirectDraw.cpp" />
     <ClCompile Include="DirectDrawClipper.cpp" />
@@ -20,6 +21,7 @@
     <ClCompile Include="Unknown.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Blitter.hpp" />
     <ClInclude Include="ddraw.hpp" />
     <ClInclude Include="DirectDraw.hpp" />
     <ClInclude Include="DirectDrawClipper.hpp" />

@@ -1,5 +1,6 @@
 #include "DirectDrawSurface.hpp"
 #include "DirectDrawClipper.hpp"
+#include "Blitter.hpp"
 
 #include <glrage_util/Logger.hpp>
 
@@ -163,63 +164,34 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
         DirectDrawSurface* src =
             static_cast<DirectDrawSurface*>(lpDDSrcSurface);
 
-        const int32_t sourceTop = lpSrcRect ? lpSrcRect->top : 0;
-        const int32_t sourceBottom =
-            lpSrcRect ? lpSrcRect->bottom : src->m_desc.dwHeight;
+        int32_t srcWidth = src->m_desc.dwWidth;
+        int32_t srcHeight = src->m_desc.dwHeight;
 
-        const int32_t sourceLeft = lpSrcRect ? lpSrcRect->left : 0;
-        const int32_t sourceRight =
-            lpSrcRect ? lpSrcRect->right : src->m_desc.dwWidth;
+        int32_t dstWidth = m_desc.dwWidth;
+        int32_t dstHeight = m_desc.dwHeight;
 
-        const int32_t targetTop = lpDestRect ? lpDestRect->top : 0;
-        const int32_t targetBottom =
-            lpDestRect ? lpDestRect->bottom : m_desc.dwHeight;
+        int32_t depth = m_desc.ddpfPixelFormat.dwRGBBitCount / 8;
 
-        const int32_t targetLeft = lpDestRect ? lpDestRect->left : 0;
-        const int32_t targetRight =
-            lpDestRect ? lpDestRect->right : m_desc.dwWidth;
-
-        const int32_t sourceWidth = src->m_desc.dwWidth;
-        const int32_t sourceHeight = src->m_desc.dwHeight;
-
-        const int32_t targetWidth = m_desc.dwWidth;
-        const int32_t targetHeight = m_desc.dwHeight;
-
-        // copy buffer directly if possible
-        if (sourceLeft == 0 && targetLeft == 0 && sourceTop == 0 &&
-            targetTop == 0 && sourceRight == targetWidth &&
-            targetRight == targetWidth && sourceBottom == targetHeight &&
-            targetBottom == targetHeight) {
-            m_buffer = src->m_buffer;
-        } else {
-            // nearest-neighbor bit block transfer - slightly modified code from
-            // https://stackoverflow.com/q/28566290
-            const int32_t xRatio =
-                ((sourceRight - sourceLeft) << 16) / targetWidth;
-            const int32_t yRatio =
-                ((sourceBottom - sourceTop) << 16) / targetHeight;
-
-            // note: assumes that the source surface descriptor is the same as
-            // in the target and that dwRGBBitCount is a multiple of 8
-            const int32_t byteCount = m_desc.ddpfPixelFormat.dwRGBBitCount / 8;
-
-            for (int32_t y = targetTop; y < targetBottom; y++) {
-                int32_t y2xSource =
-                    (((y + sourceTop) * yRatio) >> 16) * sourceWidth;
-                int32_t ixDest = y * targetWidth;
-
-                for (int32_t x = targetLeft; x < targetRight; x++) {
-                    int32_t x2 = (((x + sourceLeft) * xRatio) >> 16);
-                    int32_t y2x2Bytes = (y2xSource + x2) * byteCount;
-                    int32_t ixDestBytes = (ixDest + x) * byteCount;
-
-                    for (int32_t n = 0; n < byteCount; n++) {
-                        m_buffer[ixDestBytes + n] =
-                            src->m_buffer[y2x2Bytes + n];
-                    }
-                }
-            }
+        Blitter::Rect srcRect{0, 0, srcWidth, srcHeight};
+        if (lpSrcRect) {
+            srcRect.left = lpSrcRect->left;
+            srcRect.top = lpSrcRect->top;
+            srcRect.right = lpSrcRect->right;
+            srcRect.bottom = lpSrcRect->bottom;
         }
+
+        Blitter::Rect dstRect{0, 0, dstWidth, dstHeight};
+        if (lpDestRect) {
+            dstRect.left = lpDestRect->left;
+            dstRect.top = lpDestRect->top;
+            dstRect.right = lpDestRect->right;
+            dstRect.bottom = lpDestRect->bottom;
+        }
+
+        Blitter::Image srcImg{srcWidth, srcHeight, depth, src->m_buffer};
+        Blitter::Image dstImg{dstWidth, dstHeight, depth, m_buffer};
+
+        Blitter::blit(srcImg, srcRect, dstImg, dstRect);
     }
 
     // Clear primary surface in 2D mode ony. OpenGL already does the clearing
