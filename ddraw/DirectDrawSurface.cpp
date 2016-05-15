@@ -195,6 +195,9 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
             Blitter::Image dstImg{dstWidth, dstHeight, depth, m_buffer};
 
             Blitter::blit(srcImg, srcRect, dstImg, dstRect);
+
+            // simulate dimming of DOS/PSX menu
+            rgba5551AdjustBrightness(false);
         } else {
             int32_t srcWidth = src->m_desc.dwWidth;
             int32_t srcHeight = src->m_desc.dwHeight;
@@ -540,7 +543,8 @@ HRESULT WINAPI DirectDrawSurface::Unlock(LPVOID lp)
     if (m_desc.ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE &&
         !(m_desc.ddsCaps.dwCaps & DDSCAPS_FLIP)) {
         // FMV hack for Tomb Raider
-        if (m_context.getGameID().find("tomb") != std::string::npos) {
+        bool tomb = m_context.getGameID().find("tomb") != std::string::npos;
+        if (tomb) {
             // fix black lines by copying even to odd lines
             for (DWORD i = 0; i < m_desc.dwHeight; i += 2) {
                 auto itrEven = std::next(m_buffer.begin(), i * m_desc.lPitch);
@@ -548,12 +552,21 @@ HRESULT WINAPI DirectDrawSurface::Unlock(LPVOID lp)
                     std::next(m_buffer.begin(), (i + 1) * m_desc.lPitch);
                 std::copy(itrEven, std::next(itrEven, m_desc.lPitch), itrOdd);
             }
+
+            // video frames have only half brightness, fix it
+            rgba5551AdjustBrightness(true);
         }
 
         m_context.swapBuffers();
         m_context.setupViewport();
         m_renderer.upload(m_desc, m_buffer);
         m_renderer.render();
+
+        // the video codec updates changed pixels only. so the original
+        // brightness must be restored after rendering to avoid errors
+        if (tomb) {
+            rgba5551AdjustBrightness(false);
+        }
     }
 
     return DD_OK;
@@ -689,6 +702,39 @@ void DirectDrawSurface::clear(int32_t color)
     }
 
     m_dirty = true;
+}
+
+// ugly hack to change the brightness level of a RGBA5551 surface
+void DirectDrawSurface::rgba5551AdjustBrightness(bool brighten)
+{
+    if (m_desc.ddpfPixelFormat.dwRGBBitCount != 16) {
+        // not supported
+        return;
+    }
+
+    // living on the edge...
+    uint16_t* buf = reinterpret_cast<uint16_t*>(&m_buffer[0]);
+    int32_t size = m_desc.dwWidth * m_desc.dwHeight;
+
+    for (int32_t i = 0; i < size; i++) {
+        for (int32_t j = 0; j < 15; j += 5) {
+            // extract channel
+            uint16_t c = (buf[i] >> j) & 0x1f;
+
+            // update value
+            if (brighten) {
+                c *= 2;
+            } else {
+                c /= 2;
+            }
+
+            // clear channel bits
+            buf[i] &= ~(0x1f << j);
+
+            // write channel bits
+            buf[i] |= c << j;
+        }
+    }
 }
 
 } // namespace ddraw
