@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RuntimePatcher.hpp"
+#include "RuntimePatch.hpp"
 
 namespace glrage {
 
-class AssaultRigsPatcher : public RuntimePatcher
+class AssaultRigsPatcher : public RuntimePatch
 {
 public:
     virtual void apply();

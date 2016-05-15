@@ -27,16 +27,16 @@
     <ClInclude Include="TombRaiderHooks.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RuntimePatcher.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RuntimeData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AssaultRigsPatcher.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RuntimePatcherMain.hpp">
+    <ClInclude Include="RuntimePatch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RuntimePatcher.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,16 +50,16 @@
     <ClCompile Include="TombRaiderHooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RuntimePatcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RuntimeData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AssaultRigsPatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RuntimePatcherMain.cpp">
+    <ClCompile Include="RuntimePatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimePatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

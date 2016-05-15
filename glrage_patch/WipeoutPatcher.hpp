@@ -1,12 +1,12 @@
 #pragma once
 
-#include "RuntimePatcher.hpp"
+#include "RuntimePatch.hpp"
 
 #include <Windows.h>
 
 namespace glrage {
 
-class WipeoutPatcher : public RuntimePatcher
+class WipeoutPatcher : public RuntimePatch
 {
 public:
     virtual void apply();

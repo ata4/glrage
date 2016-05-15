@@ -13,8 +13,8 @@
   <ItemGroup>
     <ClInclude Include="AssaultRigsPatcher.hpp" />
     <ClInclude Include="RuntimeData.hpp" />
+    <ClInclude Include="RuntimePatch.hpp" />
     <ClInclude Include="RuntimePatcher.hpp" />
-    <ClInclude Include="RuntimePatcherMain.hpp" />
     <ClInclude Include="TombRaiderHooks.hpp" />
     <ClInclude Include="TombRaiderPatcher.hpp" />
     <ClInclude Include="WipeoutPatcher.hpp" />
@@ -22,8 +22,8 @@
   <ItemGroup>
     <ClCompile Include="AssaultRigsPatcher.cpp" />
     <ClCompile Include="RuntimeData.cpp" />
+    <ClCompile Include="RuntimePatch.cpp" />
     <ClCompile Include="RuntimePatcher.cpp" />
-    <ClCompile Include="RuntimePatcherMain.cpp" />
     <ClCompile Include="TombRaiderHooks.cpp" />
     <ClCompile Include="TombRaiderPatcher.cpp" />
     <ClCompile Include="WipeoutPatcher.cpp" />

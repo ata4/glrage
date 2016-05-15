@@ -1,163 +1,96 @@
 #include "RuntimePatcher.hpp"
+#include "AssaultRigsPatcher.hpp"
+#include "TombRaiderPatcher.hpp"
+#include "WipeoutPatcher.hpp"
 
-#include <glrage_util/Logger.hpp>
+#include <glrage/GLRage.hpp>
+#include <glrage_util/ErrorUtils.hpp>
 #include <glrage_util/StringUtils.hpp>
+
+#include <Shlwapi.h>
+#include <Windows.h>
+
+#include <algorithm>
+#include <cstdint>
+#include <memory>
+
+#include <map>
+#include <vector>
 
 namespace glrage {
 
-void RuntimePatcher::setContext(ModuleContext& ctx)
+void RuntimePatcher::patch()
 {
-    m_ctx = ctx;
+    getModulePath();
+    getModuleVersion();
+
+    // run known patches
+    // clang-format off
+    std::map<std::string, std::shared_ptr<RuntimePatch>> patches = {
+        {"Tomb Raider",      std::make_shared<TombRaiderPatcher>(false)},
+        {"Tomb Raider Gold", std::make_shared<TombRaiderPatcher>(true)},
+        {"Assault Rigs",     std::make_shared<AssaultRigsPatcher>()},
+        {"Wipeout",          std::make_shared<WipeoutPatcher>()}
+    };
+    // clang-format on
+
+    Context& ctx = GLRage::getContext();
+    ctx.setGameID(m_ctx.fileName);
+
+    // set config path based on the module file name
+    m_ctx.config.setPath(
+        ctx.getBasePath() + L"\\patches\\" + m_ctx.fileNameW + L".ini");
+
+    // apply patch module as defined in the config
+    std::string game = m_ctx.config.getString("game", "");
+    auto patch = patches.find(game);
+    if (patch == patches.end()) {
+        ErrorUtils::error("Invalid patch module '" + game + "'");
+    }
+
+    patch->second->setContext(m_ctx);
+    patch->second->apply();
 }
 
-bool RuntimePatcher::patch(
-    uint32_t addr, const std::string& expected, const std::string& replacement)
+void RuntimePatcher::getModulePath()
 {
-    RuntimeData expectedData(StringUtils::hexToBytes(expected));
-    RuntimeData replacementData(StringUtils::hexToBytes(replacement));
-    return patch(addr, expectedData, replacementData);
+    // get executable name
+    m_ctx.path.reserve(MAX_PATH);
+    GetModuleFileName(nullptr, &m_ctx.path[0], m_ctx.path.capacity());
+
+    // extract file name and copy result
+    m_ctx.fileNameW = PathFindFileName(m_ctx.path.c_str());
+
+    // remove extension
+    m_ctx.fileNameW =
+        m_ctx.fileNameW.substr(0, m_ctx.fileNameW.find_last_of(L"."));
+
+    // convert to lower case
+    transform(m_ctx.fileNameW.begin(), m_ctx.fileNameW.end(),
+        m_ctx.fileNameW.begin(), ::towlower);
+
+    // convert to UTF-8
+    m_ctx.fileName = std::string(StringUtils::wideToUtf8(m_ctx.fileNameW));
 }
 
-bool RuntimePatcher::patch(
-    uint32_t addr, const std::string& expected, const RuntimeData& replacement)
+void RuntimePatcher::getModuleVersion()
 {
-    RuntimeData expectedData(StringUtils::hexToBytes(expected));
-    return patch(addr, expectedData, replacement);
-}
-
-bool RuntimePatcher::patch(
-    uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement)
-{
-    bool result = false;
-    bool restoreProtect = false;
-
-    const std::vector<uint8_t> expectedData = expected.data();
-    const std::vector<uint8_t> replacementData = replacement.data();
-
-    const size_t size = expectedData.size();
-    std::vector<uint8_t> actualData(size);
-
-    // vectors must match in size
-    if (size != replacementData.size()) {
-        goto end;
+    DWORD size = GetFileVersionInfoSize(m_ctx.path.c_str(), nullptr);
+    if (!size) {
+        return;
     }
 
-    // apply read/write flags to the memory page
-    DWORD oldProtect = 0;
-    LPVOID lpaddr = reinterpret_cast<LPVOID>(addr);
-    if (!VirtualProtect(lpaddr, size, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-        goto end;
+    std::vector<uint8_t> versionInfo(size);
+    if (!GetFileVersionInfo(m_ctx.path.c_str(), 0, size, &versionInfo[0])) {
+        return;
     }
 
-    restoreProtect = true;
-
-    // read current memory to a temporary vector
-    HANDLE proc = GetCurrentProcess();
-    DWORD numRead = 0;
-    if (!ReadProcessMemory(proc, lpaddr, &actualData[0], size, &numRead) ||
-        numRead != size) {
-        goto end;
+    UINT fileInfoLen = 0;
+    VS_FIXEDFILEINFO* fileInfoBuf;
+    if (VerQueryValue(&versionInfo[0], L"\\",
+            reinterpret_cast<LPVOID*>(&fileInfoBuf), &fileInfoLen)) {
+        m_ctx.fileInfo = *fileInfoBuf;
     }
-
-    // compare actual data with expected data
-    if (actualData != expectedData) {
-        goto end;
-    }
-
-    // write patched data to memory
-    DWORD numWritten = 0;
-    if (!WriteProcessMemory(
-            proc, lpaddr, &replacementData[0], size, &numWritten) ||
-        numWritten != size) {
-        goto end;
-    }
-
-    result = true;
-
-end:
-    // restore original page flags
-    if (restoreProtect) {
-        VirtualProtect(lpaddr, size, oldProtect, nullptr);
-    }
-
-    if (!result) {
-        LOG_INFO("Patch at 0x%x with %d bytes failed!", addr, size);
-        LOG_INFO("Expected: " + StringUtils::bytesToHex(expectedData));
-        LOG_INFO("Actual:   " + StringUtils::bytesToHex(actualData));
-        LOG_INFO("Patch:    " + StringUtils::bytesToHex(replacementData));
-    }
-
-    return result;
-}
-
-bool RuntimePatcher::patch(uint32_t addr, const std::string& replacement)
-{
-    RuntimeData replacementData(StringUtils::hexToBytes(replacement));
-    return patch(addr, replacementData);
-}
-
-bool RuntimePatcher::patch(uint32_t addr, const RuntimeData& replacement)
-{
-    bool result = false;
-    bool restoreProtect = false;
-
-    const std::vector<uint8_t> replacementData = replacement.data();
-    const size_t size = replacementData.size();
-
-    // apply read/write flags to the memory page
-    DWORD oldProtect = 0;
-    LPVOID lpaddr = reinterpret_cast<LPVOID>(addr);
-    if (!VirtualProtect(lpaddr, size, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-        goto end;
-    }
-
-    restoreProtect = true;
-    HANDLE proc = GetCurrentProcess();
-
-    // write patched data to memory
-    DWORD numWritten = 0;
-    if (!WriteProcessMemory(
-            proc, lpaddr, &replacementData[0], size, &numWritten) ||
-        numWritten != size) {
-        goto end;
-    }
-
-    result = true;
-
-end:
-    // restore original page flags
-    if (restoreProtect) {
-        VirtualProtect(lpaddr, size, oldProtect, nullptr);
-    }
-
-    if (!result) {
-        LOG_INFO("Patch at 0x%x with %d bytes failed!", addr, size);
-        LOG_INFO("Patch:    " + StringUtils::bytesToHex(replacementData));
-    }
-
-    return result;
-}
-
-void RuntimePatcher::patchAddr(
-    int32_t addrCall, const std::string& expected, void* func, uint8_t op)
-{
-    int32_t addrFunc = reinterpret_cast<int32_t>(func);
-    int32_t addrCallNew = addrFunc - addrCall - 5;
-
-    m_tmp.clear();
-    m_tmp << op << addrCallNew;
-
-    patch(addrCall, expected, m_tmp);
-}
-
-bool RuntimePatcher::patchNop(uint32_t addr, const std::string& expected)
-{
-    RuntimeData expectedData(StringUtils::hexToBytes(expected));
-    std::vector<uint8_t> replacement =
-        std::vector<uint8_t>(expectedData.data());
-    std::fill(replacement.begin(), replacement.end(), 0x90);
-    RuntimeData replacementData(replacement);
-    return patch(addr, expectedData, replacementData);
 }
 
 } // namespace glrage

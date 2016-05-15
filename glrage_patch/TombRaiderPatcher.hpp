@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RuntimePatcher.hpp"
+#include "RuntimePatch.hpp"
 
 namespace glrage {
 
-class TombRaiderPatcher : public RuntimePatcher
+class TombRaiderPatcher : public RuntimePatch
 {
 public:
     TombRaiderPatcher(bool ub);

@@ -2,7 +2,7 @@
 
 #include "ContextImpl.hpp"
 
-#include <glrage_patch/RuntimePatcherMain.hpp>
+#include <glrage_patch/RuntimePatcher.hpp>
 
 namespace glrage {
 
@@ -17,11 +17,11 @@ namespace glrage {
 class GLRage {
 public:
     static GLRAPI Context& getContext();
-    static GLRAPI RuntimePatcherMain& getPatcher();
+    static GLRAPI RuntimePatcher& getPatcher();
 
 private:
     static ContextImpl m_context;
-    static RuntimePatcherMain m_patcher;
+    static RuntimePatcher m_patcher;
 };
 
 } // namespace glrage
