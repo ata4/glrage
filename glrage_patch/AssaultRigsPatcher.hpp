@@ -7,6 +7,7 @@ namespace glrage {
 class AssaultRigsPatcher : public RuntimePatch
 {
 public:
+    virtual GameID gameID();
     virtual void apply();
 };
 

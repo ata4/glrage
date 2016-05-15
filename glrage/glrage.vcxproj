@@ -93,6 +93,7 @@
   <ItemGroup>
     <ClInclude Include="Context.hpp" />
     <ClInclude Include="ContextImpl.hpp" />
+    <ClInclude Include="GameID.hpp" />
     <ClInclude Include="GLRage.hpp" />
     <ClInclude Include="Screenshot.hpp" />
   </ItemGroup>

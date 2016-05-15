@@ -18,6 +18,11 @@ TombRaiderPatcher::TombRaiderPatcher(bool ub)
 {
 }
 
+GameID TombRaiderPatcher::gameID()
+{
+    return m_ub ? GameID::TombRaiderGold : GameID::TombRaider;
+}
+
 void TombRaiderPatcher::apply()
 {
     // mandatory crash patches

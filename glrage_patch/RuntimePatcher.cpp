@@ -35,7 +35,6 @@ void RuntimePatcher::patch()
     // clang-format on
 
     Context& ctx = GLRage::getContext();
-    ctx.setGameID(m_ctx.fileName);
 
     // set config path based on the module file name
     m_ctx.config.setPath(
@@ -43,13 +42,16 @@ void RuntimePatcher::patch()
 
     // apply patch module as defined in the config
     std::string game = m_ctx.config.getString("game", "");
-    auto patch = patches.find(game);
-    if (patch == patches.end()) {
+    auto patchResult = patches.find(game);
+    if (patchResult == patches.end()) {
         ErrorUtils::error("Invalid patch module '" + game + "'");
     }
 
-    patch->second->setContext(m_ctx);
-    patch->second->apply();
+    auto patch = patchResult->second;
+    patch->setContext(m_ctx);
+    patch->apply();
+
+    ctx.setGameID(patch->gameID());
 }
 
 void RuntimePatcher::getModulePath()

@@ -5,6 +5,11 @@
 
 namespace glrage {
 
+GameID RuntimePatch::gameID()
+{
+    return GameID::Unknown;
+}
+
 void RuntimePatch::setContext(ModuleContext& ctx)
 {
     m_ctx = ctx;

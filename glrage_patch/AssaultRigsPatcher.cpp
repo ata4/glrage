@@ -6,6 +6,11 @@
 
 namespace glrage {
 
+GameID AssaultRigsPatcher::gameID()
+{
+    return GameID::AssaultRigs;
+}
+
 void AssaultRigsPatcher::apply()
 {
     // Fix "Insufficient memory" error on systems with more than 4 GB RAM where

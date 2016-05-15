@@ -35,8 +35,8 @@ public:
     HWND getHWnd();
     std::wstring getBasePath();
     std::wstring getConfigPath();
-    std::string getGameID();
-    void setGameID(const std::string& gameID);
+    GameID getGameID();
+    void setGameID(GameID gameID);
 
 private:
     // constants
@@ -84,7 +84,7 @@ private:
     int32_t m_height = 0;
 
     // detected game
-    std::string m_gameID = "unknown";
+    GameID m_gameID = GameID::Unknown;
 };
 
 } // namespace glrage

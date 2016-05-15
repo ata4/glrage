@@ -9,6 +9,11 @@ static const int64_t build_301096 = 840143410;
 static const int64_t build_220796 = 837628019;
 static const int64_t build_070796 = 836749807;
 
+GameID WipeoutPatcher::gameID()
+{
+    return GameID::Wipeout;
+}
+
 void WipeoutPatcher::apply()
 {
     // There are currently three known builds, which require different patches

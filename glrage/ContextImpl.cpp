@@ -437,12 +437,12 @@ std::wstring ContextImpl::getConfigPath()
     return getBasePath() + L"\\glrage.ini";
 }
 
-std::string ContextImpl::getGameID()
+GameID ContextImpl::getGameID()
 {
     return m_gameID;
 }
 
-void ContextImpl::setGameID(const std::string& gameID)
+void ContextImpl::setGameID(GameID gameID)
 {
     m_gameID = gameID;
 }

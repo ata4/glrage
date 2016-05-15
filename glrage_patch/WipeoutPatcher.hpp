@@ -9,6 +9,7 @@ namespace glrage {
 class WipeoutPatcher : public RuntimePatch
 {
 public:
+    virtual GameID gameID();
     virtual void apply();
 
 private:

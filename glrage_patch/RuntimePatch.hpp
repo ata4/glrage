@@ -2,6 +2,7 @@
 
 #include "RuntimeData.hpp"
 
+#include <glrage/GameID.hpp>
 #include <glrage_util/Config.hpp>
 
 #include <Windows.h>
@@ -26,6 +27,7 @@ class RuntimePatch
 {
 public:
     virtual void apply() = 0;
+    virtual GameID gameID();
     void setContext(ModuleContext& ctx);
 
 protected:

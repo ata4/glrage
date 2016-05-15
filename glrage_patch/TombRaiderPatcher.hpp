@@ -8,6 +8,7 @@ class TombRaiderPatcher : public RuntimePatch
 {
 public:
     TombRaiderPatcher(bool ub);
+    virtual GameID gameID();
     virtual void apply();
 
 private:

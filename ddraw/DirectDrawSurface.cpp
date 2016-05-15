@@ -196,8 +196,10 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
 
             Blitter::blit(srcImg, srcRect, dstImg, dstRect);
 
-            // simulate dimming of DOS/PSX menu
-            rgba5551AdjustBrightness(false);
+            if (isTombRaider()) {
+                // simulate dimming of DOS/PSX menu
+                rgba5551AdjustBrightness(false);
+            }
         } else {
             int32_t srcWidth = src->m_desc.dwWidth;
             int32_t srcHeight = src->m_desc.dwHeight;
@@ -543,7 +545,7 @@ HRESULT WINAPI DirectDrawSurface::Unlock(LPVOID lp)
     if (m_desc.ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE &&
         !(m_desc.ddsCaps.dwCaps & DDSCAPS_FLIP)) {
         // FMV hack for Tomb Raider
-        bool tomb = m_context.getGameID().find("tomb") != std::string::npos;
+        bool tomb = isTombRaider();
         if (tomb) {
             // fix black lines by copying even to odd lines
             for (DWORD i = 0; i < m_desc.dwHeight; i += 2) {
@@ -735,6 +737,12 @@ void DirectDrawSurface::rgba5551AdjustBrightness(bool brighten)
             buf[i] |= c << j;
         }
     }
+}
+
+bool DirectDrawSurface::isTombRaider()
+{
+    GameID gameID = m_context.getGameID();
+    return gameID == GameID::TombRaider || gameID == GameID::TombRaiderGold;
 }
 
 } // namespace ddraw

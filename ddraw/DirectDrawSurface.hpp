@@ -115,6 +115,7 @@ private:
     /*** Custom methods ***/
     void clear(int32_t color);
     void rgba5551AdjustBrightness(bool brighten);
+    bool isTombRaider();
 };
 
 } // namespace ddraw
