@@ -92,7 +92,7 @@ void TombRaiderPatcher::applyGraphicPatches()
     // ugly on default.
     if (m_ctx.config.getBool("watercolor_override", true)) {
         float filterRed =
-            m_ctx.config.getFloat("watercolor_filter_red", 0.3f);
+            m_ctx.config.getFloat("watercolor_filter_red", 0.45f);
         float filterGreen =
             m_ctx.config.getFloat("watercolor_filter_green", 1.0f);
 
