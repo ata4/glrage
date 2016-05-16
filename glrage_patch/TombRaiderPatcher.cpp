@@ -587,7 +587,7 @@ void TombRaiderPatcher::applyLogicPatches()
 void TombRaiderPatcher::applyLocalePatches()
 {
     std::wstring basePath = GLRage::getContext().getBasePath();
-    std::wstring localePath = basePath + L"\\patch\\locale\\";
+    std::wstring localePath = basePath + L"\\patches\\locale\\";
 
     // load locale file
     std::string locale =
@@ -597,9 +597,10 @@ void TombRaiderPatcher::applyLocalePatches()
     std::ifstream langStream(langPath);
 
     if (!langStream.good()) {
-        throw std::runtime_error("Can't open translation file '" +
-                                 StringUtils::wideToUtf8(langPath) + "': " +
-                                 ErrorUtils::getSystemErrorString());
+        throw std::runtime_error(
+            StringUtils::format("Can't open translation file '%s': %s", 1024,
+                StringUtils::wideToUtf8(langPath),
+                ErrorUtils::getSystemErrorString()));
     }
 
     static std::map<int32_t, std::string> stringMap;
@@ -610,7 +611,8 @@ void TombRaiderPatcher::applyLocalePatches()
             int32_t stringIndex = std::stoi(line.substr(0, 4));
             stringMap[stringIndex] = line.substr(5, std::string::npos);
         } catch (...) {
-            throw std::runtime_error("Invalid string index at line " + lineNum);
+            throw std::runtime_error(StringUtils::format(
+                "Invalid string index at line %d", 1024, lineNum));
         }
     }
 
@@ -619,9 +621,10 @@ void TombRaiderPatcher::applyLocalePatches()
     std::ifstream stringsStream(stringsPath);
 
     if (!stringsStream.good()) {
-        throw std::runtime_error("Can't open translation strings file '" +
-                                 StringUtils::wideToUtf8(stringsPath) + "': " +
-                                 ErrorUtils::getSystemErrorString());
+        throw std::runtime_error(
+            StringUtils::format("Can't open translation strings file '%s': %s",
+                1024, StringUtils::wideToUtf8(stringsPath),
+                ErrorUtils::getSystemErrorString()));
     }
 
     RuntimeData expected;
