@@ -1,37 +1,49 @@
 #include "StringUtils.hpp"
 
-#include <codecvt>
-#include <iomanip>
-#include <locale>
 #include <sstream>
+#include <algorithm>
+#include <iomanip>
+#include <codecvt>
 
 namespace glrage {
 
-void StringUtils::format(
-    std::string& str, const std::string& fmt, const int maxlen, ...)
+void StringUtils::format(std::string& str, std::string fmt, ...)
 {
     va_list vl;
-    va_start(vl, maxlen);
-    formatImpl(str, fmt, maxlen, vl);
+
+    va_start(vl, fmt);
+    formatResize(str, fmt, vl);
+    va_end(vl);
+
+    va_start(vl, fmt);
+    formatImpl(str, fmt, vl);
     va_end(vl);
 }
 
-std::string StringUtils::format(const std::string& fmt, const int maxlen, ...)
+std::string StringUtils::format(std::string fmt, ...)
 {
     std::string result;
     va_list vl;
-    va_start(vl, maxlen);
-    formatImpl(result, fmt, maxlen, vl);
+
+    va_start(vl, fmt);
+    formatResize(result, fmt, vl);
     va_end(vl);
+
+    va_start(vl, fmt);
+    formatImpl(result, fmt, vl);
+    va_end(vl);
+
     return result;
 }
 
-void StringUtils::formatImpl(
-    std::string& str, const std::string& fmt, const int maxlen, va_list& vl)
+void StringUtils::formatResize(std::string& str, std::string& fmt, va_list& vl)
 {
-    str.resize(maxlen);
-    int len = vsnprintf_s(&str[0], maxlen, _TRUNCATE, fmt.c_str(), vl);
-    str.resize(len);
+    str.resize((std::min)(_scprintf(fmt.c_str(), vl), 0x4000));
+}
+
+void StringUtils::formatImpl(std::string& str, std::string& fmt, va_list& vl)
+{
+    vsnprintf_s(&str[0], str.capacity(), str.capacity(), fmt.c_str(), vl);
 }
 
 std::string StringUtils::bytesToHex(const std::vector<uint8_t>& data)

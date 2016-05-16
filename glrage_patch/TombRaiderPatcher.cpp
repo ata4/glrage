@@ -145,7 +145,7 @@ void TombRaiderPatcher::applyGraphicPatches()
         // set display string (needs to be static so the data won't vanish after
         // patching has finished)
         static std::string displayMode =
-            StringUtils::format("%dx%d", 24, width, height);
+            StringUtils::format("%dx%d", width, height);
 
         m_tmp.clear();
         m_tmp << reinterpret_cast<int32_t>(displayMode.c_str());
@@ -598,7 +598,7 @@ void TombRaiderPatcher::applyLocalePatches()
 
     if (!langStream.good()) {
         throw std::runtime_error(
-            StringUtils::format("Can't open translation file '%s': %s", 1024,
+            StringUtils::format("Can't open translation file '%s': %s",
                 StringUtils::wideToUtf8(langPath),
                 ErrorUtils::getSystemErrorString()));
     }
@@ -612,7 +612,7 @@ void TombRaiderPatcher::applyLocalePatches()
             stringMap[stringIndex] = line.substr(5, std::string::npos);
         } catch (...) {
             throw std::runtime_error(StringUtils::format(
-                "Invalid string index at line %d", 1024, lineNum));
+                "Invalid string index at line %d", lineNum));
         }
     }
 
@@ -623,7 +623,7 @@ void TombRaiderPatcher::applyLocalePatches()
     if (!stringsStream.good()) {
         throw std::runtime_error(
             StringUtils::format("Can't open translation strings file '%s': %s",
-                1024, StringUtils::wideToUtf8(stringsPath),
+                StringUtils::wideToUtf8(stringsPath),
                 ErrorUtils::getSystemErrorString()));
     }
 
