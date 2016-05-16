@@ -38,7 +38,7 @@ std::string StringUtils::format(std::string fmt, ...)
 
 void StringUtils::formatResize(std::string& str, std::string& fmt, va_list& vl)
 {
-    str.resize((std::min)(_scprintf(fmt.c_str(), vl), 0x4000));
+    str.resize((std::min)(_vscprintf(fmt.c_str(), vl), 0x4000));
 }
 
 void StringUtils::formatImpl(std::string& str, std::string& fmt, va_list& vl)
