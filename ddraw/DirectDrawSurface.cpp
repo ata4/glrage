@@ -187,9 +187,9 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
             std::vector<uint8_t> buffer;
 
             gl::Screenshot::capture(buffer, width, height, depth, GL_BGRA,
-                GL_UNSIGNED_SHORT_1_5_5_5_REV, true);
+                GL_UNSIGNED_SHORT_1_5_5_5_REV);
 
-            Blitter::Rect srcRect{0, 0, width, height};
+            Blitter::Rect srcRect{0, height, width, 0};
 
             Blitter::Image srcImg{width, height, depth, buffer};
             Blitter::Image dstImg{dstWidth, dstHeight, depth, m_buffer};

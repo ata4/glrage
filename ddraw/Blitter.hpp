@@ -16,12 +16,12 @@ public:
 
         int32_t width()
         {
-            return right - left;
+            return std::abs(right - left);
         }
 
         int32_t height()
         {
-            return bottom - top;
+            return std::abs(bottom - top);
         }
 
         bool operator==(const Rect& r)
