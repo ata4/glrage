@@ -689,9 +689,7 @@ HRESULT WINAPI DirectDrawSurface::PageUnlock(DWORD dwFlags)
 void DirectDrawSurface::clear(int32_t color)
 {
     if (m_desc.ddpfPixelFormat.dwRGBBitCount == 8 || color == 0) {
-        // clear() may be called frequently on potentially large buffers, so use
-        // memset instead of std::fill
-        memset(&m_buffer[0], color & 0xff, m_buffer.size());
+        std::fill(m_buffer.begin(), m_buffer.end(), color & 0xff);
     } else if (m_desc.ddpfPixelFormat.dwRGBBitCount % 8 == 0) {
         int32_t i = 0;
         std::generate(m_buffer.begin(), m_buffer.end(), [this, &i, &color]() {
