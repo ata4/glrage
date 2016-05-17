@@ -77,7 +77,7 @@ void ContextImpl::init()
             "Can't create OpenGL context", ErrorUtils::getWindowsErrorString());
     }
 
-    //glClearColor(0, 0, 0, 0);
+    glClearColor(0, 0, 0, 0);
     glClearDepth(1);
 
     if (m_config.getBool("vsync", true)) {
