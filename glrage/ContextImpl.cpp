@@ -167,11 +167,9 @@ ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg) {
         // Printscreen on Windows with OpenGL doesn't work in fullscreen, so
-        // hook the
-        // key and implement screenshot saving to files.
+        // hook the key and implement screenshot saving to files.
         // For some reason, VK_SNAPSHOT doesn't generate WM_KEYDOWN events but
-        // only
-        // WM_KEYUP. Works just as well, though.
+        // only WM_KEYUP. Works just as well, though.
         case WM_KEYUP:
             if (wParam == VK_SNAPSHOT) {
                 m_screenshot.schedule(true);
@@ -189,8 +187,7 @@ ContextImpl::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             break;
 
         // force default handling for some window messages when in windowed
-        // mode,
-        // especially important for Tomb Raider
+        // mode, especially important for Tomb Raider
         case WM_MOVE:
         case WM_MOVING:
         case WM_SIZE:
