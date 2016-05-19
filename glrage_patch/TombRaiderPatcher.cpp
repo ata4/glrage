@@ -301,6 +301,10 @@ void TombRaiderPatcher::applyGraphicPatches()
     //    // if the frame rate isn't exactly at limit all the time
     //    patch(m_ub ? 0x408ABA : 0x408AAD, "83 E1 1F", "33 C9 90");
     //}
+
+    // Disables time synchronization, so the game runs as fast as possible.
+    // Might be useful for benchmarks and movie rendering.
+    //patch(m_ub ? 0x437565 : 0x437AD5, "FF 15 D0 A3 6E 00", "B8 02 00 00 00 C3");
 }
 
 void TombRaiderPatcher::applySoundPatches()
