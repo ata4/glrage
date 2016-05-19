@@ -291,6 +291,8 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC,
         stateDataStr.c_str());
 #endif
 
+    renderer->changeState();
+
     try {
         switch (eRStateID) {
             case C3D_ERS_FG_CLR:

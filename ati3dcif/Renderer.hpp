@@ -84,6 +84,7 @@ public:
         C3D_HTXPAL, C3D_UINT32, C3D_UINT32, C3D_PPALETTENTRY);
     void renderPrimStrip(C3D_VSTRIP, C3D_UINT32);
     void renderPrimList(C3D_VLIST, C3D_UINT32);
+    void changeState();
 
     // state functions start
     void fogColor(C3D_COLOR color);

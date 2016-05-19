@@ -23,19 +23,25 @@ VertexStream::VertexStream()
     gl::Utils::checkError(__FUNCTION__);
 }
 
-void VertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
+void VertexStream::addPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
 {
+    // note: strips are converted to lists, since they can't be properly batched
+    // otherwise
     switch (m_vertexType) {
         case C3D_EV_VTCF: {
-            // bind vertex format
-            m_vtcFormat.bind();
-
-            // resize vertex buffer if required
-            reserve(numVert, sizeof(C3D_VTCF));
-
-            // copy vertices dírectly to vertex buffer
             C3D_VTCF* vStripVtcf = reinterpret_cast<C3D_VTCF*>(vertStrip);
-            m_vertexBuffer.subData(0, sizeof(C3D_VTCF) * numVert, vStripVtcf);
+
+            if (m_primType == C3D_EPRIM_QUAD) {
+                // TODO: triangulate quads
+            } else {
+                for (C3D_UINT32 i = 0; i < numVert; i++) {
+                    if (i > 2) {
+                        m_vtcBuffer.push_back(vStripVtcf[i - 2]);
+                        m_vtcBuffer.push_back(vStripVtcf[i - 1]);
+                    }
+                    m_vtcBuffer.push_back(vStripVtcf[i]);
+                }
+            }
 
             break;
         }
@@ -45,23 +51,15 @@ void VertexStream::renderPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
                                std::string(C3D_EVERTEX_NAMES[m_vertexType]),
                 C3D_EC_NOTIMPYET);
     }
-
-    glDrawArrays(GLCIF_PRIMSTRIP_MODES[m_primType], 0, numVert);
-
-    gl::Utils::checkError(__FUNCTION__);
 }
 
-void VertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
+void VertexStream::addPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
 {
     switch (m_vertexType) {
         case C3D_EV_VTCF: {
-            // bind vertex format
-            m_vtcFormat.bind();
-
             // copy vertices to vertex vector buffer, then to the vertex buffer
             // (OpenGL can't handle arrays of pointers)
             C3D_VTCF** vListVtcf = reinterpret_cast<C3D_VTCF**>(vertList);
-            m_vtcBuffer.clear();
 
             if (m_primType == C3D_EPRIM_QUAD) {
                 // triangulate quads
@@ -74,22 +72,12 @@ void VertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
                     m_vtcBuffer.push_back(*vListVtcf[i + 2]);
                     m_vtcBuffer.push_back(*vListVtcf[i + 3]);
                 }
-
-                numVert = m_vtcBuffer.size();
             } else {
                 // direct copy
                 for (C3D_UINT32 i = 0; i < numVert; i++) {
                     m_vtcBuffer.push_back(*vListVtcf[i]);
                 }
             }
-
-            // resize vertex buffer if required
-            reserve(numVert, sizeof(C3D_VTCF));
-
-            // upload vertex buffer
-            m_vertexBuffer.subData(
-                0, sizeof(C3D_VTCF) * numVert, &m_vtcBuffer[0]);
-
             break;
         }
 
@@ -98,9 +86,37 @@ void VertexStream::renderPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
                                std::string(C3D_EVERTEX_NAMES[m_vertexType]),
                 C3D_EC_NOTIMPYET);
     }
+}
 
-    glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, numVert);
+void VertexStream::renderPending()
+{
+    // only render if there's something to render
+    if (m_vtcBuffer.empty()) {
+        return;
+    }
 
+    // bind vertex format
+    m_vtcFormat.bind();
+
+    // resize GPU buffer if required
+    size_t vertexBufferSize = sizeof(C3D_VTCF) * m_vtcBuffer.size();
+    if (vertexBufferSize > m_vertexBufferSize) {
+        LOG_INFO("Vertex buffer resize: %d -> %d", m_vertexBufferSize,
+            vertexBufferSize);
+        m_vertexBuffer.data(vertexBufferSize, nullptr, GL_STREAM_DRAW);
+        m_vertexBufferSize = vertexBufferSize;
+    }
+
+    // upload vertices
+    m_vertexBuffer.subData(0, vertexBufferSize, &m_vtcBuffer[0]);
+
+    // draw vertices
+    glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, m_vtcBuffer.size());
+
+    // mark buffer as empty
+    m_vtcBuffer.clear();
+
+    // check for errors
     gl::Utils::checkError(__FUNCTION__);
 }
 
@@ -124,17 +140,6 @@ void VertexStream::primType(C3D_EPRIM primType)
 void VertexStream::vertexType(C3D_EVERTEX vertexType)
 {
     m_vertexType = vertexType;
-}
-
-void VertexStream::reserve(C3D_UINT32 numVert, size_t vertSize)
-{
-    size_t vertexBufferSize = vertSize * numVert;
-    if (vertexBufferSize > m_vertexBufferSize) {
-        LOG_INFO("Vertex buffer resize: %d -> %d", m_vertexBufferSize,
-            vertexBufferSize);
-        m_vertexBuffer.data(vertexBufferSize, nullptr, GL_STREAM_DRAW);
-        m_vertexBufferSize = vertexBufferSize;
-    }
 }
 
 void VertexStream::bind()

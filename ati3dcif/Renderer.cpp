@@ -79,6 +79,8 @@ void Renderer::renderBegin(C3D_HRC hRC)
 
 void Renderer::renderEnd()
 {
+    m_vertexStream.renderPending();
+
     // restore polygon mode
     if (m_wireframe) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -157,12 +159,17 @@ void Renderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate,
 
 void Renderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert)
 {
-    m_vertexStream.renderPrimStrip(vStrip, u32NumVert);
+    m_vertexStream.addPrimStrip(vStrip, u32NumVert);
 }
 
 void Renderer::renderPrimList(C3D_VLIST vList, C3D_UINT32 u32NumVert)
 {
-    m_vertexStream.renderPrimList(vList, u32NumVert);
+    m_vertexStream.addPrimList(vList, u32NumVert);
+}
+
+void Renderer::changeState()
+{
+    m_vertexStream.renderPending();
 }
 
 void Renderer::fogColor(C3D_COLOR color)
