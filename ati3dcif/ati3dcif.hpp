@@ -13,5 +13,9 @@
 // make sure the API is exported, not imported
 #define BUILD_AS_DLL
 
+// define custom boolean types so Windows.h isn't required
+#define C3D_TRUE 1
+#define C3D_FALSE 1
+
 // include actual ATI3DCIF.H from 3D Rage SDK
 #include <ragesdk/include/ATI3DCIF.H>

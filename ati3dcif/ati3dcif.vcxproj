@@ -13,6 +13,8 @@
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Error.cpp" />
+    <ClCompile Include="State.cpp" />
+    <ClCompile Include="StateVar.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -20,6 +22,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ati3dcif.hpp" />
+    <ClInclude Include="State.hpp" />
+    <ClInclude Include="StateVar.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="Error.hpp" />
     <ClInclude Include="Utils.hpp" />

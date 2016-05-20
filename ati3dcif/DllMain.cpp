@@ -8,12 +8,13 @@
 #include <glrage_util/Logger.hpp>
 
 #include <stdexcept>
+#include <memory>
 
 namespace glrage {
 namespace cif {
 
 static Context& context = GLRage::getContext();
-static Renderer* renderer = nullptr;
+static std::unique_ptr<Renderer> renderer;
 static bool contextCreated = false;
 
 C3D_EC
@@ -61,7 +62,7 @@ EXPORT(ATI3DCIF_Init, C3D_EC, (void))
     }
 
     try {
-        renderer = new Renderer();
+        renderer = std::make_unique<Renderer>();
     } catch (...) {
         return HandleException();
     }
@@ -75,8 +76,7 @@ EXPORT(ATI3DCIF_Term, C3D_EC, (void))
 
     try {
         if (renderer) {
-            delete renderer;
-            renderer = nullptr;
+            renderer.release();
         }
     } catch (...) {
         return HandleException();
@@ -100,10 +100,11 @@ EXPORT(ATI3DCIF_GetInfo, C3D_EC, (PC3D_3DCIFINFO p3DCIFInfo))
     }
 
     // values from an ATI Xpert 98 with a 3D Rage Pro AGP 2x
-    p3DCIFInfo->u32FrameBuffBase =
-        0; // Host pointer to frame buffer base (TODO: allocate memory?)
-    p3DCIFInfo->u32OffScreenHeap =
-        0; // Host pointer to offscreen heap (TODO: allocate memory?)
+
+    // Host pointer to frame buffer base (TODO: allocate memory?)
+    p3DCIFInfo->u32FrameBuffBase = 0;
+    // Host pointer to offscreen heap (TODO: allocate memory?)
+    p3DCIFInfo->u32OffScreenHeap = 0; 
     p3DCIFInfo->u32OffScreenSize = 0x4fe800; // Size of offscreen heap
     p3DCIFInfo->u32TotalRAM = 8 << 20;       // Total amount of RAM on the card
     p3DCIFInfo->u32ASICID = 0x409;           // ASIC Id. code
@@ -213,53 +214,6 @@ EXPORT(ATI3DCIF_ContextCreate, C3D_HRC, (void))
         return nullptr;
     }
 
-    try {
-        // new context, set default states
-        C3D_COLOR black = {0};
-        C3D_RECT rect = {0};
-
-        renderer->fogColor(black);
-        renderer->vertexType(C3D_EV_VTCF);
-        renderer->primType(C3D_EPRIM_TRI);
-        renderer->solidColor(black);
-        renderer->shadeMode(C3D_ESH_SMOOTH);
-        renderer->tmapEnable(FALSE);
-        renderer->tmapSelect(nullptr);
-        renderer->tmapLight(C3D_ETL_NONE);
-        renderer->tmapPerspCor(C3D_ETPC_THREE);
-        renderer->tmapFilter(C3D_ETFILT_MINPNT_MAG2BY2);
-        renderer->tmapTexOp(C3D_ETEXOP_NONE);
-        renderer->alphaSrc(C3D_EASRC_ONE);
-        renderer->alphaDst(C3D_EADST_ZERO);
-        renderer->surfDrawPtr(nullptr);
-        renderer->surfDrawPitch(0);
-        renderer->surfDrawPixelFormat(C3D_EPF_RGB8888);
-        renderer->surfVport(rect);
-        renderer->fogEnable(FALSE);
-        renderer->ditherEnable(TRUE);
-        renderer->zCmpFunc(C3D_EZCMP_ALWAYS);
-        renderer->zMode(C3D_EZMODE_OFF);
-        renderer->surfZPtr(nullptr);
-        renderer->surfZPitch(0);
-        renderer->surfScissor(rect);
-        renderer->compositeEnable(FALSE);
-        renderer->compositeSelect(nullptr);
-        renderer->compositeFunc(C3D_ETEXCOMPFCN_MAX);
-        renderer->compositeFactor(8);
-        renderer->compositeFilter(C3D_ETFILT_MIN2BY2_MAG2BY2);
-        renderer->compositeFactorAlphaEnable(FALSE);
-        renderer->lodBiasLevel(0);
-        renderer->alphaDstTestEnable(FALSE);
-        renderer->alphaDstTestFunc(C3D_EACMP_ALWAYS);
-        renderer->alphaDstWriteSelect(C3D_EASEL_ZERO);
-        renderer->alphaDstReference(0);
-        renderer->specularEnable(FALSE);
-        renderer->enhancedColorRangeEnable(FALSE);
-    } catch (...) {
-        HandleException();
-        return nullptr;
-    }
-
     contextCreated = true;
 
     // According to ATI3DCIF.H, "only one context may be exist at a time",
@@ -291,134 +245,8 @@ EXPORT(ATI3DCIF_ContextSetState, C3D_EC,
         stateDataStr.c_str());
 #endif
 
-    renderer->changeState();
-
     try {
-        switch (eRStateID) {
-            case C3D_ERS_FG_CLR:
-                renderer->fogColor(*static_cast<C3D_PCOLOR>(pRStateData));
-                break;
-            case C3D_ERS_VERTEX_TYPE:
-                renderer->vertexType(*static_cast<C3D_PEVERTEX>(pRStateData));
-                break;
-            case C3D_ERS_PRIM_TYPE:
-                renderer->primType(*static_cast<C3D_PEPRIM>(pRStateData));
-                break;
-            case C3D_ERS_SOLID_CLR:
-                renderer->solidColor(*static_cast<C3D_PCOLOR>(pRStateData));
-                break;
-            case C3D_ERS_SHADE_MODE:
-                renderer->shadeMode(*static_cast<C3D_PESHADE>(pRStateData));
-                break;
-            case C3D_ERS_TMAP_EN:
-                renderer->tmapEnable(*static_cast<C3D_PBOOL>(pRStateData));
-                break;
-            case C3D_ERS_TMAP_SELECT:
-                renderer->tmapSelect(*static_cast<C3D_PHTX>(pRStateData));
-                break;
-            case C3D_ERS_TMAP_LIGHT:
-                renderer->tmapLight(*static_cast<C3D_PETLIGHT>(pRStateData));
-                break;
-            case C3D_ERS_TMAP_PERSP_COR:
-                renderer->tmapPerspCor(
-                    *static_cast<C3D_PETPERSPCOR>(pRStateData));
-                break;
-            case C3D_ERS_TMAP_FILTER:
-                renderer->tmapFilter(
-                    *static_cast<C3D_PETEXFILTER>(pRStateData));
-                break;
-            case C3D_ERS_TMAP_TEXOP:
-                renderer->tmapTexOp(*static_cast<C3D_PETEXOP>(pRStateData));
-                break;
-            case C3D_ERS_ALPHA_SRC:
-                renderer->alphaSrc(*static_cast<C3D_PEASRC>(pRStateData));
-                break;
-            case C3D_ERS_ALPHA_DST:
-                renderer->alphaDst(*static_cast<C3D_PEADST>(pRStateData));
-                break;
-            case C3D_ERS_SURF_DRAW_PTR:
-                renderer->surfDrawPtr(static_cast<C3D_PVOID>(pRStateData));
-                break;
-            case C3D_ERS_SURF_DRAW_PITCH:
-                renderer->surfDrawPitch(*static_cast<C3D_PUINT32>(pRStateData));
-                break;
-            case C3D_ERS_SURF_DRAW_PF:
-                renderer->surfDrawPixelFormat(
-                    *static_cast<C3D_PEPIXFMT>(pRStateData));
-                break;
-            case C3D_ERS_SURF_VPORT:
-                renderer->surfVport(*static_cast<C3D_PRECT>(pRStateData));
-                break;
-            case C3D_ERS_FOG_EN:
-                renderer->fogEnable(*static_cast<C3D_PBOOL>(pRStateData));
-                break;
-            case C3D_ERS_DITHER_EN:
-                renderer->ditherEnable(*static_cast<C3D_PBOOL>(pRStateData));
-                break;
-            case C3D_ERS_Z_CMP_FNC:
-                renderer->zCmpFunc(*static_cast<C3D_PEZCMP>(pRStateData));
-                break;
-            case C3D_ERS_Z_MODE:
-                renderer->zMode(*static_cast<C3D_PEZMODE>(pRStateData));
-                break;
-            case C3D_ERS_SURF_Z_PTR:
-                renderer->surfZPtr(static_cast<C3D_PVOID>(pRStateData));
-                break;
-            case C3D_ERS_SURF_Z_PITCH:
-                renderer->surfZPitch(*static_cast<C3D_PUINT32>(pRStateData));
-                break;
-            case C3D_ERS_SURF_SCISSOR:
-                renderer->surfScissor(*static_cast<C3D_PRECT>(pRStateData));
-                break;
-            case C3D_ERS_COMPOSITE_EN:
-                renderer->compositeEnable(*static_cast<C3D_PBOOL>(pRStateData));
-                break;
-            case C3D_ERS_COMPOSITE_SELECT:
-                renderer->compositeSelect(*static_cast<C3D_PHTX>(pRStateData));
-                break;
-            case C3D_ERS_COMPOSITE_FNC:
-                renderer->compositeFunc(
-                    *static_cast<C3D_PETEXCOMPFCN>(pRStateData));
-                break;
-            case C3D_ERS_COMPOSITE_FACTOR:
-                renderer->compositeFactor(
-                    *static_cast<C3D_PUINT32>(pRStateData));
-                break;
-            case C3D_ERS_COMPOSITE_FILTER:
-                renderer->compositeFilter(
-                    *static_cast<C3D_PETEXFILTER>(pRStateData));
-                break;
-            case C3D_ERS_COMPOSITE_FACTOR_ALPHA:
-                renderer->compositeFactorAlphaEnable(
-                    *static_cast<C3D_PBOOL>(pRStateData));
-                break;
-            case C3D_ERS_LOD_BIAS_LEVEL:
-                renderer->lodBiasLevel(*static_cast<C3D_PUINT32>(pRStateData));
-                break;
-            case C3D_ERS_ALPHA_DST_TEST_ENABLE:
-                renderer->alphaDstTestEnable(
-                    *static_cast<C3D_PBOOL>(pRStateData));
-                break;
-            case C3D_ERS_ALPHA_DST_TEST_FNC:
-                renderer->alphaDstTestFunc(
-                    *static_cast<C3D_PEACMP>(pRStateData));
-                break;
-            case C3D_ERS_ALPHA_DST_WRITE_SELECT:
-                renderer->alphaDstWriteSelect(
-                    *static_cast<C3D_PEASEL>(pRStateData));
-                break;
-            case C3D_ERS_ALPHA_DST_REFERENCE:
-                renderer->alphaDstReference(
-                    *static_cast<C3D_PUINT32>(pRStateData));
-                break;
-            case C3D_ERS_SPECULAR_EN:
-                renderer->specularEnable(*static_cast<C3D_PBOOL>(pRStateData));
-                break;
-            case C3D_ERS_ENHANCED_COLOR_RANGE_EN:
-                renderer->enhancedColorRangeEnable(
-                    *static_cast<C3D_PBOOL>(pRStateData));
-                break;
-        }
+        renderer->setState(eRStateID, pRStateData);
     } catch (...) {
         return HandleException();
     }
@@ -494,7 +322,8 @@ EXPORT(ATI3DCIF_RenderPrimMesh, C3D_EC,
 {
     LOG_TRACE("0x%p, %d", vMesh, u32NumIndicies);
 
-    return C3D_EC_OK;
+    // TODO
+    return C3D_EC_NOTIMPYET;
 }
 
 } // extern "C"

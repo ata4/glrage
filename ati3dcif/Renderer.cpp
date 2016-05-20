@@ -8,14 +8,31 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/mat4x4.hpp>
 
-// Disable VC "new behavior" warning regarding the array initializer
-#pragma warning(disable : 4351)
-
 namespace glrage {
 namespace cif {
 
+using std::placeholders::_1;
+
 Renderer::Renderer()
 {
+    // register state observers
+    // clang-format off
+    m_state.registerObserver([&](StateVar::Value& v) { m_vertexStream.renderPending(); });
+    m_state.registerObserver(std::bind(&Renderer::vertexType, this, _1), C3D_ERS_VERTEX_TYPE);
+    m_state.registerObserver(std::bind(&Renderer::primType, this, _1), C3D_ERS_PRIM_TYPE);
+    m_state.registerObserver(std::bind(&Renderer::solidColor, this, _1), C3D_ERS_SOLID_CLR);
+    m_state.registerObserver(std::bind(&Renderer::shadeMode, this, _1), C3D_ERS_SHADE_MODE);
+    m_state.registerObserver(std::bind(&Renderer::tmapEnable, this, _1), C3D_ERS_TMAP_EN);
+    m_state.registerObserver(std::bind(&Renderer::tmapSelect, this, _1), C3D_ERS_TMAP_SELECT);
+    m_state.registerObserver(std::bind(&Renderer::tmapLight, this, _1), C3D_ERS_TMAP_LIGHT);
+    m_state.registerObserver(std::bind(&Renderer::tmapFilter, this, _1), C3D_ERS_TMAP_FILTER);
+    m_state.registerObserver(std::bind(&Renderer::tmapTexOp, this, _1), C3D_ERS_TMAP_TEXOP);
+    m_state.registerObserver(std::bind(&Renderer::alphaSrc, this, _1), C3D_ERS_ALPHA_SRC);
+    m_state.registerObserver(std::bind(&Renderer::alphaDst, this, _1), C3D_ERS_ALPHA_DST);
+    m_state.registerObserver(std::bind(&Renderer::zCmpFunc, this, _1), C3D_ERS_Z_CMP_FNC);
+    m_state.registerObserver(std::bind(&Renderer::zMode, this, _1), C3D_ERS_Z_MODE);
+    // clang-format on
+
     // bind sampler
     m_sampler.bind(0);
 
@@ -27,8 +44,8 @@ Renderer::Renderer()
 
     // compile and link shaders and configure program
     std::wstring basePath = m_context.getBasePath();
-    m_program.attach(gl::Shader(GL_VERTEX_SHADER)
-                         .fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
+    m_program.attach(gl::Shader(
+        GL_VERTEX_SHADER).fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
     m_program.attach(gl::Shader(GL_FRAGMENT_SHADER)
                          .fromFile(basePath + L"\\shaders\\ati3dcif.fsh"));
     m_program.link();
@@ -45,6 +62,9 @@ Renderer::Renderer()
 
     // cache frequently used config values
     m_wireframe = m_config.getBool("wireframe", false);
+
+    // apply default state
+    resetState();
 
     gl::Utils::checkError(__FUNCTION__);
 }
@@ -64,7 +84,7 @@ void Renderer::renderBegin(C3D_HRC hRC)
     m_sampler.bind(0);
 
     // restore texture binding
-    tmapSelect(m_tmap);
+    tmapSelectImpl(m_state.get(C3D_ERS_TMAP_SELECT).htx);
 
     // CIF always uses an orthographic view, the application deals with the
     // perspective when required
@@ -110,15 +130,14 @@ void Renderer::textureUnreg(C3D_HTX htxToUnreg)
 {
     // LOG_TRACE("id=%d", id);
 
-    TextureMap::iterator it = m_textures.find(htxToUnreg);
+    auto it = m_textures.find(htxToUnreg);
     if (it == m_textures.end()) {
         throw Error("Invalid texture handle", C3D_EC_BADPARAM);
     }
 
-    // unbind texture if it's current
-    if (htxToUnreg == m_tmap) {
-        glBindTexture(GL_TEXTURE_2D, 0);
-        m_tmap = 0;
+    // unbind texture if currently bound
+    if (htxToUnreg == m_state.get(C3D_ERS_TMAP_SELECT).htx) {
+        m_state.set(C3D_ERS_TMAP_SELECT, StateVar::Value{0});
     }
 
     std::shared_ptr<Texture> texture = it->second;
@@ -136,7 +155,7 @@ void Renderer::texturePaletteCreate(
 
         default:
             throw Error("Unsupported palette type: " +
-                               std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]),
+                            std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]),
                 C3D_EC_NOTIMPYET);
     }
 }
@@ -153,8 +172,8 @@ void Renderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate,
     C3D_UINT32 u32StartIndex, C3D_UINT32 u32NumEntries,
     C3D_PPALETTENTRY pclrPalette)
 {
-    throw Error("Renderer::texturePaletteAnimate: Not implemented",
-        C3D_EC_NOTIMPYET);
+    throw Error(
+        "Renderer::texturePaletteAnimate: Not implemented", C3D_EC_NOTIMPYET);
 }
 
 void Renderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert)
@@ -167,39 +186,41 @@ void Renderer::renderPrimList(C3D_VLIST vList, C3D_UINT32 u32NumVert)
     m_vertexStream.addPrimList(vList, u32NumVert);
 }
 
-void Renderer::changeState()
+void Renderer::setState(C3D_ERSID eRStateID, C3D_PRSDATA pRStateData)
 {
-    m_vertexStream.renderPending();
+    m_state.set(eRStateID, pRStateData);
 }
 
-void Renderer::fogColor(C3D_COLOR color)
+void Renderer::resetState()
 {
-    // TODO
+    m_state.reset();
 }
 
-void Renderer::vertexType(C3D_EVERTEX type)
+void Renderer::vertexType(StateVar::Value& value)
 {
-    m_vertexStream.vertexType(type);
+    m_vertexStream.vertexType(value.evertex);
 }
 
-void Renderer::primType(C3D_EPRIM type)
+void Renderer::primType(StateVar::Value& value)
 {
-    m_vertexStream.primType(type);
+    m_vertexStream.primType(value.eprim);
 }
 
-void Renderer::solidColor(C3D_COLOR color)
+void Renderer::solidColor(StateVar::Value& value)
 {
+    C3D_COLOR color = value.color;
     m_program.uniform4f("solidColor", color.r / 255.0f, color.g / 255.0f,
         color.b / 255.0f, color.a / 255.0f);
 }
 
-void Renderer::shadeMode(C3D_ESHADE mode)
+void Renderer::shadeMode(StateVar::Value& value)
 {
-    m_program.uniform1i("shadeMode", mode);
+    m_program.uniform1i("shadeMode", value.eshade);
 }
 
-void Renderer::tmapEnable(C3D_BOOL enable)
+void Renderer::tmapEnable(StateVar::Value& value)
 {
+    C3D_BOOL enable = value.boolean;
     m_program.uniform1i("tmapEn", enable);
     if (enable) {
         glEnable(GL_TEXTURE_2D);
@@ -208,18 +229,21 @@ void Renderer::tmapEnable(C3D_BOOL enable)
     }
 }
 
-void Renderer::tmapSelect(C3D_HTX handle)
+void Renderer::tmapSelect(StateVar::Value& value)
 {
-    m_tmap = handle;
+    tmapSelectImpl(value.htx);
+}
 
+void Renderer::tmapSelectImpl(C3D_HTX handle)
+{
     // unselect texture if handle is zero
-    if (m_tmap == 0) {
+    if (handle == 0) {
         glBindTexture(GL_TEXTURE_2D, 0);
         return;
     }
 
     // check if handle is correct
-    TextureMap::iterator it = m_textures.find(m_tmap);
+    auto it = m_textures.find(handle);
     if (it == m_textures.end()) {
         throw Error("Invalid texture handle", C3D_EC_BADPARAM);
     }
@@ -234,80 +258,50 @@ void Renderer::tmapSelect(C3D_HTX handle)
         "chromaKey", ck.r / 255.0f, ck.g / 255.0f, ck.b / 255.0f);
 }
 
-void Renderer::tmapLight(C3D_ETLIGHT mode)
+void Renderer::tmapLight(StateVar::Value& value)
 {
-    m_program.uniform1i("tmapLight", mode);
+    m_program.uniform1i("tmapLight", value.etlight);
 }
 
-void Renderer::tmapPerspCor(C3D_ETPERSPCOR mode)
+void Renderer::tmapFilter(StateVar::Value& value)
 {
-    // TODO
-}
-
-void Renderer::tmapFilter(C3D_ETEXFILTER filter)
-{
+    C3D_ETEXFILTER filter = value.etexfilter;
     m_sampler.parameteri(
         GL_TEXTURE_MAG_FILTER, GLCIF_TEXTURE_MAG_FILTER[filter]);
     m_sampler.parameteri(
         GL_TEXTURE_MIN_FILTER, GLCIF_TEXTURE_MIN_FILTER[filter]);
 }
 
-void Renderer::tmapTexOp(C3D_ETEXOP op)
+void Renderer::tmapTexOp(StateVar::Value& value)
 {
-    m_program.uniform1i("texOp", op);
+    m_program.uniform1i("texOp", value.etexop);
 }
 
-void Renderer::alphaSrc(C3D_EASRC func)
+void Renderer::alphaSrc(StateVar::Value& value)
 {
-    m_alphaSrc = func;
-    glBlendFunc(GLCIF_BLEND_FUNC[m_alphaSrc], GLCIF_BLEND_FUNC[m_alphaDst]);
+    C3D_EASRC alphaSrc = value.easrc;
+    C3D_EADST alphaDst = m_state.get(C3D_ERS_ALPHA_DST).eadst;
+    glBlendFunc(GLCIF_BLEND_FUNC[alphaSrc], GLCIF_BLEND_FUNC[alphaDst]);
 }
 
-void Renderer::alphaDst(C3D_EADST func)
+void Renderer::alphaDst(StateVar::Value& value)
 {
-    m_alphaDst = func;
-    glBlendFunc(GLCIF_BLEND_FUNC[m_alphaSrc], GLCIF_BLEND_FUNC[m_alphaDst]);
+    C3D_EASRC alphaSrc =  m_state.get(C3D_ERS_ALPHA_SRC).easrc;
+    C3D_EADST alphaDst = value.eadst;
+    glBlendFunc(GLCIF_BLEND_FUNC[alphaSrc], GLCIF_BLEND_FUNC[alphaDst]);
 }
 
-void Renderer::surfDrawPtr(C3D_PVOID ptr)
+void Renderer::zCmpFunc(StateVar::Value& value)
 {
-    // TODO
-}
-
-void Renderer::surfDrawPitch(C3D_UINT32 pitch)
-{
-    // TODO
-}
-
-void Renderer::surfDrawPixelFormat(C3D_EPIXFMT format)
-{
-    // TODO
-}
-
-void Renderer::surfVport(C3D_RECT vport)
-{
-    // TODO
-}
-
-void Renderer::fogEnable(C3D_BOOL enable)
-{
-    // TODO
-}
-
-void Renderer::ditherEnable(C3D_BOOL enable)
-{
-    // TODO
-}
-
-void Renderer::zCmpFunc(C3D_EZCMP func)
-{
+    C3D_EZCMP func = value.ezcmp;
     if (func < C3D_EZCMP_MAX) {
         glDepthFunc(GLCIF_DEPTH_FUNC[func]);
     }
 }
 
-void Renderer::zMode(C3D_EZMODE mode)
+void Renderer::zMode(StateVar::Value& value)
 {
+    C3D_EZMODE mode = value.ezmode;
     glDepthMask(GLCIF_DEPTH_MASK[mode]);
 
     if (mode > C3D_EZMODE_TESTON) {
@@ -315,86 +309,6 @@ void Renderer::zMode(C3D_EZMODE mode)
     } else {
         glDisable(GL_DEPTH_TEST);
     }
-}
-
-void Renderer::surfZPtr(C3D_PVOID ptr)
-{
-    // TODO
-}
-
-void Renderer::surfZPitch(C3D_UINT32 pitch)
-{
-    // TODO
-}
-
-void Renderer::surfScissor(C3D_RECT scissor)
-{
-    // TODO
-}
-
-void Renderer::compositeEnable(C3D_BOOL enable)
-{
-    // TODO
-}
-
-void Renderer::compositeSelect(C3D_HTX select)
-{
-    // TODO
-}
-
-void Renderer::compositeFunc(C3D_ETEXCOMPFCN func)
-{
-    // TODO
-}
-
-void Renderer::compositeFactor(C3D_UINT32 fact)
-{
-    // TODO
-}
-
-void Renderer::compositeFilter(C3D_ETEXFILTER filter)
-{
-    // TODO
-}
-
-void Renderer::compositeFactorAlphaEnable(C3D_BOOL enable)
-{
-    // TODO
-}
-
-void Renderer::lodBiasLevel(C3D_UINT32 level)
-{
-    // TODO
-}
-
-void Renderer::alphaDstTestEnable(C3D_BOOL enable)
-{
-    // TODO
-}
-
-void Renderer::alphaDstTestFunc(C3D_EACMP func)
-{
-    // TODO
-}
-
-void Renderer::alphaDstWriteSelect(C3D_EASEL mode)
-{
-    // TODO
-}
-
-void Renderer::alphaDstReference(C3D_UINT32 ref)
-{
-    // TODO
-}
-
-void Renderer::specularEnable(C3D_BOOL enable)
-{
-    // TODO
-}
-
-void Renderer::enhancedColorRangeEnable(C3D_BOOL enable)
-{
-    // TODO
 }
 
 } // namespace cif
