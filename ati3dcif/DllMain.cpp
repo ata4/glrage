@@ -258,8 +258,6 @@ EXPORT(ATI3DCIF_RenderBegin, C3D_EC, (C3D_HRC hRC))
 {
     LOG_TRACE("0x%p", hRC);
 
-    context.renderBegin();
-
     try {
         renderer->renderBegin(hRC);
     } catch (...) {

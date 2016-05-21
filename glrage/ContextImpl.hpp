@@ -30,7 +30,7 @@ public:
     int32_t getWindowHeight();
     void setupViewport();
     void swapBuffers();
-    void renderBegin();
+    void setRendered();
     bool isRendered();
     HWND getHWnd();
     std::wstring getBasePath();

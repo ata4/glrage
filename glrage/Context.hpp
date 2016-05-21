@@ -30,7 +30,7 @@ public:
     virtual int32_t getWindowHeight() = 0;
     virtual void setupViewport() = 0;
     virtual void swapBuffers() = 0;
-    virtual void renderBegin() = 0;
+    virtual void setRendered() = 0;
     virtual bool isRendered() = 0;
     virtual HWND getHWnd() = 0;
     virtual std::wstring getBasePath() = 0;

@@ -178,11 +178,13 @@ void Renderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate,
 
 void Renderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert)
 {
+    m_context.setRendered();
     m_vertexStream.addPrimStrip(vStrip, u32NumVert);
 }
 
 void Renderer::renderPrimList(C3D_VLIST vList, C3D_UINT32 u32NumVert)
 {
+    m_context.setRendered();
     m_vertexStream.addPrimList(vList, u32NumVert);
 }
 

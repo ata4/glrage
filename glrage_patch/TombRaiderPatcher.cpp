@@ -566,6 +566,17 @@ void TombRaiderPatcher::applyLogicPatches()
         }
     }
 
+    // The Eidos title screen is displayed for one frame only on default.
+    // This patch fixes the function call that normally leads to a stub for some
+    // reason.
+    if (m_ub) {
+        patchAddr(0x437F9E, "E8 2D 1F FF FF", reinterpret_cast<void*>(0x41CC80),
+            0xE8);
+    } else {
+        patchAddr(0x43856E, "E8 BD F9 FF FF", reinterpret_cast<void*>(0x41CD50),
+            0xE8);
+    }
+
     // Random fun patches, discovered from various experiments.
 
     // Crazy/creepy SFX mod. Forces a normally unused raw reading mode on all

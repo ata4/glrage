@@ -396,7 +396,7 @@ void ContextImpl::swapBuffers()
     m_render = false;
 }
 
-void ContextImpl::renderBegin()
+void ContextImpl::setRendered()
 {
     m_render = true;
 }
