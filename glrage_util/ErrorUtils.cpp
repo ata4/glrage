@@ -60,7 +60,7 @@ std::string ErrorUtils::getSystemErrorString()
 {
     static char error[1024];
     strerror_s(error, errno);
-    return std::string(error);
+    return error;
 }
 
 // https://stackoverflow.com/a/17387176: Create a string from the last error

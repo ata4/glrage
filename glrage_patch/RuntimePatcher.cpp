@@ -72,7 +72,7 @@ void RuntimePatcher::getModulePath()
         m_ctx.fileNameW.begin(), ::towlower);
 
     // convert to UTF-8
-    m_ctx.fileName = std::string(StringUtils::wideToUtf8(m_ctx.fileNameW));
+    m_ctx.fileName = StringUtils::wideToUtf8(m_ctx.fileNameW);
 }
 
 void RuntimePatcher::getModuleVersion()
