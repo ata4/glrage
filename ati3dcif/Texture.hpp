@@ -2,6 +2,8 @@
 
 #include "ati3dcif.hpp"
 
+#include <vector>
+
 #include <glrage_gl/Texture.hpp>
 
 namespace glrage {
@@ -12,7 +14,7 @@ class Texture : public gl::Texture
 public:
     Texture();
     ~Texture();
-    void load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette);
+    void load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette);
     C3D_COLOR& chromaKey();
 
 private:

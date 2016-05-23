@@ -20,7 +20,7 @@ Texture::~Texture()
 {
 }
 
-void Texture::load(C3D_PTMAP tmap, C3D_PPALETTENTRY palette)
+void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
 {
     m_chromaKey = tmap->clrTexChromaKey;
 

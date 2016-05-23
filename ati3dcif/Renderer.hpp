@@ -110,7 +110,8 @@ private:
     Config m_config{m_context.getConfigPath(), "ATI3DCIF"};
     bool m_wireframe;
     std::map<C3D_HTX, std::shared_ptr<Texture>> m_textures;
-    C3D_PPALETTENTRY m_palette{nullptr};
+    std::map<C3D_HTXPAL, std::vector<C3D_PALETTENTRY>> m_palettes;
+    int32_t m_paletteID{0};
     gl::Program m_program;
     gl::Sampler m_sampler;
     VertexStream m_vertexStream;

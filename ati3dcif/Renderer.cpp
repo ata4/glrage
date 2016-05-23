@@ -113,9 +113,9 @@ void Renderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
     //    ptmapToReg->eTexFormat, ptmapToReg->u32MaxMapXSizeLg2,
     //    ptmapToReg->u32MaxMapYSizeLg2, ptmapToReg->bMipMap);
 
-    std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+    auto texture = std::make_shared<Texture>();
     texture->bind();
-    texture->load(ptmapToReg, m_palette);
+    texture->load(ptmapToReg, m_palettes[ptmapToReg->htxpalTexPalette]);
 
     // use id as texture handle
     *phtmap = reinterpret_cast<C3D_HTX>(texture->id());
@@ -147,9 +147,13 @@ void Renderer::textureUnreg(C3D_HTX htxToUnreg)
 void Renderer::texturePaletteCreate(
     C3D_ECI_TMAP_TYPE epalette, void* pPalette, C3D_PHTXPAL phtpalCreated)
 {
+    C3D_HTXPAL handle = reinterpret_cast<C3D_HTXPAL>(m_paletteID++);
+
     switch (epalette) {
         case C3D_ECI_TMAP_8BIT: {
-            m_palette = static_cast<C3D_PPALETTENTRY>(pPalette);
+            auto palettePtr = static_cast<C3D_PPALETTENTRY>(pPalette);
+            std::vector<C3D_PALETTENTRY> palette(palettePtr, palettePtr + 256);
+            m_palettes[handle] = palette;
             break;
         }
 
@@ -158,14 +162,13 @@ void Renderer::texturePaletteCreate(
                             std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]),
                 C3D_EC_NOTIMPYET);
     }
+
+    *phtpalCreated = handle;
 }
 
 void Renderer::texturePaletteDestroy(C3D_HTXPAL htxpalToDestroy)
 {
-    if (m_palette) {
-        delete m_palette;
-        m_palette = nullptr;
-    }
+    m_palettes.erase(htxpalToDestroy);
 }
 
 void Renderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate,
