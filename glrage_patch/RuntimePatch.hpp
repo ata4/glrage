@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RuntimeData.hpp"
+#include "Chunk.hpp"
 
 #include <glrage/GameID.hpp>
 #include <glrage_util/Config.hpp>
@@ -31,22 +31,15 @@ public:
     void setContext(ModuleContext& ctx);
 
 protected:
-    bool patch(uint32_t addr, const std::string& expected,
-        const std::string& replacement);
-    bool patch(uint32_t addr, const std::string& expected,
-        const RuntimeData& replacement);
-    bool patch(uint32_t addr, const RuntimeData& expected,
-        const RuntimeData& replacement);
+    bool patch(uint32_t addr, const Chunk& expected,
+        const Chunk& replacement);
 
-    bool patch(uint32_t addr, const std::string& replacement);
-    bool patch(uint32_t addr, const RuntimeData& replacement);
+    bool patch(uint32_t addr, const Chunk& replacement);
 
-    void patchAddr(
-        int32_t addrCall, const std::string& expected, void* func, uint8_t op);
+    void patchAddr(int32_t addr, const Chunk& expected, void* func, uint8_t op);
 
-    bool patchNop(uint32_t addr, const std::string& expected);
+    bool patchNop(uint32_t addr, const Chunk& expected);
 
-    RuntimeData m_tmp;
     ModuleContext m_ctx;
 };
 

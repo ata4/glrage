@@ -77,15 +77,8 @@ void TombRaiderPatcher::applyGraphicPatches()
         float divisor = (1.0f / brightness) * 1024;
         float multi = 0.0625f * brightness;
 
-        m_tmp.clear();
-        m_tmp << divisor;
-
-        patch(0x451034, "00 00 00 45", m_tmp);
-
-        m_tmp.clear();
-        m_tmp << multi;
-
-        patch(0x45103C, "DB F6 FE 3C", m_tmp);
+        patch(0x451034, "00 00 00 45", divisor);
+        patch(0x45103C, "DB F6 FE 3C", multi);
     }
 
     // This patch allows the customization of the water color, which is rather
@@ -96,10 +89,8 @@ void TombRaiderPatcher::applyGraphicPatches()
         float filterGreen =
             m_ctx.config.getFloat("watercolor_filter_green", 1.0f);
 
-        m_tmp.clear();
-        m_tmp << filterRed << filterGreen;
-
-        patch(0x451028, "9A 99 19 3F 33 33 33 3F", m_tmp);
+        Chunk c = Chunk() << filterRed << filterGreen;
+        patch(0x451028, "9A 99 19 3F 33 33 33 3F", c);
     }
 
     // This patch replaces 800x600 with a custom resolution for widescreen
@@ -117,42 +108,31 @@ void TombRaiderPatcher::applyGraphicPatches()
         }
 
         // update display mode and viewport parameters
-        m_tmp.clear();
-        m_tmp << width;
-        patch(m_ub ? 0x407CAA : 0x407C9D, "20 03 00 00", m_tmp);
+        patch(m_ub ? 0x407CAA : 0x407C9D, "20 03 00 00", width);
+        patch(m_ub ? 0x407CB4 : 0x407CA7, "58 02 00 00", height);
 
-        m_tmp.clear();
-        m_tmp << height;
-        patch(m_ub ? 0x407CB4 : 0x407CA7, "58 02 00 00", m_tmp);
-
-        m_tmp.clear();
-        m_tmp << static_cast<float_t>(width - 1);
-        patch(m_ub ? 0x407CBE : 0x407CB1, "00 C0 47 44", m_tmp);
-
-        m_tmp.clear();
-        m_tmp << static_cast<float_t>(height - 1);
-        patch(m_ub ? 0x407CC8 : 0x407CBB, "00 C0 15 44", m_tmp);
+        patch(m_ub ? 0x407CBE : 0x407CB1, "00 C0 47 44",
+            static_cast<float_t>(width - 1));
+        patch(m_ub ? 0x407CC8 : 0x407CBB, "00 C0 15 44",
+            static_cast<float_t>(height - 1));
 
         // update clipping size
-        m_tmp.clear();
-        m_tmp << static_cast<int16_t>(width);
-        patch(m_ub ? 0x408A64 : 0x408A57, "20 03", m_tmp);
-
-        m_tmp.clear();
-        m_tmp << static_cast<int16_t>(height);
-        patch(m_ub ? 0x408A6D : 0x408A60, "58 02", m_tmp);
+        patch(m_ub ? 0x408A64 : 0x408A57, "20 03",
+            static_cast<int16_t>(width));
+        patch(m_ub ? 0x408A6D : 0x408A60, "58 02",
+            static_cast<int16_t>(height));
 
         // set display string (needs to be static so the data won't vanish after
         // patching has finished)
         static std::string displayMode =
             StringUtils::format("%dx%d", width, height);
 
-        m_tmp.clear();
-        m_tmp << reinterpret_cast<int32_t>(displayMode.c_str());
         if (m_ub) {
-            patch(0x42DB5B, "40 61 45 00 ", m_tmp);
+            patch(0x42DB5B, "40 61 45 00 ",
+                reinterpret_cast<int32_t>(displayMode.c_str()));
         } else {
-            patch(0x42DF6B, "58 67 45 00", m_tmp);
+            patch(0x42DF6B, "58 67 45 00",
+                reinterpret_cast<int32_t>(displayMode.c_str()));
         }
 
         // UI scale patch, rescales the in-game overlay to keep the proportions
@@ -192,19 +172,13 @@ void TombRaiderPatcher::applyGraphicPatches()
     // Field of view customization patch.
     if (m_ctx.config.getBool("fov_override", true)) {
         int32_t fov = m_ctx.config.getInt("fov_value", 65);
-
-        int8_t fov8 = static_cast<int8_t>(fov);
-        m_tmp.clear();
-        m_tmp << fov8;
-
-        patch(m_ub ? 0x4163E2 : 0x4164D2, "50", m_tmp);
-
+        int8_t fov8 = fov;
         int16_t fov16 = fov * 182;
-        m_tmp.clear();
-        m_tmp << fov16;
 
-        patch(m_ub ? 0x41AAAA : 0x41AB9A, "E0 38", m_tmp);
-        patch(m_ub ? 0x41E45B : 0x41E7DB, "E0 38", m_tmp);
+        patch(m_ub ? 0x4163E2 : 0x4164D2, "50", fov8);
+
+        patch(m_ub ? 0x41AAAA : 0x41AB9A, "E0 38", fov16);
+        patch(m_ub ? 0x41E45B : 0x41E7DB, "E0 38", fov16);
 
         // change the FOV mode from horizontal to vertical if enabled
         if (m_ctx.config.getBool("fov_vertical", true)) {
@@ -258,13 +232,13 @@ void TombRaiderPatcher::applyGraphicPatches()
             m_ctx.config.getInt("draw_distance_fade", 12288);
         int32_t drawDistMax = m_ctx.config.getInt("draw_distance_max", 20480);
 
-        RuntimeData drawDistFadeData;
+        Chunk drawDistFadeData;
         drawDistFadeData << drawDistFade;
 
-        RuntimeData drawDistFadeNegData;
+        Chunk drawDistFadeNegData;
         drawDistFadeNegData << -drawDistFade;
 
-        RuntimeData drawDistMaxData;
+        Chunk drawDistMaxData;
         drawDistMaxData << drawDistMax;
 
         patch(0x402030, "00 50 00 00", drawDistMaxData);
@@ -475,13 +449,10 @@ void TombRaiderPatcher::applyLogicPatches()
         reinterpret_cast<HHOOK*>(m_ub ? 0x45A314 : 0x45A93C);
 
     // replace keyboard hook
-    m_tmp.clear();
-    m_tmp << reinterpret_cast<int32_t>(TombRaiderHooks::keyboardProc);
-
     if (m_ub) {
-        patch(0x43D518, "C0 D1 43 00", m_tmp);
+        patch(0x43D518, "C0 D1 43 00", &TombRaiderHooks::keyboardProc);
     } else {
-        patch(0x43DC30, "C0 D8 43 00", m_tmp);
+        patch(0x43DC30, "C0 D8 43 00", &TombRaiderHooks::keyboardProc);
     }
 
     // hook keypress subroutine
@@ -642,8 +613,8 @@ void TombRaiderPatcher::applyLocalePatches()
                 ErrorUtils::getSystemErrorString()));
     }
 
-    RuntimeData expected;
-    RuntimeData replacement;
+    Chunk expected;
+    Chunk replacement;
 
     while (std::getline(stringsStream, line)) {
         std::istringstream lineStream(line);
@@ -670,7 +641,7 @@ void TombRaiderPatcher::applyLocalePatches()
                 stringPos = value;
                 expected.clear();
                 expected << stringPos;
-                string = std::string(reinterpret_cast<char*>(stringPos));
+                string = reinterpret_cast<char*>(stringPos);
                 continue;
             }
 

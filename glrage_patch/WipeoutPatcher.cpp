@@ -31,13 +31,10 @@ void WipeoutPatcher::apply()
     // the user.
     // This patch replaces the SystemParametersInfo function with a stub to
     // disable that behavior.
-    m_tmp.clear();
-    m_tmp << hookSystemParametersInfoA;
-
     if (buildDate == build_301096) {
-        patch(0x7E0290, m_tmp);
+        patch(0x7E0290, &hookSystemParametersInfoA);
     } else {
-        patch(0x7D0290, m_tmp);
+        patch(0x7D0290, &hookSystemParametersInfoA);
     }
 
     // Disable bugged alt+tab check that causes a segfault after playing the

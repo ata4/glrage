@@ -16,22 +16,7 @@ void RuntimePatch::setContext(ModuleContext& ctx)
 }
 
 bool RuntimePatch::patch(
-    uint32_t addr, const std::string& expected, const std::string& replacement)
-{
-    RuntimeData expectedData(StringUtils::hexToBytes(expected));
-    RuntimeData replacementData(StringUtils::hexToBytes(replacement));
-    return patch(addr, expectedData, replacementData);
-}
-
-bool RuntimePatch::patch(
-    uint32_t addr, const std::string& expected, const RuntimeData& replacement)
-{
-    RuntimeData expectedData(StringUtils::hexToBytes(expected));
-    return patch(addr, expectedData, replacement);
-}
-
-bool RuntimePatch::patch(
-    uint32_t addr, const RuntimeData& expected, const RuntimeData& replacement)
+    uint32_t addr, const Chunk& expected, const Chunk& replacement)
 {
     bool result = false;
     bool restoreProtect = false;
@@ -95,13 +80,7 @@ end:
     return result;
 }
 
-bool RuntimePatch::patch(uint32_t addr, const std::string& replacement)
-{
-    RuntimeData replacementData(StringUtils::hexToBytes(replacement));
-    return patch(addr, replacementData);
-}
-
-bool RuntimePatch::patch(uint32_t addr, const RuntimeData& replacement)
+bool RuntimePatch::patch(uint32_t addr, const Chunk& replacement)
 {
     bool result = false;
     bool restoreProtect = false;
@@ -144,25 +123,19 @@ end:
 }
 
 void RuntimePatch::patchAddr(
-    int32_t addrCall, const std::string& expected, void* func, uint8_t op)
+    int32_t addr, const Chunk& expected, void* func, uint8_t op)
 {
     int32_t addrFunc = reinterpret_cast<int32_t>(func);
-    int32_t addrCallNew = addrFunc - addrCall - 5;
+    int32_t addrCallNew = addrFunc - addr - 5;
 
-    m_tmp.clear();
-    m_tmp << op << addrCallNew;
-
-    patch(addrCall, expected, m_tmp);
+    patch(addr, expected, Chunk() << op << addrCallNew);
 }
 
-bool RuntimePatch::patchNop(uint32_t addr, const std::string& expected)
+bool RuntimePatch::patchNop(uint32_t addr, const Chunk& expected)
 {
-    RuntimeData expectedData(StringUtils::hexToBytes(expected));
-    std::vector<uint8_t> replacement =
-        std::vector<uint8_t>(expectedData.data());
+    auto replacement = std::vector<uint8_t>(expected.data().size());
     std::fill(replacement.begin(), replacement.end(), 0x90);
-    RuntimeData replacementData(replacement);
-    return patch(addr, expectedData, replacementData);
+    return patch(addr, expected, replacement);
 }
 
 } // namespace glrage

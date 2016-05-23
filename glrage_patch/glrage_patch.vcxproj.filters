@@ -23,9 +23,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RuntimeData.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="RuntimePatch.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -44,11 +41,11 @@
     <ClInclude Include="WipeoutPatcher.hpp">
       <Filter>Source Files\Wipeout</Filter>
     </ClInclude>
+    <ClInclude Include="Chunk.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RuntimeData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RuntimePatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

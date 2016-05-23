@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssaultRigsPatcher.hpp" />
-    <ClInclude Include="RuntimeData.hpp" />
+    <ClInclude Include="Chunk.hpp" />
     <ClInclude Include="RuntimePatch.hpp" />
     <ClInclude Include="RuntimePatcher.hpp" />
     <ClInclude Include="TombRaiderHooks.hpp" />
@@ -21,7 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssaultRigsPatcher.cpp" />
-    <ClCompile Include="RuntimeData.cpp" />
     <ClCompile Include="RuntimePatch.cpp" />
     <ClCompile Include="RuntimePatcher.cpp" />
     <ClCompile Include="TombRaiderHooks.cpp" />

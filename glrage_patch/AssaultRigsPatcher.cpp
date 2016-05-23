@@ -32,9 +32,7 @@ void AssaultRigsPatcher::apply()
             height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
         }
 
-        m_tmp.clear();
-        m_tmp << width << height;
-        patch(0x490234, "80 02 00 00 E0 01 00 00", m_tmp);
+        patch(0x490234, "80 02 00 00 E0 01 00 00", Chunk() << width << height);
 
         // Replace "640 BY 480" in the options with "CUSTOM".
         patch(0x486AC0, "36 34 30 20 42 59 20 34 38 30",
