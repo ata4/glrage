@@ -23,7 +23,7 @@ struct ModuleContext
     VS_FIXEDFILEINFO fileInfo;
 };
 
-class RuntimePatch
+class Patch
 {
 public:
     virtual void apply() = 0;

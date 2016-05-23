@@ -11,21 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AssaultRigsPatcher.hpp" />
+    <ClInclude Include="AssaultRigsPatch.hpp" />
     <ClInclude Include="Chunk.hpp" />
-    <ClInclude Include="RuntimePatch.hpp" />
+    <ClInclude Include="Patch.hpp" />
     <ClInclude Include="RuntimePatcher.hpp" />
     <ClInclude Include="TombRaiderHooks.hpp" />
-    <ClInclude Include="TombRaiderPatcher.hpp" />
-    <ClInclude Include="WipeoutPatcher.hpp" />
+    <ClInclude Include="TombRaiderPatch.hpp" />
+    <ClInclude Include="WipeoutPatch.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AssaultRigsPatcher.cpp" />
-    <ClCompile Include="RuntimePatch.cpp" />
+    <ClCompile Include="AssaultRigsPatch.cpp" />
+    <ClCompile Include="Patch.cpp" />
     <ClCompile Include="RuntimePatcher.cpp" />
     <ClCompile Include="TombRaiderHooks.cpp" />
-    <ClCompile Include="TombRaiderPatcher.cpp" />
-    <ClCompile Include="WipeoutPatcher.cpp" />
+    <ClCompile Include="TombRaiderPatch.cpp" />
+    <ClCompile Include="WipeoutPatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="patches\arigs.ini" />

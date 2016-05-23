@@ -23,45 +23,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RuntimePatch.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="RuntimePatcher.hpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AssaultRigsPatcher.hpp">
-      <Filter>Source Files\Assault Rigs</Filter>
     </ClInclude>
     <ClInclude Include="TombRaiderHooks.hpp">
       <Filter>Source Files\Tomb Raider</Filter>
     </ClInclude>
-    <ClInclude Include="TombRaiderPatcher.hpp">
-      <Filter>Source Files\Tomb Raider</Filter>
-    </ClInclude>
-    <ClInclude Include="WipeoutPatcher.hpp">
-      <Filter>Source Files\Wipeout</Filter>
-    </ClInclude>
     <ClInclude Include="Chunk.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Patch.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssaultRigsPatch.hpp">
+      <Filter>Source Files\Assault Rigs</Filter>
+    </ClInclude>
+    <ClInclude Include="TombRaiderPatch.hpp">
+      <Filter>Source Files\Tomb Raider</Filter>
+    </ClInclude>
+    <ClInclude Include="WipeoutPatch.hpp">
+      <Filter>Source Files\Wipeout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RuntimePatch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RuntimePatcher.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AssaultRigsPatcher.cpp">
-      <Filter>Source Files\Assault Rigs</Filter>
     </ClCompile>
     <ClCompile Include="TombRaiderHooks.cpp">
       <Filter>Source Files\Tomb Raider</Filter>
     </ClCompile>
-    <ClCompile Include="TombRaiderPatcher.cpp">
+    <ClCompile Include="Patch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssaultRigsPatch.cpp">
+      <Filter>Source Files\Assault Rigs</Filter>
+    </ClCompile>
+    <ClCompile Include="TombRaiderPatch.cpp">
       <Filter>Source Files\Tomb Raider</Filter>
     </ClCompile>
-    <ClCompile Include="WipeoutPatcher.cpp">
+    <ClCompile Include="WipeoutPatch.cpp">
       <Filter>Source Files\Wipeout</Filter>
     </ClCompile>
   </ItemGroup>

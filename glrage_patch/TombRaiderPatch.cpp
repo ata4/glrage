@@ -1,4 +1,4 @@
-#include "TombRaiderPatcher.hpp"
+#include "TombRaiderPatch.hpp"
 #include "TombRaiderHooks.hpp"
 
 #include <glrage/GLRage.hpp>
@@ -13,17 +13,17 @@
 
 namespace glrage {
 
-TombRaiderPatcher::TombRaiderPatcher(bool ub)
+TombRaiderPatch::TombRaiderPatch(bool ub)
     : m_ub(ub)
 {
 }
 
-GameID TombRaiderPatcher::gameID()
+GameID TombRaiderPatch::gameID()
 {
     return m_ub ? GameID::TombRaiderGold : GameID::TombRaider;
 }
 
-void TombRaiderPatcher::apply()
+void TombRaiderPatch::apply()
 {
     // mandatory crash patches
     applyCrashPatches();
@@ -34,7 +34,7 @@ void TombRaiderPatcher::apply()
     applyLogicPatches();
 }
 
-void TombRaiderPatcher::applyCrashPatches()
+void TombRaiderPatch::applyCrashPatches()
 {
     // Tomb Raider ATI patch fails on later Windows versions because of a
     // missing return statement in a function.
@@ -66,7 +66,7 @@ void TombRaiderPatcher::applyCrashPatches()
     patch(m_ub ? 0x4390E3 : 0x439793, "33 C0", "90 90");
 }
 
-void TombRaiderPatcher::applyGraphicPatches()
+void TombRaiderPatch::applyGraphicPatches()
 {
     // The ATI version of Tomb Raider converts vertex colors to half of the
     // original brightness, which results in a dim look and turns some areas in
@@ -281,7 +281,7 @@ void TombRaiderPatcher::applyGraphicPatches()
     //patch(m_ub ? 0x437565 : 0x437AD5, "FF 15 D0 A3 6E 00", "B8 02 00 00 00 C3");
 }
 
-void TombRaiderPatcher::applySoundPatches()
+void TombRaiderPatch::applySoundPatches()
 {
     // For reasons unknown, the length of a sound sample is stored in a struct
     // field as a 16 bit integer, which means that the maximum allowed length
@@ -431,7 +431,7 @@ void TombRaiderPatcher::applySoundPatches()
     }
 }
 
-void TombRaiderPatcher::applyLogicPatches()
+void TombRaiderPatch::applyLogicPatches()
 {
     // This changes the first drive letter to search for the Tomb Raider CD from
     // 'C' to 'A', which allows the game to find CDs placed in the drives A: or
@@ -570,7 +570,7 @@ void TombRaiderPatcher::applyLogicPatches()
     // patch(0x416E17, "85 0C 00", "65 18 01");
 }
 
-void TombRaiderPatcher::applyLocalePatches()
+void TombRaiderPatch::applyLocalePatches()
 {
     std::wstring basePath = GLRage::getContext().getBasePath();
     std::wstring localePath = basePath + L"\\patches\\locale\\";

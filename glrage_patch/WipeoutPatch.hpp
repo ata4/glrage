@@ -1,12 +1,12 @@
 #pragma once
 
-#include "RuntimePatch.hpp"
+#include "Patch.hpp"
 
 #include <Windows.h>
 
 namespace glrage {
 
-class WipeoutPatcher : public RuntimePatch
+class WipeoutPatch : public Patch
 {
 public:
     virtual GameID gameID();

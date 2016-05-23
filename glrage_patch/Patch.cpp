@@ -1,21 +1,21 @@
-#include "RuntimePatch.hpp"
+#include "Patch.hpp"
 
 #include <glrage_util/Logger.hpp>
 #include <glrage_util/StringUtils.hpp>
 
 namespace glrage {
 
-GameID RuntimePatch::gameID()
+GameID Patch::gameID()
 {
     return GameID::Unknown;
 }
 
-void RuntimePatch::setContext(ModuleContext& ctx)
+void Patch::setContext(ModuleContext& ctx)
 {
     m_ctx = ctx;
 }
 
-bool RuntimePatch::patch(
+bool Patch::patch(
     uint32_t addr, const Chunk& expected, const Chunk& replacement)
 {
     bool result = false;
@@ -80,7 +80,7 @@ end:
     return result;
 }
 
-bool RuntimePatch::patch(uint32_t addr, const Chunk& replacement)
+bool Patch::patch(uint32_t addr, const Chunk& replacement)
 {
     bool result = false;
     bool restoreProtect = false;
@@ -122,7 +122,7 @@ end:
     return result;
 }
 
-void RuntimePatch::patchAddr(
+void Patch::patchAddr(
     int32_t addr, const Chunk& expected, void* func, uint8_t op)
 {
     int32_t addrFunc = reinterpret_cast<int32_t>(func);
@@ -131,7 +131,7 @@ void RuntimePatch::patchAddr(
     patch(addr, expected, Chunk() << op << addrCallNew);
 }
 
-bool RuntimePatch::patchNop(uint32_t addr, const Chunk& expected)
+bool Patch::patchNop(uint32_t addr, const Chunk& expected)
 {
     auto replacement = std::vector<uint8_t>(expected.data().size());
     std::fill(replacement.begin(), replacement.end(), 0x90);

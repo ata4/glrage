@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RuntimePatch.hpp"
+#include "Patch.hpp"
 
 namespace glrage {
 
-class AssaultRigsPatcher : public RuntimePatch
+class AssaultRigsPatch : public Patch
 {
 public:
     virtual GameID gameID();

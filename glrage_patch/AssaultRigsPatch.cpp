@@ -1,4 +1,4 @@
-#include "AssaultRigsPatcher.hpp"
+#include "AssaultRigsPatch.hpp"
 
 #include <glrage_util/Config.hpp>
 
@@ -6,12 +6,12 @@
 
 namespace glrage {
 
-GameID AssaultRigsPatcher::gameID()
+GameID AssaultRigsPatch::gameID()
 {
     return GameID::AssaultRigs;
 }
 
-void AssaultRigsPatcher::apply()
+void AssaultRigsPatch::apply()
 {
     // Fix "Insufficient memory" error on systems with more than 4 GB RAM where
     // GlobalMemoryStatus returns -1 (unless compatibility mode is activated,

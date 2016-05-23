@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RuntimePatch.hpp"
+#include "Patch.hpp"
 #include "RuntimePatcher.hpp"
 
 #include <string>

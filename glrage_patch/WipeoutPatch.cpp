@@ -1,4 +1,4 @@
-#include "WipeoutPatcher.hpp"
+#include "WipeoutPatch.hpp"
 
 #include <glrage_util/Config.hpp>
 #include <glrage_util/Logger.hpp>
@@ -9,12 +9,12 @@ static const int64_t build_301096 = 840143410;
 static const int64_t build_220796 = 837628019;
 static const int64_t build_070796 = 836749807;
 
-GameID WipeoutPatcher::gameID()
+GameID WipeoutPatch::gameID()
 {
     return GameID::Wipeout;
 }
 
-void WipeoutPatcher::apply()
+void WipeoutPatch::apply()
 {
     // There are currently three known builds, which require different patches
     int64_t buildDate = static_cast<int64_t>(m_ctx.fileInfo.dwFileDateMS) << 32;
@@ -84,7 +84,7 @@ void WipeoutPatcher::apply()
     }
 }
 
-BOOL WINAPI WipeoutPatcher::hookSystemParametersInfoA(
+BOOL WINAPI WipeoutPatch::hookSystemParametersInfoA(
     UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni)
 {
     // do nothing

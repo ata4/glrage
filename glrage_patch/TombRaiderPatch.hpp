@@ -1,13 +1,13 @@
 #pragma once
 
-#include "RuntimePatch.hpp"
+#include "Patch.hpp"
 
 namespace glrage {
 
-class TombRaiderPatcher : public RuntimePatch
+class TombRaiderPatch : public Patch
 {
 public:
-    TombRaiderPatcher(bool ub);
+    TombRaiderPatch(bool ub);
     virtual GameID gameID();
     virtual void apply();
 

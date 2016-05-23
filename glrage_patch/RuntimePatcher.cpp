@@ -1,7 +1,7 @@
 #include "RuntimePatcher.hpp"
-#include "AssaultRigsPatcher.hpp"
-#include "TombRaiderPatcher.hpp"
-#include "WipeoutPatcher.hpp"
+#include "AssaultRigsPatch.hpp"
+#include "TombRaiderPatch.hpp"
+#include "WipeoutPatch.hpp"
 
 #include <glrage/GLRage.hpp>
 #include <glrage_util/ErrorUtils.hpp>
@@ -26,11 +26,11 @@ void RuntimePatcher::patch()
 
     // run known patches
     // clang-format off
-    std::map<std::string, std::shared_ptr<RuntimePatch>> patches = {
-        {"Tomb Raider",      std::make_shared<TombRaiderPatcher>(false)},
-        {"Tomb Raider Gold", std::make_shared<TombRaiderPatcher>(true)},
-        {"Assault Rigs",     std::make_shared<AssaultRigsPatcher>()},
-        {"Wipeout",          std::make_shared<WipeoutPatcher>()}
+    std::map<std::string, std::shared_ptr<Patch>> patches = {
+        {"Tomb Raider",      std::make_shared<TombRaiderPatch>(false)},
+        {"Tomb Raider Gold", std::make_shared<TombRaiderPatch>(true)},
+        {"Assault Rigs",     std::make_shared<AssaultRigsPatch>()},
+        {"Wipeout",          std::make_shared<WipeoutPatch>()}
     };
     // clang-format on
 
