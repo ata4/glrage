@@ -59,7 +59,7 @@ public:
     void set(const Value& value);
     const Value& get();
     void reset();
-    void registerObserver(Observer observer);
+    void registerObserver(const Observer& observer);
 
 private:
     void notify();

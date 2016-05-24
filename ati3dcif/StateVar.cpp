@@ -29,7 +29,8 @@ void StateVar::reset()
     notify();
 }
 
-void StateVar::registerObserver(Observer observer) {
+void StateVar::registerObserver(const Observer& observer)
+{
     m_observers.push_back(observer);
 }
 

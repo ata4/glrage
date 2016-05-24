@@ -5,6 +5,7 @@ namespace cif {
 
 State::State()
     : m_vars{{
+          // clang-format off
           {C3D_COLOR{0, 0, 0, 0}},                      // C3D_ERS_FG_CLR
           {C3D_EVERTEX{C3D_EV_VTCF}},                   // C3D_ERS_VERTEX_TYPE
           {C3D_EPRIM{C3D_EPRIM_TRI}},                   // C3D_ERS_PRIM_TYPE
@@ -42,6 +43,7 @@ State::State()
           {C3D_UINT32{0}},                              // C3D_ERS_ALPHA_DST_REFERENCE
           {C3D_BOOL{C3D_FALSE}},                        // C3D_ERS_SPECULAR_EN
           {C3D_BOOL{C3D_FALSE}},                        // C3D_ERS_ENHANCED_COLOR_RANGE_EN
+          // clang-format on
       }}
 {
 }
@@ -68,14 +70,14 @@ void State::reset()
     }
 }
 
-void State::registerObserver(StateVar::Observer observer)
+void State::registerObserver(const StateVar::Observer& observer)
 {
     for (auto& var : m_vars) {
         var.registerObserver(observer);
     }
 }
 
-void State::registerObserver(StateVar::Observer observer, C3D_ERSID id)
+void State::registerObserver(const StateVar::Observer& observer, C3D_ERSID id)
 {
     m_vars[id].registerObserver(observer);
 }

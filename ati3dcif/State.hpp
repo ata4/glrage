@@ -15,8 +15,8 @@ public:
     const StateVar::Value& get(C3D_ERSID id);
     void set(C3D_ERSID id, const StateVar::Value& value);
     void reset();
-    void registerObserver(StateVar::Observer observer);
-    void registerObserver(StateVar::Observer observer, C3D_ERSID id);
+    void registerObserver(const StateVar::Observer& observer);
+    void registerObserver(const StateVar::Observer& observer, C3D_ERSID id);
 
 private:
     std::array<StateVar, C3D_ERS_NUM> m_vars;

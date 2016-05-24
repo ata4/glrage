@@ -44,8 +44,8 @@ Renderer::Renderer()
 
     // compile and link shaders and configure program
     std::wstring basePath = m_context.getBasePath();
-    m_program.attach(gl::Shader(
-        GL_VERTEX_SHADER).fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
+    m_program.attach(gl::Shader(GL_VERTEX_SHADER)
+                         .fromFile(basePath + L"\\shaders\\ati3dcif.vsh"));
     m_program.attach(gl::Shader(GL_FRAGMENT_SHADER)
                          .fromFile(basePath + L"\\shaders\\ati3dcif.fsh"));
     m_program.link();
@@ -150,21 +150,21 @@ void Renderer::textureUnreg(C3D_HTX htxToUnreg)
 void Renderer::texturePaletteCreate(
     C3D_ECI_TMAP_TYPE epalette, void* pPalette, C3D_PHTXPAL phtpalCreated)
 {
+    if (epalette != C3D_ECI_TMAP_8BIT) {
+        throw Error("Unsupported palette type: " +
+                        std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]),
+            C3D_EC_NOTIMPYET);
+    }
+
+    // copy palette entries to vector
+    auto palettePtr = static_cast<C3D_PPALETTENTRY>(pPalette);
+    std::vector<C3D_PALETTENTRY> palette(palettePtr, palettePtr + 256);
+
+    // create new palette handle
     C3D_HTXPAL handle = reinterpret_cast<C3D_HTXPAL>(m_paletteID++);
 
-    switch (epalette) {
-        case C3D_ECI_TMAP_8BIT: {
-            auto palettePtr = static_cast<C3D_PPALETTENTRY>(pPalette);
-            std::vector<C3D_PALETTENTRY> palette(palettePtr, palettePtr + 256);
-            m_palettes[handle] = palette;
-            break;
-        }
-
-        default:
-            throw Error("Unsupported palette type: " +
-                            std::string(C3D_ECI_TMAP_TYPE_NAMES[epalette]),
-                C3D_EC_NOTIMPYET);
-    }
+    // store palette
+    m_palettes[handle] = palette;
 
     *phtpalCreated = handle;
 }
@@ -178,8 +178,7 @@ void Renderer::texturePaletteAnimate(C3D_HTXPAL htxpalToAnimate,
     C3D_UINT32 u32StartIndex, C3D_UINT32 u32NumEntries,
     C3D_PPALETTENTRY pclrPalette)
 {
-    throw Error(
-        "Renderer::texturePaletteAnimate: Not implemented", C3D_EC_NOTIMPYET);
+    throw Error(__FUNCTION__ ": Not implemented", C3D_EC_NOTIMPYET);
 }
 
 void Renderer::renderPrimStrip(C3D_VSTRIP vStrip, C3D_UINT32 u32NumVert)
