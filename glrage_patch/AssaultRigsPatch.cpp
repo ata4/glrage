@@ -16,7 +16,7 @@ void AssaultRigsPatch::apply()
     // Fix "Insufficient memory" error on systems with more than 4 GB RAM where
     // GlobalMemoryStatus returns -1 (unless compatibility mode is activated,
     // which would break GLRage).
-    patch(0x434B63, "0F 8E 32 01 00 00", "90 90 90 90 90 90");
+    patchNop(0x434B63, "0F 8E 32 01 00 00");
 
     // HD/widescreen resolution patch. Replaces 640x480, normally the maximum
     // resolution, with the current desktop resolution.
@@ -41,7 +41,7 @@ void AssaultRigsPatch::apply()
 
     // Disable re-initialization when losing window focus, which is unnecessary
     // and pretty annoying.
-    patch(0x004342F8, "0F 86 59 F4 FF FF", "90 90 90 90 90 90");
+    patchNop(0x004342F8, "0F 86 59 F4 FF FF");
 }
 
 } // namespace glrage

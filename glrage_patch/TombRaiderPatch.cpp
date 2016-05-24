@@ -63,7 +63,7 @@ void TombRaiderPatch::applyCrashPatches()
     // fails, so a positioning function is fed with a null pointer when
     // rendering the "Inventory" label. This patch prevents the text overlay sub
     // from creating a null pointer if there are too many text overlays.
-    patch(m_ub ? 0x4390E3 : 0x439793, "33 C0", "90 90");
+    patchNop(m_ub ? 0x4390E3 : 0x439793, "33 C0");
 }
 
 void TombRaiderPatch::applyGraphicPatches()
@@ -300,10 +300,9 @@ void TombRaiderPatch::applySoundPatches()
 
     // Pass raw pan values to the sound functions to maintain full precision.
     std::string panPatchOriginal = "C1 F8 08 05 80 00 00 00";
-    std::string panPatchReplace = "90 90 90 90 90 90 90 90";
-    patch(m_ub ? 0x4385DF : 0x438C1F, panPatchOriginal, panPatchReplace);
-    patch(m_ub ? 0x438631 : 0x438C71, panPatchOriginal, panPatchReplace);
-    patch(m_ub ? 0x4386E0 : 0x438D20, panPatchOriginal, panPatchReplace);
+    patchNop(m_ub ? 0x4385DF : 0x438C1F, panPatchOriginal);
+    patchNop(m_ub ? 0x438631 : 0x438C71, panPatchOriginal);
+    patchNop(m_ub ? 0x4386E0 : 0x438D20, panPatchOriginal);
 
     // The ATI patch lacks support for looping sounds. This patch finishes the
     // undone work and replaces the sound loop function stubs with actual
@@ -416,9 +415,9 @@ void TombRaiderPatch::applySoundPatches()
         // also pass 0 to the CD play sub when loading a level so the background
         // track can be silenced correctly
         if (m_ub) {
-            patch(0x437AF7, "74 0E", "90 90");
+            patchNop(0x437AF7, "74 0E");
         } else {
-            patch(0x43639E, "74 09", "90 90");
+            patchNop(0x43639E, "74 09");
         }
 
         // fix level audio mapping to match the track list of the original game
@@ -487,16 +486,16 @@ void TombRaiderPatch::applyLogicPatches()
     }
 
     // prevent selection of user keys in the options (they don't work anyway)
-    patch(m_ub ? 0x42E76C : 0x42EB7C, "0F 94 C0", "90 90 90");
+    patchNop(m_ub ? 0x42E76C : 0x42EB7C, "0F 94 C0");
 
     // No-CD patch. Allows the game to load game files and movies from the local
     // directory instead from the CD.
     if (m_ctx.config.getBool("nocd", false)) {
         // disable CD check call
         if (m_ub) {
-            patch(0x41DE7F, "E8 CC E0 FF FF", "90 90 90 90 90");
+            patchNop(0x41DE7F, "E8 CC E0 FF FF");
         } else {
-            patch(0x41E17F, "E8 9C DE FF FF", "90 90 90 90 90");
+            patchNop(0x41E17F, "E8 9C DE FF FF");
         }
 
         // fix format string: "%c:\%s" -> "%s"
@@ -560,7 +559,7 @@ void TombRaiderPatch::applyLogicPatches()
 
     // This forces all sounds to be played globally with full volume regardless
     // of their distance to Lara. Can be useful for sound debugging.
-    // patch(0x42AAC6, "75 15", "90 90");
+    // patchNop(0x42AAC6, "75 15");
 
     // Underwater mod. Render everything as if it was beneath water. Trippy!
     // patch(0x417216, "26 94", "C6 93");
