@@ -93,6 +93,12 @@ HWND* TombRaiderHooks::m_tombHwnd = nullptr;
 // Keyboard hook handle.
 HHOOK* TombRaiderHooks::m_tombHhk = nullptr;
 
+// DirectSound handle
+LPDIRECTSOUND* TombRaiderHooks::m_tombDirectSound = nullptr;
+
+// map for duplicated sound buffers
+DirectSoundBufferMap TombRaiderHooks::m_tmpSoundBuffers;
+
 int32_t TombRaiderHooks::soundInit()
 {
     int32_t result = m_tombSoundInit();
@@ -164,6 +170,31 @@ TombRaiderHooks::soundPlaySample(
     }
 
     LPDIRECTSOUNDBUFFER buffer = sample->buffer;
+
+    // check if the buffer is already playing
+    DWORD status;
+    sample->buffer->GetStatus(&status);
+    if (status == DSBSTATUS_PLAYING) {
+        // find existing buffer that isn't currently playing
+        DirectSoundBufferList& tmpBuffers = m_tmpSoundBuffers[buffer];
+        for (auto& tmpBuffer : tmpBuffers) {
+            tmpBuffer->GetStatus(&status);
+            if (status != DSBSTATUS_PLAYING) {
+                buffer = tmpBuffer;
+                break;
+            }
+        }
+
+        // create new buffer if all other buffers are currently playing
+        if (status == DSBSTATUS_PLAYING) {
+            LPDIRECTSOUNDBUFFER tmpBufferNew;
+            (*m_tombDirectSound)->DuplicateSoundBuffer(buffer, &tmpBufferNew);
+            tmpBuffers.push_back(tmpBufferNew);
+            buffer = tmpBufferNew;
+            LOG_INFO("Duplicated sound buffer %p to %p (total: %d)",
+                sample->buffer, buffer, tmpBuffers.size());
+        }
+    }
 
     // calculate pitch from sample rate
     int32_t dsPitch = sample->sampleRate;

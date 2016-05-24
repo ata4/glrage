@@ -1,10 +1,12 @@
 #pragma once
 
 #include <Windows.h>
-#include <cstdint>
 #include <dsound.h>
-#include <map>
 #include <mmeapi.h>
+
+#include <cstdint>
+#include <map>
+#include <vector>
 
 namespace glrage {
 
@@ -38,6 +40,9 @@ typedef BOOL TombRaiderRenderCollectedItem(
 typedef void* TombRaiderCreateOverlayText(
     int16_t x, int16_t y, int16_t a3, const char* text);
 typedef int16_t TombRaiderSetFOV(int16_t fov);
+typedef std::vector<LPDIRECTSOUNDBUFFER> DirectSoundBufferList;
+typedef std::map<LPDIRECTSOUNDBUFFER, DirectSoundBufferList>
+    DirectSoundBufferMap;
 
 class TombRaiderHooks
 {
@@ -94,9 +99,11 @@ public:
     static int32_t* m_tombTicks;
     static HWND* m_tombHwnd;
     static HHOOK* m_tombHhk;
+    static LPDIRECTSOUND* m_tombDirectSound;
 
     // other vars
     static bool m_musicAlwaysLoop;
+    static DirectSoundBufferMap m_tmpSoundBuffers;
 
 private:
     static LPDIRECTSOUNDBUFFER soundPlaySample(int32_t soundID, int32_t volume,

@@ -151,6 +151,8 @@ void TombRaiderPatch::applyGraphicPatches()
             reinterpret_cast<int32_t*>(m_ub ? 0x68EBA8 : 0x68F3A8);
         TombRaiderHooks::m_tombTicks =
             reinterpret_cast<int32_t*>(m_ub ? 0x459CF0 : 0x45A318);
+        TombRaiderHooks::m_tombDirectSound =
+            reinterpret_cast<LPDIRECTSOUND*>(m_ub ? 0x45E9D8 : 0x0045F1CC);
 
         // clang-format off
         if (m_ub) {
