@@ -84,7 +84,7 @@ void Renderer::renderBegin(C3D_HRC hRC)
     m_sampler.bind(0);
 
     // restore texture binding
-    tmapSelectImpl(m_state.get(C3D_ERS_TMAP_SELECT).htx);
+    tmapRestore();
 
     // CIF always uses an orthographic view, the application deals with the
     // perspective when required
@@ -122,6 +122,9 @@ void Renderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
 
     // store in texture map
     m_textures[*phtmap] = texture;
+
+    // restore previously bound texture
+    tmapRestore();
 
     gl::Utils::checkError(__FUNCTION__);
 }
@@ -261,6 +264,10 @@ void Renderer::tmapSelectImpl(C3D_HTX handle)
     C3D_COLOR ck = texture->chromaKey();
     m_program.uniform3f(
         "chromaKey", ck.r / 255.0f, ck.g / 255.0f, ck.b / 255.0f);
+}
+
+void Renderer::tmapRestore() {
+    tmapSelectImpl(m_state.get(C3D_ERS_TMAP_SELECT).htx);
 }
 
 void Renderer::tmapLight(StateVar::Value& value)

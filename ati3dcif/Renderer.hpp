@@ -105,6 +105,7 @@ private:
     // state functions end
 
     void tmapSelectImpl(C3D_HTX handle);
+    void tmapRestore();
 
     Context& m_context = GLRage::getContext();
     Config m_config{m_context.getConfigPath(), "ATI3DCIF"};
