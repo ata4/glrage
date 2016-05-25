@@ -3,6 +3,7 @@
 #include "Utils.hpp"
 
 #include <glrage_gl/Utils.hpp>
+#include <glrage_util/Logger.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -25,16 +26,17 @@ void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
     m_chromaKey = tmap->clrTexChromaKey;
 
     // convert and generate texture for each level
-    uint32_t levels =
-        tmap->bMipMap
-            ? std::max(tmap->u32MaxMapXSizeLg2, tmap->u32MaxMapYSizeLg2) + 1
-            : 1;
     uint32_t width = 1 << tmap->u32MaxMapXSizeLg2;
     uint32_t height = 1 << tmap->u32MaxMapYSizeLg2;
     uint32_t size = width * height;
 
+    uint32_t levels = 1;
+    if (tmap->bMipMap) {
+        levels = std::max(tmap->u32MaxMapXSizeLg2, tmap->u32MaxMapYSizeLg2) + 1;
+    }
+
     for (uint32_t level = 0; level < levels; level++) {
-        // LOG_INFO("level %d (%dx%d)", level, width, height);
+        LOG_INFO("level %d (%dx%d)", level, width, height);
 
         // convert texture data
         switch (tmap->eTexFormat) {
@@ -108,6 +110,12 @@ void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
         width = std::max(1u, width / 2);
         height = std::max(1u, height / 2);
         size = width * height;
+    }
+
+    // generate mipmaps automatically if the application doesn't provide any
+    if (levels == 1) {
+        bind();
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
 
     // FIXME: sampler object overrides these parameters
