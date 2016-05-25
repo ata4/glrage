@@ -83,6 +83,12 @@ void ContextImpl::init()
     if (m_config.getBool("vsync", true)) {
         wglSwapIntervalEXT(1);
     }
+
+    bool fullscreen_virtual = m_config.getBool("fullscreen_virtual", false);
+    m_screenWidth =
+        GetSystemMetrics(fullscreen_virtual ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
+    m_screenHeight =
+        GetSystemMetrics(fullscreen_virtual ? SM_CYVIRTUALSCREEN : SM_CYSCREEN);
 }
 
 void ContextImpl::attach(HWND hwnd)
@@ -257,8 +263,8 @@ void ContextImpl::setFullscreen(bool fullscreen)
     int32_t height;
 
     if (m_fullscreen) {
-        width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-        height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        width = m_screenWidth;
+        height = m_screenHeight;
     } else {
         width = m_width;
         height = m_height;
@@ -306,17 +312,14 @@ void ContextImpl::setWindowSize(int32_t width, int32_t height)
     LOG_INFO("Window size: %dx%d", width, height);
 
     // reduce window size as long as its greater or equal to the desktop size
-    auto desktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    auto desktopHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-
-    while (!m_fullscreen && width >= desktopWidth && height >= desktopHeight) {
+    while (!m_fullscreen && width >= m_screenWidth && height >= m_screenHeight) {
         width /= 2;
         height /= 2;
     }
 
     // center window on desktop
-    auto left = desktopWidth / 2 - width / 2;
-    auto top = desktopHeight / 2 - height / 2;
+    auto left = m_screenWidth / 2 - width / 2;
+    auto top = m_screenHeight / 2 - height / 2;
 
     // get corrected client area
     auto style = GetWindowLong(m_hwnd, GWL_STYLE);
