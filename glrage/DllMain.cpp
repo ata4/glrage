@@ -11,7 +11,6 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
     switch (dwReason) {
         case DLL_PROCESS_ATTACH:
             GLRage::getPatcher().patch();
-            GLRage::getConfig().load(GLRage::getContext().getConfigPath());
             break;
     }
 

@@ -32,6 +32,10 @@ BOOL CALLBACK ContextImpl::callbackEnumWindowsProc(HWND hwnd, LPARAM _this)
 
 ContextImpl::ContextImpl()
 {
+    // load main config file
+    m_config.load(getBasePath() + L"\\glrage.ini");
+
+    // init rect
     SetRectEmpty(&m_tmprect);
 
     // set pixel format
@@ -444,11 +448,6 @@ std::wstring ContextImpl::getBasePath()
     PathRemoveFileSpec(path);
 
     return path;
-}
-
-std::wstring ContextImpl::getConfigPath()
-{
-    return getBasePath() + L"\\glrage.ini";
 }
 
 GameID ContextImpl::getGameID()

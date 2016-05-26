@@ -38,7 +38,6 @@ public:
     bool isRendered();
     HWND getHWnd();
     std::wstring getBasePath();
-    std::wstring getConfigPath();
     GameID getGameID();
     void setGameID(GameID gameID);
 
