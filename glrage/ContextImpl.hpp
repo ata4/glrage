@@ -10,9 +10,11 @@ namespace glrage {
 class ContextImpl : public Context
 {
 public:
-    static constexpr TCHAR* PROP_CONTEXT = L"Context.this";
+    static ContextImpl& instance();
+    static LRESULT CALLBACK callbackWindowProc(
+        HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    static BOOL CALLBACK callbackEnumWindowsProc(HWND hwnd, LPARAM _this);
 
-    ContextImpl();
     void init();
     void attach(HWND hwnd);
     void attach();
@@ -39,6 +41,10 @@ public:
     void setGameID(GameID gameID);
 
 private:
+    ContextImpl();
+    ContextImpl(ContextImpl const&) = delete;
+    void operator=(ContextImpl const&) = delete;
+
     // constants
     static const LONG STYLE_WINDOW =
         WS_CAPTION | WS_THICKFRAME | WS_OVERLAPPED | WS_SYSMENU;

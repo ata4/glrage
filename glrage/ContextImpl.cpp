@@ -13,18 +13,21 @@
 
 namespace glrage {
 
-static LRESULT CALLBACK WindowProc(
-    HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+ContextImpl& ContextImpl::instance()
 {
-    ContextImpl* context = reinterpret_cast<ContextImpl*>(
-        GetProp(hwnd, ContextImpl::PROP_CONTEXT));
-    return context->windowProc(hwnd, msg, wParam, lParam);
+    static ContextImpl instance;
+    return instance;
 }
 
-static BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM _this)
+LRESULT CALLBACK ContextImpl::callbackWindowProc(
+    HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    ContextImpl* context = reinterpret_cast<ContextImpl*>(_this);
-    return context->enumWindowsProc(hwnd);
+    return instance().windowProc(hwnd, msg, wParam, lParam);
+}
+
+BOOL CALLBACK ContextImpl::callbackEnumWindowsProc(HWND hwnd, LPARAM _this)
+{
+    return instance().enumWindowsProc(hwnd);
 }
 
 ContextImpl::ContextImpl()
@@ -104,11 +107,10 @@ void ContextImpl::attach(HWND hwnd)
     ErrorUtils::setHWnd(m_hwnd);
 
     // get window procedure pointer and replace it with custom procedure
-    SetProp(m_hwnd, PROP_CONTEXT, this);
-    m_windowProc =
-        reinterpret_cast<WNDPROC>(GetWindowLongPtr(m_hwnd, GWL_WNDPROC));
-    SetWindowLongPtr(
-        m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
+    auto windowProc = GetWindowLongPtr(m_hwnd, GWL_WNDPROC);
+    m_windowProc = reinterpret_cast<WNDPROC>(windowProc);
+    windowProc = reinterpret_cast<LONG_PTR>(&callbackWindowProc);
+    SetWindowLongPtr(m_hwnd, GWL_WNDPROC, windowProc);
 
     // detach from current window
     wglMakeCurrent(NULL, NULL);
@@ -149,7 +151,7 @@ void ContextImpl::attach()
     }
 
     m_pid = GetCurrentProcessId();
-    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(this));
+    EnumWindows(&callbackEnumWindowsProc, NULL);
 }
 
 void ContextImpl::detach()
@@ -161,8 +163,8 @@ void ContextImpl::detach()
     wglDeleteContext(m_hglrc);
     m_hglrc = nullptr;
 
-    SetWindowLongPtr(
-        m_hwnd, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(m_windowProc));
+    auto windowProc = reinterpret_cast<LONG_PTR>(m_windowProc);
+    SetWindowLongPtr(m_hwnd, GWL_WNDPROC, windowProc);
     m_windowProc = nullptr;
 
     m_hwnd = nullptr;
@@ -416,16 +418,16 @@ HWND ContextImpl::getHWnd()
 
 std::wstring ContextImpl::getBasePath()
 {
-    TCHAR path[MAX_PATH];
-    HMODULE hModule = NULL;
+    HMODULE hModule = nullptr;
     DWORD dwFlags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
                     GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
 
-    if (!GetModuleHandleEx(
-            dwFlags, reinterpret_cast<LPCWSTR>(&WindowProc), &hModule)) {
+    auto windowProc = reinterpret_cast<LPCWSTR>(&callbackWindowProc);
+    if (!GetModuleHandleEx(dwFlags, windowProc, &hModule)) {
         throw std::runtime_error("Can't get module handle");
     }
 
+    TCHAR path[MAX_PATH];
     GetModuleFileName(hModule, path, sizeof(path));
     PathRemoveFileSpec(path);
 

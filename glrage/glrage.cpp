@@ -2,12 +2,11 @@
 
 namespace glrage {
 
-ContextImpl GLRage::m_context;
 RuntimePatcher GLRage::m_patcher;
 
 GLRAPI Context& GLRage::getContext()
 {
-    return m_context;
+    return ContextImpl::instance();
 }
 
 GLRAPI RuntimePatcher& GLRage::getPatcher()
