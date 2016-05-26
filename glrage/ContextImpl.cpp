@@ -42,6 +42,14 @@ ContextImpl::ContextImpl()
     m_pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
     m_pfd.cDepthBits = 32;
     m_pfd.iLayerType = PFD_MAIN_PLANE;
+
+    // get screen dimensions
+    bool fullscreen_virtual =
+        m_config.getBool("context.fullscreen_virtual", false);
+    m_screenWidth =
+        GetSystemMetrics(fullscreen_virtual ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
+    m_screenHeight =
+        GetSystemMetrics(fullscreen_virtual ? SM_CYVIRTUALSCREEN : SM_CYSCREEN);
 }
 
 void ContextImpl::init()
@@ -86,13 +94,6 @@ void ContextImpl::init()
     if (m_config.getBool("context.vsync", true)) {
         wglSwapIntervalEXT(1);
     }
-
-    bool fullscreen_virtual =
-        m_config.getBool("context.fullscreen_virtual", false);
-    m_screenWidth =
-        GetSystemMetrics(fullscreen_virtual ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
-    m_screenHeight =
-        GetSystemMetrics(fullscreen_virtual ? SM_CYVIRTUALSCREEN : SM_CYSCREEN);
 }
 
 void ContextImpl::attach(HWND hwnd)
