@@ -1,7 +1,7 @@
 #include "TombRaiderPatch.hpp"
 #include "TombRaiderHooks.hpp"
 
-#include <glrage/GLRage.hpp>
+#include <glrage/ContextImpl.hpp>
 #include <glrage_util/ErrorUtils.hpp>
 #include <glrage_util/Logger.hpp>
 #include <glrage_util/StringUtils.hpp>
@@ -72,8 +72,8 @@ void TombRaiderPatch::applyGraphicPatches()
     // original brightness, which results in a dim look and turns some areas in
     // dark levels almost pitch black. This patch boosts the brightness back to
     // normal levels.
-    if (m_ctx.config.getBool("brightness_override", true)) {
-        float brightness = m_ctx.config.getFloat("brightness_value", 1.0f);
+    if (m_config.getBool("patch.brightness_override", true)) {
+        float brightness = m_config.getFloat("patch.brightness_value", 1.0f);
         float divisor = (1.0f / brightness) * 1024;
         float multi = 0.0625f * brightness;
 
@@ -83,11 +83,11 @@ void TombRaiderPatch::applyGraphicPatches()
 
     // This patch allows the customization of the water color, which is rather
     // ugly on default.
-    if (m_ctx.config.getBool("watercolor_override", true)) {
+    if (m_config.getBool("patch.watercolor_override", true)) {
         float filterRed =
-            m_ctx.config.getFloat("watercolor_filter_red", 0.45f);
+            m_config.getFloat("patch.watercolor_filter_red", 0.45f);
         float filterGreen =
-            m_ctx.config.getFloat("watercolor_filter_green", 1.0f);
+            m_config.getFloat("patch.watercolor_filter_green", 1.0f);
 
         Chunk c = Chunk() << filterRed << filterGreen;
         patch(0x451028, "9A 99 19 3F 33 33 33 3F", c);
@@ -95,9 +95,9 @@ void TombRaiderPatch::applyGraphicPatches()
 
     // This patch replaces 800x600 with a custom resolution for widescreen
     // support and to reduce vertex artifacts due to subpixel inaccuracy.
-    if (m_ctx.config.getBool("resolution_override", true)) {
-        int32_t width = m_ctx.config.getInt("resolution_width", -1);
-        int32_t height = m_ctx.config.getInt("resolution_height", -1);
+    if (m_config.getBool("patch.resolution_override", true)) {
+        int32_t width = m_config.getInt("patch.resolution_width", -1);
+        int32_t height = m_config.getInt("patch.resolution_height", -1);
 
         if (width <= 0) {
             width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
@@ -172,8 +172,8 @@ void TombRaiderPatch::applyGraphicPatches()
     }
 
     // Field of view customization patch.
-    if (m_ctx.config.getBool("fov_override", true)) {
-        int32_t fov = m_ctx.config.getInt("fov_value", 65);
+    if (m_config.getBool("patch.fov_override", true)) {
+        int32_t fov = m_config.getInt("patch.fov_value", 65);
         int8_t fov8 = fov;
         int16_t fov16 = fov * 182;
 
@@ -183,7 +183,7 @@ void TombRaiderPatch::applyGraphicPatches()
         patch(m_ub ? 0x41E45B : 0x41E7DB, "E0 38", fov16);
 
         // change the FOV mode from horizontal to vertical if enabled
-        if (m_ctx.config.getBool("fov_vertical", true)) {
+        if (m_config.getBool("patch.fov_vertical", true)) {
             TombRaiderHooks::m_tombSetFOV =
                 reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
 
@@ -229,10 +229,10 @@ void TombRaiderPatch::applyGraphicPatches()
     patch(m_ub ? 0x416801 : 0x4168F1, tmpExp, tmpRep);
     patch(m_ub ? 0x4168FE : 0x4169EE, tmpExp, tmpRep);
 
-    if (m_ctx.config.getBool("draw_distance_override", false)) {
+    if (m_config.getBool("patch.draw_distance_override", false)) {
         int32_t drawDistFade =
-            m_ctx.config.getInt("draw_distance_fade", 12288);
-        int32_t drawDistMax = m_ctx.config.getInt("draw_distance_max", 20480);
+            m_config.getInt("patch.draw_distance_fade", 12288);
+        int32_t drawDistMax = m_config.getInt("patch.draw_distance_max", 20480);
 
         Chunk drawDistFadeData;
         drawDistFadeData << drawDistFade;
@@ -270,7 +270,7 @@ void TombRaiderPatch::applyGraphicPatches()
     // per second and offers no interpolation, so it's impossible to render more
     // frames without either rendering duplicate frames or speeding up the game
     // time.
-    // if (m_ctx.config.getBool("60fps", true)) {
+    // if (m_config.getBool("patch.60fps", true)) {
     //    // render on every tick instead of every other
     //    patch(m_ub ? 0x408A91 : 0x408A84, "02", "00");
     //    // disables frame skipping, which also fixes issues with the demo mode
@@ -343,7 +343,7 @@ void TombRaiderPatch::applySoundPatches()
     // Very optional patch: change ambient track in Lost Valley from "derelict"
     // to "water", which, in my very personal opinion, is more fitting for the
     // theme of this level.
-    if (!m_ub && m_ctx.config.getBool("lostvalley_ambience", false)) {
+    if (!m_ub && m_config.getBool("patch.lostvalley_ambience", false)) {
         patch(0x456A1E, "39", "3A");
     }
 
@@ -378,7 +378,7 @@ void TombRaiderPatch::applySoundPatches()
 
     // Soundtrack patch. Allows both ambient and music cues to be played via
     // MCI.
-    if (m_ctx.config.getBool("full_soundtrack", false)) {
+    if (m_config.getBool("patch.full_soundtrack", false)) {
         // hook play function (level music)
         if (m_ub) {
             patchAddr(0x438700, "66 83 3D 3C 5D",
@@ -490,7 +490,7 @@ void TombRaiderPatch::applyLogicPatches()
 
     // No-CD patch. Allows the game to load game files and movies from the local
     // directory instead from the CD.
-    if (m_ctx.config.getBool("nocd", false)) {
+    if (m_config.getBool("patch.nocd", false)) {
         // disable CD check call
         if (m_ub) {
             patchNop(0x41DE7F, "E8 CC E0 FF FF");
@@ -529,7 +529,7 @@ void TombRaiderPatch::applyLogicPatches()
 
     // Experimental localization patch. Replaces string pointers with pointers
     // for translations.
-    if (m_ctx.config.getBool("localization", false)) {
+    if (m_config.getBool("patch.localization", false)) {
         try {
             applyLocalePatches();
         } catch (const std::runtime_error& ex) {
@@ -573,12 +573,12 @@ void TombRaiderPatch::applyLogicPatches()
 
 void TombRaiderPatch::applyLocalePatches()
 {
-    std::wstring basePath = GLRage::getContext().getBasePath();
+    std::wstring basePath = ContextImpl::instance().getBasePath();
     std::wstring localePath = basePath + L"\\patches\\locale\\";
 
     // load locale file
     std::string locale =
-        m_ctx.config.getString("localization_locale", "en_GB");
+        m_config.getString("localization_locale", "en_GB");
     std::wstring langPath =
         localePath + StringUtils::utf8ToWide(locale) + L".txt";
     std::ifstream langStream(langPath);

@@ -2,20 +2,16 @@
 
 #include <cstdint>
 #include <string>
+#include <map>
 
 namespace glrage {
 
 class Config
 {
 public:
-    Config(const std::wstring& path = L"", const std::string& section = "");
+    static Config& instance();
 
-    std::wstring getPath();
-    void setPath(const std::wstring& path);
-
-    std::string getSection();
-    void setSection(const std::string& section);
-
+    void load(const std::wstring& path);
     std::string getString(
         const std::string& name, const std::string& defaultValue);
     int32_t getInt(const std::string& name, const int32_t defaultValue);
@@ -23,9 +19,14 @@ public:
     bool getBool(const std::string& name, const bool defaultValue);
 
 private:
-    std::wstring m_path;
-    std::wstring m_section;
-    std::wstring m_value;
+    Config(){};
+    Config(Config const&) = delete;
+    void operator=(Config const&) = delete;
+
+    static int valueHandler(
+        void* user, const char* section, const char* name, const char* value);
+
+    std::map<std::string, std::string> m_values;
 };
 
 } // namespace glrage

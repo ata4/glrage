@@ -3,7 +3,7 @@
 #include "TombRaiderPatch.hpp"
 #include "WipeoutPatch.hpp"
 
-#include <glrage/GLRage.hpp>
+#include <glrage/ContextImpl.hpp>
 #include <glrage_util/ErrorUtils.hpp>
 #include <glrage_util/StringUtils.hpp>
 
@@ -40,14 +40,14 @@ void RuntimePatcher::patch()
     };
     // clang-format on
 
-    Context& ctx = GLRage::getContext();
+    ContextImpl& ctx = ContextImpl::instance();
+    Config& config = Config::instance();
 
-    // set config path based on the module file name
-    m_ctx.config.setPath(
-        ctx.getBasePath() + L"\\patches\\" + m_ctx.fileNameW + L".ini");
+    // load game patch config
+    config.load(ctx.getBasePath() + L"\\patches\\" + m_ctx.fileNameW + L".ini");
 
     // apply patch module as defined in the config
-    std::string game = m_ctx.config.getString("game", "");
+    std::string game = config.getString("patch.game", "");
     auto patchResult = patches.find(game);
     if (patchResult == patches.end()) {
         ErrorUtils::error("Invalid patch module '" + game + "'");

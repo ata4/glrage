@@ -28,8 +28,8 @@ private:
     static const GLenum TEX_FORMAT = GL_BGRA;
     static const GLenum TEX_TYPE = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 
-    Context& m_context = GLRage::getContext();
-    Config m_config{m_context.getConfigPath(), "DirectDraw"};
+    Context& m_context{GLRage::getContext()};
+    Config& m_config{GLRage::getConfig()};
     uint32_t m_width = 0;
     uint32_t m_height = 0;
     gl::VertexArray m_surfaceFormat;

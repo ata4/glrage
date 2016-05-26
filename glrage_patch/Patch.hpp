@@ -16,7 +16,6 @@ namespace glrage {
 
 struct ModuleContext
 {
-    Config config{L"", "Patch"};
     std::wstring path;
     std::string fileName;
     std::wstring fileNameW;
@@ -41,6 +40,7 @@ protected:
     bool patchNop(uint32_t addr, const Chunk& expected);
 
     ModuleContext m_ctx;
+    Config& m_config{Config::instance()};
 };
 
 } // namespace glrage

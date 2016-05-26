@@ -1,49 +1,35 @@
 #include "Config.hpp"
 #include "StringUtils.hpp"
+#include "Logger.hpp"
+#include "ini.h"
 
-#include <Windows.h>
+#include <algorithm>
 
 namespace glrage {
 
-Config::Config(const std::wstring& path, const std::string& section)
+Config& Config::instance()
 {
-    setPath(path);
-    setSection(section);
+    static Config instance;
+    return instance;
 }
 
-std::wstring Config::getPath()
+void Config::load(const std::wstring& path)
 {
-    return m_path;
-}
-
-void Config::setPath(const std::wstring& path)
-{
-    m_path = path;
-}
-
-std::string Config::getSection()
-{
-    return StringUtils::wideToUtf8(m_section);
-}
-
-void Config::setSection(const std::string& section)
-{
-    m_section = StringUtils::utf8ToWide(section);
+    std::string pathUtf = StringUtils::wideToUtf8(path);
+    if (ini_parse(pathUtf.c_str(), valueHandler, this)) {
+        LOG_INFO("Can't open ini file %s", pathUtf.c_str());
+    }
 }
 
 std::string Config::getString(
     const std::string& name, const std::string& defaultValue)
 {
-    std::wstring nameW = StringUtils::utf8ToWide(name);
-    std::wstring defaultValueW = StringUtils::utf8ToWide(defaultValue);
-
-    m_value.resize(1024);
-    DWORD size = GetPrivateProfileString(m_section.c_str(), nameW.c_str(),
-        defaultValueW.c_str(), &m_value[0], m_value.capacity(),
-        m_path.c_str());
-    m_value.resize(size);
-
-    return StringUtils::wideToUtf8(m_value);
+    auto result = m_values.find(name);
+    if (result == m_values.end()) {
+        return defaultValue;
+    } else {
+        return result->second;
+    }
 }
 
 int32_t Config::getInt(const std::string& name, const int32_t defaultValue)
@@ -59,6 +45,24 @@ float Config::getFloat(const std::string& name, const float defaultValue)
 bool Config::getBool(const std::string& name, const bool defaultValue)
 {
     return getString(name, defaultValue ? "true" : "false") == "true";
+}
+
+int Config::valueHandler(void* user, const char* section, const char* name,
+                            const char* value)
+{
+    std::string key = std::string() + section + "." + name;
+
+    // convert to lower case for easier indexing
+    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+    // inih doesn't filter out quotes like GetPrivateProfileString, so do it
+    // here instead
+    std::string v = value;
+    v.erase(std::remove(v.begin(), v.end(), '"'), v.end());
+    v.erase(std::remove(v.begin(), v.end(), '\''), v.end());
+
+    instance().m_values[key] = v;
+    return 1;
 }
 
 } // namespace glrage

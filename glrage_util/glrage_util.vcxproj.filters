@@ -9,6 +9,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\inih">
+      <UniqueIdentifier>{b79bba71-16ba-4b0e-a176-b06e30be0120}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.hpp">
@@ -23,6 +26,9 @@
     <ClInclude Include="StringUtils.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ini.h">
+      <Filter>Source Files\inih</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringUtils.cpp">
@@ -36,6 +42,9 @@
     </ClCompile>
     <ClCompile Include="Config.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ini.c">
+      <Filter>Source Files\inih</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

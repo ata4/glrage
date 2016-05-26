@@ -1,7 +1,5 @@
 #include "Screenshot.hpp"
 
-#include <glrage/GLRage.hpp>
-
 #include <glrage_util/ErrorUtils.hpp>
 #include <glrage_util/StringUtils.hpp>
 
@@ -11,6 +9,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace glrage {
 namespace gl {

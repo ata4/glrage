@@ -9,13 +9,12 @@
 namespace glrage {
 namespace ddraw {
 
-static Context& context = GLRage::getContext();
-
 HRESULT WINAPI DirectDrawCreate(
     GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter)
 {
     LOG_TRACE("%p, %p, %p", lpGUID, lplpDD, pUnkOuter);
 
+    Context& context = GLRage::getContext();
     context.init();
     context.attach();
 

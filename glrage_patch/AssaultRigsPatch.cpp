@@ -20,9 +20,9 @@ void AssaultRigsPatch::apply()
 
     // HD/widescreen resolution patch. Replaces 640x480, normally the maximum
     // resolution, with the current desktop resolution.
-    if (m_ctx.config.getBool("resolution_override", true)) {
-        int32_t width = m_ctx.config.getInt("resolution_width", -1);
-        int32_t height = m_ctx.config.getInt("resolution_height", -1);
+    if (m_config.getBool("patch.resolution_override", true)) {
+        int32_t width = m_config.getInt("patch.resolution_width", -1);
+        int32_t height = m_config.getInt("patch.resolution_height", -1);
 
         if (width <= 0) {
             width = GetSystemMetrics(SM_CXVIRTUALSCREEN);

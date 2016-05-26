@@ -107,8 +107,8 @@ private:
     void tmapSelectImpl(C3D_HTX handle);
     void tmapRestore();
 
-    Context& m_context = GLRage::getContext();
-    Config m_config{m_context.getConfigPath(), "ATI3DCIF"};
+    Context& m_context{GLRage::getContext()};
+    Config& m_config{GLRage::getConfig()};
     bool m_wireframe;
     std::map<C3D_HTX, std::shared_ptr<Texture>> m_textures;
     std::map<C3D_HTXPAL, std::vector<C3D_PALETTENTRY>> m_palettes;

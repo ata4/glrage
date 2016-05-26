@@ -13,12 +13,14 @@
   <ItemGroup>
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="ErrorUtils.hpp" />
+    <ClInclude Include="ini.h" />
     <ClInclude Include="Logger.hpp" />
     <ClInclude Include="StringUtils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="ErrorUtils.cpp" />
+    <ClCompile Include="ini.c" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="StringUtils.cpp" />
   </ItemGroup>

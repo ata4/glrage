@@ -1,6 +1,5 @@
 #include "Screenshot.hpp"
-
-#include "GLRage.hpp"
+#include "ContextImpl.hpp"
 
 #include <glrage_util/StringUtils.hpp>
 #include <glrage_gl/Screenshot.hpp>
@@ -30,7 +29,7 @@ void Screenshot::captureScheduled()
 void Screenshot::capture()
 {
     // find unused screenshot file name
-    std::wstring basePath = GLRage::getContext().getBasePath();
+    std::wstring basePath = ContextImpl::instance().getBasePath();
     std::wstring path;
     DWORD dwAttrib;
     do {

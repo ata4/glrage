@@ -54,7 +54,7 @@ void WipeoutPatch::apply()
     }
 
     // Disable unskippable title screen, saves a few seconds of wait time.
-    if (m_ctx.config.getBool("disable_title_screen", false)) {
+    if (m_config.getBool("patch.disable_title_screen", false)) {
         switch (buildDate) {
             case build_070796:
                 patchNop(0x459087, "E8 F4 34 00 00");
@@ -69,7 +69,7 @@ void WipeoutPatch::apply()
     }
 
     // Disable introductory video.
-    if (m_ctx.config.getBool("disable_introductory_video", false)) {
+    if (m_config.getBool("patch.disable_introductory_video", false)) {
         switch (buildDate) {
             case 1:
                 patchNop(0x45902E, "E8 C5 39 00 00");

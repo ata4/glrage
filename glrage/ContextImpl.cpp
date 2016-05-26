@@ -83,11 +83,12 @@ void ContextImpl::init()
     glClearColor(0, 0, 0, 0);
     glClearDepth(1);
 
-    if (m_config.getBool("vsync", true)) {
+    if (m_config.getBool("context.vsync", true)) {
         wglSwapIntervalEXT(1);
     }
 
-    bool fullscreen_virtual = m_config.getBool("fullscreen_virtual", false);
+    bool fullscreen_virtual =
+        m_config.getBool("context.fullscreen_virtual", false);
     m_screenWidth =
         GetSystemMetrics(fullscreen_virtual ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
     m_screenHeight =

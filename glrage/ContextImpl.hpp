@@ -52,7 +52,7 @@ private:
                                         WS_EX_CLIENTEDGE | WS_EX_STATICEDGE;
 
     // config object
-    Config m_config{getConfigPath(), "Context"};
+    Config& m_config{Config::instance()};
 
     // window handle
     HWND m_hwnd = nullptr;

@@ -12,4 +12,9 @@ GLRAPI RuntimePatcher& GLRage::getPatcher()
     return RuntimePatcher::instance();
 }
 
+GLRAPI Config& GLRage::getConfig()
+{
+    return Config::instance();
+}
+
 } // namespace glrage

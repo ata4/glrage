@@ -37,7 +37,7 @@ Renderer::Renderer()
     m_sampler.bind(0);
 
     // improve texture filtering quality
-    float filterAniso = m_config.getFloat("filter_anisotropy", 16.0f);
+    float filterAniso = m_config.getFloat("ati3dcif.filter_anisotropy", 16.0f);
     if (filterAniso > 0) {
         m_sampler.parameterf(GL_TEXTURE_MAX_ANISOTROPY_EXT, filterAniso);
     }
@@ -61,7 +61,7 @@ Renderer::Renderer()
         "matModelView", 1, GL_FALSE, glm::value_ptr(modelView));
 
     // cache frequently used config values
-    m_wireframe = m_config.getBool("wireframe", false);
+    m_wireframe = m_config.getBool("ati3dcif.wireframe", false);
 
     // apply default state
     resetState();

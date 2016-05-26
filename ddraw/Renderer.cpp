@@ -14,7 +14,8 @@ Renderer::Renderer()
     m_surfaceBuffer.data(0, nullptr, GL_STATIC_DRAW);
 
     // configure sampler
-    std::string filterMethod = m_config.getString("filter_method", "linear");
+    std::string filterMethod =
+        m_config.getString("directdraw.filter_method", "linear");
     GLint filterMethodEnum;
 
     if (filterMethod == "nearest") {

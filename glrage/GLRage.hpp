@@ -3,6 +3,7 @@
 #include "ContextImpl.hpp"
 
 #include <glrage_patch/RuntimePatcher.hpp>
+#include <glrage_util/Config.hpp>
 
 namespace glrage {
 
@@ -18,6 +19,7 @@ class GLRage {
 public:
     static GLRAPI Context& getContext();
     static GLRAPI RuntimePatcher& getPatcher();
+    static GLRAPI Config& getConfig();
 
 private:
     static ContextImpl m_context;
