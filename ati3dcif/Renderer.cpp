@@ -17,7 +17,20 @@ Renderer::Renderer()
 {
     // register state observers
     // clang-format off
-    m_state.registerObserver([&](StateVar::Value& v) { m_vertexStream.renderPending(); });
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_VERTEX_TYPE);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_PRIM_TYPE);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_SOLID_CLR);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_SHADE_MODE);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_TMAP_EN);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_TMAP_SELECT);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_TMAP_LIGHT);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_TMAP_FILTER);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_TMAP_TEXOP);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_ALPHA_SRC);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_ALPHA_DST);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_Z_CMP_FNC);
+    m_state.registerObserver(std::bind(&Renderer::switchState, this, _1), C3D_ERS_Z_MODE);
+
     m_state.registerObserver(std::bind(&Renderer::vertexType, this, _1), C3D_ERS_VERTEX_TYPE);
     m_state.registerObserver(std::bind(&Renderer::primType, this, _1), C3D_ERS_PRIM_TYPE);
     m_state.registerObserver(std::bind(&Renderer::solidColor, this, _1), C3D_ERS_SOLID_CLR);
@@ -99,12 +112,15 @@ void Renderer::renderBegin(C3D_HRC hRC)
 
 void Renderer::renderEnd()
 {
+    // make sure everything has been rendered
     m_vertexStream.renderPending();
 
     // restore polygon mode
     if (m_wireframe) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+
+    gl::Utils::checkError(__FUNCTION__);
 }
 
 void Renderer::textureReg(C3D_PTMAP ptmapToReg, C3D_PHTX phtmap)
@@ -201,6 +217,12 @@ void Renderer::setState(C3D_ERSID eRStateID, C3D_PRSDATA pRStateData)
 void Renderer::resetState()
 {
     m_state.reset();
+}
+
+void Renderer::switchState(StateVar::Value& value)
+{
+    // render pending polygons from the previous state
+    m_vertexStream.renderPending();
 }
 
 void Renderer::vertexType(StateVar::Value& value)

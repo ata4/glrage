@@ -89,6 +89,7 @@ public:
 
 private:
     // state functions start
+    void switchState(StateVar::Value& value);
     void vertexType(StateVar::Value& value);
     void primType(StateVar::Value& value);
     void solidColor(StateVar::Value& value);
