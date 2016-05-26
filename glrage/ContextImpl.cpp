@@ -357,6 +357,16 @@ int32_t ContextImpl::getWindowHeight()
     return m_tmprect.bottom - m_tmprect.top;
 }
 
+int32_t ContextImpl::getScreenWidth()
+{
+    return m_screenWidth;
+}
+
+int32_t ContextImpl::getScreenHeight()
+{
+    return m_screenHeight;
+}
+
 void ContextImpl::setupViewport()
 {
     auto vpWidth = getWindowWidth();

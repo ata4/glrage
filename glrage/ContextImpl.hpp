@@ -30,6 +30,8 @@ public:
     void setWindowSize(int32_t width, int32_t height);
     int32_t getWindowWidth();
     int32_t getWindowHeight();
+    int32_t getScreenWidth();
+    int32_t getScreenHeight();
     void setupViewport();
     void swapBuffers();
     void setRendered();

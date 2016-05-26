@@ -1,5 +1,6 @@
 #include "AssaultRigsPatch.hpp"
 
+#include <glrage/ContextImpl.hpp>
 #include <glrage_util/Config.hpp>
 
 #include <Windows.h>
@@ -24,12 +25,14 @@ void AssaultRigsPatch::apply()
         int32_t width = m_config.getInt("patch.resolution_width", -1);
         int32_t height = m_config.getInt("patch.resolution_height", -1);
 
+        ContextImpl& ctx = ContextImpl::instance();
+
         if (width <= 0) {
-            width = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            width = ctx.getScreenWidth();
         }
 
         if (height <= 0) {
-            height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+            height = ctx.getScreenHeight();
         }
 
         patch(0x490234, "80 02 00 00 E0 01 00 00", Chunk() << width << height);

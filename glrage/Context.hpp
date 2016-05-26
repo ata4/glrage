@@ -28,6 +28,8 @@ public:
     virtual void setWindowSize(int32_t width, int32_t height) = 0;
     virtual int32_t getWindowWidth() = 0;
     virtual int32_t getWindowHeight() = 0;
+    virtual int32_t getScreenWidth() = 0;
+    virtual int32_t getScreenHeight() = 0;
     virtual void setupViewport() = 0;
     virtual void swapBuffers() = 0;
     virtual void setRendered() = 0;
