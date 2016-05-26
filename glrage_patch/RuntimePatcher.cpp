@@ -19,6 +19,12 @@
 
 namespace glrage {
 
+RuntimePatcher& RuntimePatcher::instance()
+{
+    static RuntimePatcher instance;
+    return instance;
+}
+
 void RuntimePatcher::patch()
 {
     getModulePath();

@@ -11,9 +11,15 @@ namespace glrage {
 class RuntimePatcher
 {
 public:
+    static RuntimePatcher& instance();
+
     void patch();
 
 private:
+    RuntimePatcher(){};
+    RuntimePatcher(RuntimePatcher const&) = delete;
+    void operator=(RuntimePatcher const&) = delete;
+    
     void getModulePath();
     void getModuleVersion();
 
