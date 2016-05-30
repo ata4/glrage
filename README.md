@@ -112,9 +112,9 @@ Wipeout runs mostly stable, but there are some graphical glitches right now.
 
 # Compiling
 
-You'll need Visual Studio 2015 to compile the source files. Additionally, you will also need the [ATi 3D Rage Pro SDK 4.1](http://www.vogonsdrivers.com/getfile.php?fileid=497) and extract it to the repo's main folder.
-You can also just extract ATI3DCIF.H header file to `ragesdk/include`, since the rest isn't required for compiling.
+You'll need Visual Studio 2015 to compile the source files. Additionally, you will also need the ATI3DCIF.H header file from the [ATi 3D Rage Pro SDK 4.1](http://www.vogonsdrivers.com/getfile.php?fileid=497) and put it in `ragesdk/include`.
 
 # License
+
 This software is provided under GNU Lesser General Public License version 3.
-See LGPL-3 or http://www.gnu.org/licenses/lgpl.html for the full text of this license.
+See LICENSE or http://www.gnu.org/licenses/lgpl.html for the full text of this license.
