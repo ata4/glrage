@@ -113,10 +113,10 @@ void ContextImpl::attach(HWND hwnd)
     ErrorUtils::setHWnd(m_hwnd);
 
     // get window procedure pointer and replace it with custom procedure
-    auto windowProc = GetWindowLongPtr(m_hwnd, GWL_WNDPROC);
+    auto windowProc = GetWindowLongPtr(m_hwnd, GWLP_WNDPROC);
     m_windowProc = reinterpret_cast<WNDPROC>(windowProc);
     windowProc = reinterpret_cast<LONG_PTR>(&callbackWindowProc);
-    SetWindowLongPtr(m_hwnd, GWL_WNDPROC, windowProc);
+    SetWindowLongPtr(m_hwnd, GWLP_WNDPROC, windowProc);
 
     // detach from current window
     wglMakeCurrent(NULL, NULL);
@@ -170,7 +170,7 @@ void ContextImpl::detach()
     m_hglrc = nullptr;
 
     auto windowProc = reinterpret_cast<LONG_PTR>(m_windowProc);
-    SetWindowLongPtr(m_hwnd, GWL_WNDPROC, windowProc);
+    SetWindowLongPtr(m_hwnd, GWLP_WNDPROC, windowProc);
     m_windowProc = nullptr;
 
     m_hwnd = nullptr;
