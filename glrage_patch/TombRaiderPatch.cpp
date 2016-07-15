@@ -459,14 +459,13 @@ void TombRaiderPatch::applyLogicPatches()
     // disable internal DOS/Windows scan code remapping, which is now done in
     // TombRaiderHooks::keyboardProc
     patch(m_ub ? 0x42EC81 : 0x42F151, "75 0A", "EB 34");
-    if (!m_ub) {
-        patch(0x41E44B, "07", "6D");
-        patch(0x41E4D4, "07", "6D");
-    }
+    patch(m_ub ? 0x41E0FB : 0x41E44B, "07", "6D");
+    patch(m_ub ? 0x41E183 : 0x41E4D4, "07", "6D");
 
     // custom key bindings are only implemented for joystick buttons, this
-    // patch implements the function stub to poll the currently pressed key
+    // patch implements the function stub to return the previously pressed key
     if (m_ub) {
+        patchAddr(0x42EAF8, "E8 F3 8D 00 00", TombRaiderHooks::getPressedKey, 0xE8);
     } else {
         patchAddr(0x42EF35, "E8 86 8C 00 00", TombRaiderHooks::getPressedKey, 0xE8);
     }
