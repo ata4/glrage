@@ -446,8 +446,6 @@ void TombRaiderPatch::applyLogicPatches()
     // has ever been pressed while the game is running.
     TombRaiderHooks::m_tombKeyStates =
         reinterpret_cast<uint8_t**>(m_ub ? 0x45B348 : 0x45B998);
-    TombRaiderHooks::m_tombDefaultKeyBindings =
-        reinterpret_cast<int16_t*>(m_ub ? 0x454880 : 0x454A08);
     TombRaiderHooks::m_tombHhk =
         reinterpret_cast<HHOOK*>(m_ub ? 0x45A314 : 0x45A93C);
 
@@ -458,17 +456,13 @@ void TombRaiderPatch::applyLogicPatches()
         patch(0x43DC30, "C0 D8 43 00", &TombRaiderHooks::keyboardProc);
     }
 
-    // hook keypress subroutine
-    if (m_ub) {
-        patchAddr(
-            0x41E0E0, "8B 54 24 04 8B", TombRaiderHooks::keyIsPressed, 0xE9);
-    } else {
-        patchAddr(
-            0x41E3E0, "8B 4C 24 04 56", TombRaiderHooks::keyIsPressed, 0xE9);
-    }
-
-    // disable internal scan code remapping
+    // disable internal DOS/Windows scan code remapping, which is now done in
+    // TombRaiderHooks::keyboardProc
     patch(m_ub ? 0x42EC81 : 0x42F151, "75 0A", "EB 34");
+    if (!m_ub) {
+        patch(0x41E44B, "07", "6D");
+        patch(0x41E4D4, "07", "6D");
+    }
 
     // custom key bindings are only implemented for joystick buttons, this
     // patch implements the function stub to poll the currently pressed key

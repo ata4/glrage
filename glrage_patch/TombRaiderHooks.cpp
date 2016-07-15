@@ -39,9 +39,6 @@ TombRaiderRenderCollectedItem* TombRaiderHooks::m_tombRenderCollectedItem =
 // Pointer to the key state table. If an entry is 1, then the key is pressed.
 uint8_t** TombRaiderHooks::m_tombKeyStates = nullptr;
 
-// Default key binding table. Maps the key scan codes to button IDs.
-int16_t* TombRaiderHooks::m_tombDefaultKeyBindings = nullptr;
-
 // Number of currently loaded audio samples.
 int32_t* TombRaiderHooks::m_tombNumAudioSamples = nullptr;
 
@@ -293,13 +290,6 @@ TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
 
 next:
     return CallNextHookEx(*m_tombHhk, nCode, wParam, lParam);
-}
-
-BOOL TombRaiderHooks::keyIsPressed(int32_t keyCode)
-{
-    int16_t keyBinding = m_tombDefaultKeyBindings[keyCode];
-    uint8_t* keyStates = *m_tombKeyStates;
-    return keyStates[keyBinding];
 }
 
 int32_t TombRaiderHooks::getPressedKey()

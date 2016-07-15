@@ -61,7 +61,6 @@ public:
     static BOOL musicStop();
     static BOOL musicSetVolume(int16_t volume);
     static LRESULT keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam);
-    static BOOL keyIsPressed(int32_t keyCode);
     static int32_t getPressedKey();
     static BOOL renderHealthBar(int32_t health);
     static BOOL renderAirBar(int32_t air);
@@ -82,7 +81,6 @@ public:
 
     // Tomb Raider vars
     static uint8_t** m_tombKeyStates;
-    static int16_t* m_tombDefaultKeyBindings;
     static int32_t* m_tombNumAudioSamples;
     static TombRaiderAudioSample*** m_tombSampleTable;
     static BOOL* m_tombSoundInit1;
