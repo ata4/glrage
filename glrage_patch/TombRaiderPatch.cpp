@@ -380,6 +380,14 @@ void TombRaiderPatch::applySoundPatches()
         // which are all looping
         TombRaiderHooks::m_musicAlwaysLoop = m_ub;
     }
+
+    // insert missing SFX volume initialization by replacing a nullsub call
+    // after loading the settings
+    if (m_ub) {
+        patchAddr(0x437FA6, "E8 25 1F FF FF", TombRaiderHooks::soundUpdateVolume, 0xE8);
+    } else {
+        patchAddr(0x438576, "E8 B5 F9 FF FF", TombRaiderHooks::soundUpdateVolume, 0xE8);
+    }
 }
 
 void TombRaiderPatch::applyKeyboardPatches()

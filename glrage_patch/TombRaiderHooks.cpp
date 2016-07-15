@@ -58,6 +58,9 @@ static TombRaiderSetFOV* m_tombSetFOV = nullptr;
 // renders the previously collected item
 static TombRaiderRenderCollectedItem* m_tombRenderCollectedItem = nullptr;
 
+// changes the global sound effect volume
+static TombRaiderSoundSetVolume* m_tombSoundSetVolume = nullptr;
+
 /** Tomb Raider var pointers **/
 
 // Pointer to the key state table. If an entry is 1, then the key is pressed.
@@ -73,6 +76,9 @@ static TombRaiderAudioSample*** m_tombSampleTable = nullptr;
 // the same location.
 static BOOL* m_tombSoundInit1 = nullptr;
 static BOOL* m_tombSoundInit2 = nullptr;
+
+// Current sound effect volume, ranging from 0 to 10.
+static uint8_t* m_tombSFXVolume = nullptr;
 
 // Linear to logarithmic lookup table for decibel conversion.
 static int32_t* m_tombDecibelLut = nullptr;
@@ -146,6 +152,7 @@ void TombRaiderHooks::init(bool ub)
     m_tombCreateOverlayText = reinterpret_cast<TombRaiderCreateOverlayText*>(ub ? 0x4390D0 : 0x439780);
     m_tombSetFOV = reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
     m_tombRenderCollectedItem = reinterpret_cast<TombRaiderRenderCollectedItem*>(ub ? 0x435800 : 0x435D80);
+    m_tombSoundSetVolume = reinterpret_cast<TombRaiderSoundSetVolume*>(ub ? 0x42AFF0 : 0x42B410);
 
     // var pointers
     m_tombKeyStates = reinterpret_cast<uint8_t**>(ub ? 0x45B348 : 0x45B998);
@@ -153,6 +160,7 @@ void TombRaiderHooks::init(bool ub)
     m_tombSampleTable = reinterpret_cast<TombRaiderAudioSample***>(ub ? 0x45B314 : 0x45B954);
     m_tombSoundInit1 = reinterpret_cast<BOOL*>(ub ? 0x459CF4 : 0x45A31C);
     m_tombSoundInit2 = reinterpret_cast<BOOL*>(ub ? 0x459CF8 : 0x45A320);
+    m_tombSFXVolume = reinterpret_cast<uint8_t*>(ub ? 0x455D38 : 0x456334);
     m_tombDecibelLut = reinterpret_cast<int32_t*>(ub ? 0x45E9E0 : 0x45F1E0);
     m_tombCDTrackID = reinterpret_cast<int32_t*>(ub ? 0x4534F4 : 0x4534DC);
     m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(ub ? 0x45B330 : 0x45B97C);
@@ -321,6 +329,14 @@ void TombRaiderHooks::soundStopAll()
             sample->buffer->Stop();
         }
     }
+}
+
+void TombRaiderHooks::soundUpdateVolume()
+{
+    LOG_TRACE("");
+
+    musicSetVolume(25 * (*m_tombCDVolume) + 5);
+    m_tombSoundSetVolume(6 * (*m_tombSFXVolume) + 3);
 }
 
 LRESULT
