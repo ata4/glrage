@@ -470,6 +470,13 @@ void TombRaiderPatch::applyLogicPatches()
     // disable internal scan code remapping
     patch(m_ub ? 0x42EC81 : 0x42F151, "75 0A", "EB 34");
 
+    // custom key bindings are only implemented for joystick buttons, this
+    // patch implements the function stub to poll the currently pressed key
+    if (m_ub) {
+    } else {
+        patchAddr(0x42EF35, "E8 86 8C 00 00", TombRaiderHooks::getPressedKey, 0xE8);
+    }
+
     // fix infinite loop before starting the credits
     patch(m_ub ? 0x41CC88 : 0x41CD58, "74", "EB");
 
@@ -486,9 +493,6 @@ void TombRaiderPatch::applyLogicPatches()
         patch(0x41D4F5, "37 AA 01 00", "48 B9 FE FF");
         patch(0x41D528, "04 AA 01 00", "15 B9 FE FF");
     }
-
-    // prevent selection of user keys in the options (they don't work anyway)
-    patchNop(m_ub ? 0x42E76C : 0x42EB7C, "0F 94 C0");
 
     // No-CD patch. Allows the game to load game files and movies from the local
     // directory instead from the CD.

@@ -62,6 +62,7 @@ public:
     static BOOL musicSetVolume(int16_t volume);
     static LRESULT keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam);
     static BOOL keyIsPressed(int32_t keyCode);
+    static int32_t getPressedKey();
     static BOOL renderHealthBar(int32_t health);
     static BOOL renderAirBar(int32_t air);
     static BOOL renderCollectedItem(int32_t x, int32_t y, int32_t scale,
@@ -104,6 +105,7 @@ public:
     // other vars
     static bool m_musicAlwaysLoop;
     static DirectSoundBufferMap m_tmpSoundBuffers;
+    static int32_t m_lastScanCode;
 
 private:
     static LPDIRECTSOUNDBUFFER soundPlaySample(int32_t soundID, int32_t volume,

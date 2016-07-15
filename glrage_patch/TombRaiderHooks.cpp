@@ -99,6 +99,9 @@ LPDIRECTSOUND* TombRaiderHooks::m_tombDirectSound = nullptr;
 // map for duplicated sound buffers
 DirectSoundBufferMap TombRaiderHooks::m_tmpSoundBuffers;
 
+// previously pressed key scan code
+int32_t TombRaiderHooks::m_lastScanCode = 0;
+
 int32_t TombRaiderHooks::soundInit()
 {
     int32_t result = m_tombSoundInit();
@@ -281,6 +284,7 @@ TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
 
     keyStates[scanCode] = pressed;
     keyStates[325] = pressed;
+    m_lastScanCode = scanCode;
 
     // terminate ALT key hook so the menu won't pop up when jumping
     if (wParam == VK_MENU) {
@@ -296,6 +300,13 @@ BOOL TombRaiderHooks::keyIsPressed(int32_t keyCode)
     int16_t keyBinding = m_tombDefaultKeyBindings[keyCode];
     uint8_t* keyStates = *m_tombKeyStates;
     return keyStates[keyBinding];
+}
+
+int32_t TombRaiderHooks::getPressedKey()
+{
+    auto lastScanCode = m_lastScanCode;
+    m_lastScanCode = 0;
+    return lastScanCode;
 }
 
 BOOL TombRaiderHooks::renderHealthBar(int32_t health)
