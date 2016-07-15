@@ -25,6 +25,9 @@ GameID TombRaiderPatch::gameID()
 
 void TombRaiderPatch::apply()
 {
+    // prepare hooks
+    TombRaiderHooks::init(m_ub);
+
     // mandatory crash patches
     applyCrashPatches();
 
@@ -139,22 +142,6 @@ void TombRaiderPatch::applyGraphicPatches()
 
         // UI scale patch, rescales the in-game overlay to keep the proportions
         // of the 800x600 resolution on higher resolutions.
-        TombRaiderHooks::m_tombRenderLine =
-            reinterpret_cast<TombRaiderRenderLine*>(0x402710);
-        TombRaiderHooks::m_tombRenderCollectedItem =
-            reinterpret_cast<TombRaiderRenderCollectedItem*>(
-                m_ub ? 0x435800 : 0x435D80);
-        TombRaiderHooks::m_tombCreateOverlayText =
-            reinterpret_cast<TombRaiderCreateOverlayText*>(
-                m_ub ? 0x4390D0 : 0x439780);
-        TombRaiderHooks::m_tombRenderWidth =
-            reinterpret_cast<int32_t*>(m_ub ? 0x6CA5D4 : 0x6CADD4);
-        TombRaiderHooks::m_tombRenderHeight =
-            reinterpret_cast<int32_t*>(m_ub ? 0x68EBA8 : 0x68F3A8);
-        TombRaiderHooks::m_tombTicks =
-            reinterpret_cast<int32_t*>(m_ub ? 0x459CF0 : 0x45A318);
-        TombRaiderHooks::m_tombDirectSound =
-            reinterpret_cast<LPDIRECTSOUND*>(m_ub ? 0x45E9D8 : 0x0045F1CC);
 
         // clang-format off
         if (m_ub) {
@@ -186,9 +173,6 @@ void TombRaiderPatch::applyGraphicPatches()
 
         // change the FOV mode from horizontal to vertical if enabled
         if (m_config.getBool("patch.fov_vertical", true)) {
-            TombRaiderHooks::m_tombSetFOV =
-                reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
-
             // replace inline FOV conversion code with function call that
             // contains the same code
             if (m_ub) {
@@ -311,18 +295,6 @@ void TombRaiderPatch::applySoundPatches()
     // implementations.
     // It also replaces the subroutine for normal sounds to fix the annoying
     // panning issue.
-    TombRaiderHooks::m_tombSoundInit =
-        reinterpret_cast<TombRaiderSoundInit*>(m_ub ? 0x419DA0 : 0x419E90);
-    TombRaiderHooks::m_tombNumAudioSamples =
-        reinterpret_cast<int32_t*>(m_ub ? 0x45B324 : 0x45B96C);
-    TombRaiderHooks::m_tombSampleTable =
-        reinterpret_cast<TombRaiderAudioSample***>(m_ub ? 0x45B314 : 0x45B954);
-    TombRaiderHooks::m_tombSoundInit1 =
-        reinterpret_cast<BOOL*>(m_ub ? 0x459CF4 : 0x45A31C);
-    TombRaiderHooks::m_tombSoundInit2 =
-        reinterpret_cast<BOOL*>(m_ub ? 0x459CF8 : 0x45A320);
-    TombRaiderHooks::m_tombDecibelLut =
-        reinterpret_cast<int32_t*>(m_ub ? 0x45E9E0 : 0x45F1E0);
 
     // clang-format off
     if (m_ub) {
@@ -350,28 +322,22 @@ void TombRaiderPatch::applySoundPatches()
     }
 
     // CD audio patches.
-    TombRaiderHooks::m_tombMciDeviceID =
-        reinterpret_cast<MCIDEVICEID*>(m_ub ? 0x45B344 : 0x45B994);
-    TombRaiderHooks::m_tombAuxDeviceID =
-        reinterpret_cast<uint32_t*>(m_ub ? 0x45B338 : 0x45B984);
-    TombRaiderHooks::m_tombHwnd =
-        reinterpret_cast<HWND*>(m_ub ? 0x462E00 : 0x463600);
-    TombRaiderHooks::m_tombCDTrackID =
-        reinterpret_cast<int32_t*>(m_ub ? 0x4534F4 : 0x4534DC);
-    TombRaiderHooks::m_tombCDTrackIDLoop =
-        reinterpret_cast<int32_t*>(m_ub ? 0x45B330 : 0x45B97C);
-    TombRaiderHooks::m_tombCDLoop =
-        reinterpret_cast<BOOL*>(m_ub ? 0x45B30C : 0x45B94C);
-    TombRaiderHooks::m_tombCDVolume =
-        reinterpret_cast<uint32_t*>(m_ub ? 0x455D3C : 0x456334);
-    TombRaiderHooks::m_tombCDNumTracks =
-        reinterpret_cast<uint32_t*>(m_ub ? 0x45B31C : 0x45B964);
-
-    // Patch bad mapping function in UB that remaps the music volume from 0-10
-    // to 5-255 instead of 0-65536, which is the value range for auxSetVolume.
     if (m_ub) {
-        patchAddr(
-            0x438A70, "0F BF 44 24 04", TombRaiderHooks::musicSetVolume, 0xE9);
+        // Patch bad mapping function in UB that remaps the music volume from 0-10
+        // to 5-255 instead of 0-65536, which is the value range for auxSetVolume.
+        patchAddr(0x438A70, "0F BF 44 24 04", TombRaiderHooks::musicSetVolume, 0xE9);
+    } else {
+        // Add missing music volume update calls in original TR1.
+        patchAddr(0x410B7C, "E8 AF 73 02 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x410BB3, "E8 78 73 02 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x41D190, "E8 9B AD 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x41D318, "E8 13 AC 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x41E81A, "E8 11 97 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x41F83C, "E8 EF 86 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x41F8A4, "E8 87 86 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x42E941, "E8 EA 95 00 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x42E94D, "E8 DE 95 00 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x438508, "E8 23 FA FF FF", TombRaiderHooks::musicSetVolume, 0xE8);
     }
 
     // Hook low-level CD play function to fix a volume bug.
@@ -444,10 +410,6 @@ void TombRaiderPatch::applyLogicPatches()
     // This patch fixes a bug in the global key press handling, which normally
     // interrupts the demo mode and the credit sceens immediately after any key
     // has ever been pressed while the game is running.
-    TombRaiderHooks::m_tombKeyStates =
-        reinterpret_cast<uint8_t**>(m_ub ? 0x45B348 : 0x45B998);
-    TombRaiderHooks::m_tombHhk =
-        reinterpret_cast<HHOOK*>(m_ub ? 0x45A314 : 0x45A93C);
 
     // replace keyboard hook
     if (m_ub) {

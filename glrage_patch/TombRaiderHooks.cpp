@@ -6,98 +6,168 @@
 
 namespace glrage {
 
-bool TombRaiderHooks::m_musicAlwaysLoop = false;
-int32_t TombRaiderHooks::m_fpsTextX = 0;
-int32_t TombRaiderHooks::m_fpsTextY = 0;
+/** Tomb Raider sub types **/
 
-std::map<int32_t, int32_t> TombRaiderHooks::m_keyCodeMap = {
+typedef int32_t TombRaiderSoundInit();
+typedef BOOL TombRaiderRenderLine(
+    int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t a5, int8_t color);
+typedef BOOL TombRaiderRenderCollectedItem(
+    int32_t x, int32_t y, int32_t scale, int16_t itemID, int16_t brightness);
+typedef void* TombRaiderCreateOverlayText(
+    int16_t x, int16_t y, int16_t a3, const char* text);
+typedef int16_t TombRaiderSetFOV(int16_t fov);
+typedef BOOL TombRaiderSoundSetVolume(uint8_t volume);
+
+/** Tomb Raider structs **/
+
+#pragma pack(push)
+#pragma pack(1)
+struct TombRaiderAudioSample
+{
+    uint32_t data;
+    uint16_t length;
+    uint16_t bitsPerSample;
+    uint16_t channels;
+    uint16_t unknown1;
+    uint16_t sampleRate;
+    uint16_t unknown2;
+    uint16_t channels2;
+    uint32_t unknown3;
+    uint16_t volume;
+    uint32_t pan;
+    uint16_t unknown4;
+    LPDIRECTSOUNDBUFFER buffer;
+    uint16_t unknown5;
+};
+#pragma pack(pop)
+
+/** Tomb Raider sub pointers **/
+
+// init sound system
+static TombRaiderSoundInit* m_tombSoundInit = nullptr;
+
+// renders a line between two points
+static TombRaiderRenderLine* m_tombRenderLine = nullptr;
+
+// creates overlay text
+static TombRaiderCreateOverlayText* m_tombCreateOverlayText = nullptr;
+
+// changes the current horizontal field of view value
+static TombRaiderSetFOV* m_tombSetFOV = nullptr;
+
+// renders the previously collected item
+static TombRaiderRenderCollectedItem* m_tombRenderCollectedItem = nullptr;
+
+/** Tomb Raider var pointers **/
+
+// Pointer to the key state table. If an entry is 1, then the key is pressed.
+static uint8_t** m_tombKeyStates = nullptr;
+
+// Number of currently loaded audio samples.
+static int32_t* m_tombNumAudioSamples = nullptr;
+
+// Audio sample pointer table.
+static TombRaiderAudioSample*** m_tombSampleTable = nullptr;
+
+// Sound init booleans. There are two for some reason and both are set to 1 at
+// the same location.
+static BOOL* m_tombSoundInit1 = nullptr;
+static BOOL* m_tombSoundInit2 = nullptr;
+
+// Linear to logarithmic lookup table for decibel conversion.
+static int32_t* m_tombDecibelLut = nullptr;
+
+// CD track currently played.
+static int32_t* m_tombCDTrackID = nullptr;
+
+// CD track to play after the current one has finished. Usually for ambiance
+// tracks.
+static int32_t* m_tombCDTrackIDLoop = nullptr;
+
+// CD loop flag. If TRUE, it re-plays m_tombCDTrackIDLoop after it finished.
+static BOOL* m_tombCDLoop = nullptr;
+
+// Current music volume, ranging from 0 to 10.
+static uint32_t* m_tombCDVolume = nullptr;
+
+// Number of CD track.
+static uint32_t* m_tombCDNumTracks = nullptr;
+
+// MCI device ID.
+static MCIDEVICEID* m_tombMciDeviceID = nullptr;
+
+// Auxiliary device ID.
+static uint32_t* m_tombAuxDeviceID = nullptr;
+
+// Rendering width and height.
+static int32_t* m_tombRenderWidth = nullptr;
+static int32_t* m_tombRenderHeight = nullptr;
+
+// Tick counter, based on the milliseconds since the system has been started.
+// Each second has 60 ticks, so one tick lasts about 16.6 ms. The game logic
+// runs on every other tick at most.
+static int32_t* m_tombTicks = nullptr;
+
+// Window handle.
+static HWND* m_tombHwnd = nullptr;
+
+// Keyboard hook handle.
+static HHOOK* m_tombHhk = nullptr;
+
+// DirectSound handle
+static LPDIRECTSOUND* m_tombDirectSound = nullptr;
+
+/** Misc variables **/
+
+bool TombRaiderHooks::m_musicAlwaysLoop = false;
+
+// previously pressed key scan code
+static int32_t m_lastScanCode = 0;
+
+// FPS text position
+static int32_t m_fpsTextX = 0;
+static int32_t m_fpsTextY = 0;
+
+static std::map<int32_t, int32_t> m_keyCodeMap = {
     {29, 157}, // CTRL
     {42, 54},  // SHIFT
     {56, 184}  // ALT
 };
 
-/** Tomb Raider sub pointers **/
+/** Misc constants **/
 
-// init sound system
-TombRaiderSoundInit* TombRaiderHooks::m_tombSoundInit = nullptr;
+static const int32_t DECIBEL_LUT_SIZE = 512;
 
-// renders a line between two points
-TombRaiderRenderLine* TombRaiderHooks::m_tombRenderLine = nullptr;
+void TombRaiderHooks::init(bool ub)
+{
+    // sub pointers
+    m_tombSoundInit = reinterpret_cast<TombRaiderSoundInit*>(ub ? 0x419DA0 : 0x419E90);
+    m_tombRenderLine = reinterpret_cast<TombRaiderRenderLine*>(0x402710);
+    m_tombCreateOverlayText = reinterpret_cast<TombRaiderCreateOverlayText*>(ub ? 0x4390D0 : 0x439780);
+    m_tombSetFOV = reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
+    m_tombRenderCollectedItem = reinterpret_cast<TombRaiderRenderCollectedItem*>(ub ? 0x435800 : 0x435D80);
 
-// creates overlay text
-TombRaiderCreateOverlayText* TombRaiderHooks::m_tombCreateOverlayText = nullptr;
-
-// changes the current horizontal field of view value
-TombRaiderSetFOV* TombRaiderHooks::m_tombSetFOV = nullptr;
-
-// renders the previously collected item
-TombRaiderRenderCollectedItem* TombRaiderHooks::m_tombRenderCollectedItem =
-    nullptr;
-
-/** Tomb Raider var pointers **/
-
-// Pointer to the key state table. If an entry is 1, then the key is pressed.
-uint8_t** TombRaiderHooks::m_tombKeyStates = nullptr;
-
-// Number of currently loaded audio samples.
-int32_t* TombRaiderHooks::m_tombNumAudioSamples = nullptr;
-
-// Audio sample pointer table.
-TombRaiderAudioSample*** TombRaiderHooks::m_tombSampleTable = nullptr;
-
-// Sound init booleans. There are two for some reason and both are set to 1 at
-// the same location.
-BOOL* TombRaiderHooks::m_tombSoundInit1 = nullptr;
-BOOL* TombRaiderHooks::m_tombSoundInit2 = nullptr;
-
-// Linear to logarithmic lookup table for decibel conversion.
-int32_t* TombRaiderHooks::m_tombDecibelLut = nullptr;
-
-// CD track currently played.
-int32_t* TombRaiderHooks::m_tombCDTrackID = nullptr;
-
-// CD track to play after the current one has finished. Usually for ambiance
-// tracks.
-int32_t* TombRaiderHooks::m_tombCDTrackIDLoop = nullptr;
-
-// CD loop flag. If TRUE, it re-plays m_tombCDTrackIDLoop after it finished.
-BOOL* TombRaiderHooks::m_tombCDLoop = nullptr;
-
-// Current music volume, ranging from 0 to 10.
-uint32_t* TombRaiderHooks::m_tombCDVolume = nullptr;
-
-// Number of CD track.
-uint32_t* TombRaiderHooks::m_tombCDNumTracks = nullptr;
-
-// MCI device ID.
-MCIDEVICEID* TombRaiderHooks::m_tombMciDeviceID = nullptr;
-
-// Auxiliary device ID.
-uint32_t* TombRaiderHooks::m_tombAuxDeviceID = nullptr;
-
-// Rendering width and height.
-int32_t* TombRaiderHooks::m_tombRenderWidth = nullptr;
-int32_t* TombRaiderHooks::m_tombRenderHeight = nullptr;
-
-// Tick counter, based on the milliseconds since the system has been started.
-// Each second has 60 ticks, so one tick lasts about 16.6 ms. The game logic
-// runs on every other tick at most.
-int32_t* TombRaiderHooks::m_tombTicks = nullptr;
-
-// Window handle.
-HWND* TombRaiderHooks::m_tombHwnd = nullptr;
-
-// Keyboard hook handle.
-HHOOK* TombRaiderHooks::m_tombHhk = nullptr;
-
-// DirectSound handle
-LPDIRECTSOUND* TombRaiderHooks::m_tombDirectSound = nullptr;
-
-// map for duplicated sound buffers
-DirectSoundBufferMap TombRaiderHooks::m_tmpSoundBuffers;
-
-// previously pressed key scan code
-int32_t TombRaiderHooks::m_lastScanCode = 0;
+    // var pointers
+    m_tombKeyStates = reinterpret_cast<uint8_t**>(ub ? 0x45B348 : 0x45B998);
+    m_tombNumAudioSamples = reinterpret_cast<int32_t*>(ub ? 0x45B324 : 0x45B96C);
+    m_tombSampleTable = reinterpret_cast<TombRaiderAudioSample***>(ub ? 0x45B314 : 0x45B954);
+    m_tombSoundInit1 = reinterpret_cast<BOOL*>(ub ? 0x459CF4 : 0x45A31C);
+    m_tombSoundInit2 = reinterpret_cast<BOOL*>(ub ? 0x459CF8 : 0x45A320);
+    m_tombDecibelLut = reinterpret_cast<int32_t*>(ub ? 0x45E9E0 : 0x45F1E0);
+    m_tombCDTrackID = reinterpret_cast<int32_t*>(ub ? 0x4534F4 : 0x4534DC);
+    m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(ub ? 0x45B330 : 0x45B97C);
+    m_tombCDLoop = reinterpret_cast<BOOL*>(ub ? 0x45B30C : 0x45B94C);
+    m_tombCDVolume = reinterpret_cast<uint32_t*>(ub ? 0x455D3C : 0x456334);
+    m_tombCDNumTracks = reinterpret_cast<uint32_t*>(ub ? 0x45B31C : 0x45B964);
+    m_tombMciDeviceID = reinterpret_cast<MCIDEVICEID*>(ub ? 0x45B344 : 0x45B994);
+    m_tombAuxDeviceID = reinterpret_cast<uint32_t*>(ub ? 0x45B338 : 0x45B984);
+    m_tombRenderWidth = reinterpret_cast<int32_t*>(ub ? 0x6CA5D4 : 0x6CADD4);
+    m_tombRenderHeight = reinterpret_cast<int32_t*>(ub ? 0x68EBA8 : 0x68F3A8);
+    m_tombTicks = reinterpret_cast<int32_t*>(ub ? 0x459CF0 : 0x45A318);
+    m_tombHwnd = reinterpret_cast<HWND*>(ub ? 0x462E00 : 0x463600);
+    m_tombHhk = reinterpret_cast<HHOOK*>(ub ? 0x45A314 : 0x45A93C);
+    m_tombDirectSound = reinterpret_cast<LPDIRECTSOUND*>(ub ? 0x45E9D8 : 0x0045F1CC);
+}
 
 int32_t TombRaiderHooks::soundInit()
 {
@@ -157,6 +227,10 @@ TombRaiderHooks::soundPlaySample(
 {
     LOG_TRACE("%d %d %d %d %d", soundID, volume, pitch, pan, loop);
 
+    // map for duplicated sound buffers
+    static std::map<LPDIRECTSOUNDBUFFER, std::vector<LPDIRECTSOUNDBUFFER>>
+        m_tmpSoundBuffers;
+
     // check if sound system is initialized
     if (!*m_tombSoundInit1 || !*m_tombSoundInit2) {
         return nullptr;
@@ -176,7 +250,7 @@ TombRaiderHooks::soundPlaySample(
     sample->buffer->GetStatus(&status);
     if (status == DSBSTATUS_PLAYING) {
         // find existing buffer that isn't currently playing
-        DirectSoundBufferList& tmpBuffers = m_tmpSoundBuffers[buffer];
+        auto& tmpBuffers = m_tmpSoundBuffers[buffer];
         for (auto& tmpBuffer : tmpBuffers) {
             tmpBuffer->GetStatus(&status);
             if (status != DSBSTATUS_PLAYING) {
@@ -443,9 +517,9 @@ BOOL TombRaiderHooks::musicStop()
     *m_tombCDLoop = FALSE;
 
     // The original code used MCI_PAUSE, probably to reduce latency when
-    // switching
-    // tracks. But we'll use MCI_STOP here, since it's expected to use an MCI
-    // wrapper with nearly zero latency anyway.
+    // switching tracks.
+    // But we'll use MCI_STOP here, since it's expected to use an MCI wrapper
+    // with nearly zero latency anyway.
     MCI_GENERIC_PARMS genParms;
     return !mciSendCommandA(*m_tombMciDeviceID, MCI_STOP, MCI_WAIT,
         reinterpret_cast<DWORD_PTR>(&genParms));
