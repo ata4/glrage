@@ -34,8 +34,13 @@ void TombRaiderPatch::apply()
     // optional patches
     applyGraphicPatches();
     applySoundPatches();
+    applyKeyboardPatches();
     applyLogicPatches();
 }
+
+// Disable autoformatting here, there are too many lines that violate the column
+// limit and look really ugly when broken into multiple lines.
+// clang-format off
 
 void TombRaiderPatch::applyCrashPatches()
 {
@@ -87,10 +92,8 @@ void TombRaiderPatch::applyGraphicPatches()
     // This patch allows the customization of the water color, which is rather
     // ugly on default.
     if (m_config.getBool("patch.watercolor_override", true)) {
-        float filterRed =
-            m_config.getFloat("patch.watercolor_filter_red", 0.45f);
-        float filterGreen =
-            m_config.getFloat("patch.watercolor_filter_green", 1.0f);
+        float filterRed = m_config.getFloat("patch.watercolor_filter_red", 0.45f);
+        float filterGreen = m_config.getFloat("patch.watercolor_filter_green", 1.0f);
 
         Chunk c = Chunk() << filterRed << filterGreen;
         patch(0x451028, "9A 99 19 3F 33 33 33 3F", c);
@@ -122,28 +125,21 @@ void TombRaiderPatch::applyGraphicPatches()
             static_cast<float_t>(height - 1));
 
         // update clipping size
-        patch(m_ub ? 0x408A64 : 0x408A57, "20 03",
-            static_cast<int16_t>(width));
-        patch(m_ub ? 0x408A6D : 0x408A60, "58 02",
-            static_cast<int16_t>(height));
+        patch(m_ub ? 0x408A64 : 0x408A57, "20 03", static_cast<int16_t>(width));
+        patch(m_ub ? 0x408A6D : 0x408A60, "58 02", static_cast<int16_t>(height));
 
         // set display string (needs to be static so the data won't vanish after
         // patching has finished)
-        static std::string displayMode =
-            StringUtils::format("%dx%d", width, height);
+        static std::string displayMode = StringUtils::format("%dx%d", width, height);
 
         if (m_ub) {
-            patch(0x42DB5B, "40 61 45 00 ",
-                reinterpret_cast<int32_t>(displayMode.c_str()));
+            patch(0x42DB5B, "40 61 45 00 ", reinterpret_cast<int32_t>(displayMode.c_str()));
         } else {
-            patch(0x42DF6B, "58 67 45 00",
-                reinterpret_cast<int32_t>(displayMode.c_str()));
+            patch(0x42DF6B, "58 67 45 00", reinterpret_cast<int32_t>(displayMode.c_str()));
         }
 
         // UI scale patch, rescales the in-game overlay to keep the proportions
         // of the 800x600 resolution on higher resolutions.
-
-        // clang-format off
         if (m_ub) {
             patchAddr(0x41DA85, "E8 76 23 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
             patchAddr(0x41DC0C, "E8 EF 21 01 00", TombRaiderHooks::renderHealthBar, 0xE8);
@@ -157,7 +153,6 @@ void TombRaiderPatch::applyGraphicPatches()
             patchAddr(0x41DE71, "E8 0A 7F 01 00", TombRaiderHooks::renderCollectedItem, 0xE8);
             patchAddr(0x439B72, "E8 09 FC FF FF", TombRaiderHooks::createFPSText, 0xE8);
         }
-        // clang-format on
     }
 
     // Field of view customization patch.
@@ -176,10 +171,12 @@ void TombRaiderPatch::applyGraphicPatches()
             // replace inline FOV conversion code with function call that
             // contains the same code
             if (m_ub) {
-                patch(0x402666, "56 E8 64 7D 02 00 8B F8 A1 D4",
+                patch(0x402666,
+                    "56 E8 64 7D 02 00 8B F8 A1 D4",
                     "D1 E6 56 E8 62 00 00 00 EB 1B");
             } else {
-                patch(0x402666, "56 E8 84 81 02 00 8B F8 A1 D4",
+                patch(0x402666,
+                    "56 E8 84 81 02 00 8B F8 A1 D4",
                     "D1 E6 56 E8 62 00 00 00 EB 1B");
             }
 
@@ -187,7 +184,6 @@ void TombRaiderPatch::applyGraphicPatches()
             patchAddr(
                 0x402669, "E8 62 00 00 00", TombRaiderHooks::setFOV, 0xE8);
 
-            // clang-format off
             if (m_ub) {
                 patchAddr(0x4113E9, "E8 E2 12 FF FF", TombRaiderHooks::setFOV, 0xE8);
                 patchAddr(0x411624, "E8 A7 10 FF FF", TombRaiderHooks::setFOV, 0xE8);
@@ -199,7 +195,6 @@ void TombRaiderPatch::applyGraphicPatches()
                 patchAddr(0x41ABBC, "E8 0F 7B FE FF", TombRaiderHooks::setFOV, 0xE8);
                 patchAddr(0x41E7DF, "E8 EC 3E FE FF", TombRaiderHooks::setFOV, 0xE8);
             }
-            // clang-format on
         }
     }
 
@@ -216,8 +211,7 @@ void TombRaiderPatch::applyGraphicPatches()
     patch(m_ub ? 0x4168FE : 0x4169EE, tmpExp, tmpRep);
 
     if (m_config.getBool("patch.draw_distance_override", false)) {
-        int32_t drawDistFade =
-            m_config.getInt("patch.draw_distance_fade", 12288);
+        int32_t drawDistFade =m_config.getInt("patch.draw_distance_fade", 12288);
         int32_t drawDistMax = m_config.getInt("patch.draw_distance_max", 20480);
 
         Chunk drawDistFadeData;
@@ -295,8 +289,6 @@ void TombRaiderPatch::applySoundPatches()
     // implementations.
     // It also replaces the subroutine for normal sounds to fix the annoying
     // panning issue.
-
-    // clang-format off
     if (m_ub) {
         patchAddr(0x437B59, "E8 42 22 FE FF", TombRaiderHooks::soundInit, 0xE8);
         patchAddr(0x4386CA, "E8 01 18 FF FF", TombRaiderHooks::soundSetVolume, 0xE8);
@@ -312,7 +304,6 @@ void TombRaiderPatch::applySoundPatches()
         patchAddr(0x438C88, "E8 33 EF FF FF", TombRaiderHooks::soundPlayLoop, 0xE8);
         patchAddr(0x438CC0, "A1 88 66 45 00", TombRaiderHooks::soundStopAll, 0xE9);
     }
-    // clang-format on
 
     // Very optional patch: change ambient track in Lost Valley from "derelict"
     // to "water", which, in my very personal opinion, is more fitting for the
@@ -341,43 +332,35 @@ void TombRaiderPatch::applySoundPatches()
     }
 
     // Hook low-level CD play function to fix a volume bug.
-    patchAddr(m_ub ? 0x4379E0 : 0x437FB0, "83 EC 18 53 8B",
-        TombRaiderHooks::musicPlay, 0xE9);
+    patchAddr(m_ub ? 0x4379E0 : 0x437FB0, "83 EC 18 53 8B", TombRaiderHooks::musicPlay, 0xE9);
 
     // Soundtrack patch. Allows both ambient and music cues to be played via
     // MCI.
     if (m_config.getBool("patch.full_soundtrack", false)) {
         // hook play function (level music)
         if (m_ub) {
-            patchAddr(0x438700, "66 83 3D 3C 5D",
-                TombRaiderHooks::musicPlayRemap, 0xE9);
+            patchAddr(0x438700, "66 83 3D 3C 5D", TombRaiderHooks::musicPlayRemap, 0xE9);
         } else {
-            patchAddr(0x438D40, "66 83 3D 34 63",
-                TombRaiderHooks::musicPlayRemap, 0xE9);
+            patchAddr(0x438D40, "66 83 3D 34 63", TombRaiderHooks::musicPlayRemap, 0xE9);
         }
 
         // hook play function (cutscene music, not present in UB)
         if (!m_ub) {
-            patchAddr(0x439030, "66 83 3D 34 63",
-                TombRaiderHooks::musicPlayRemap, 0xE9);
+            patchAddr(0x439030, "66 83 3D 34 63", TombRaiderHooks::musicPlayRemap, 0xE9);
         }
 
         // hook stop function
         if (m_ub) {
-            patchAddr(
-                0x438880, "66 A1 F4 34 45", TombRaiderHooks::musicStop, 0xE9);
+            patchAddr(0x438880, "66 A1 F4 34 45", TombRaiderHooks::musicStop, 0xE9);
         } else {
-            patchAddr(
-                0x438E40, "66 A1 DC 34 45", TombRaiderHooks::musicStop, 0xE9);
+            patchAddr(0x438E40, "66 A1 DC 34 45", TombRaiderHooks::musicStop, 0xE9);
         }
 
         // hook function that is called when a track has finished
         if (m_ub) {
-            patchAddr(0x437AF0, "A1 0C B3 45 00",
-                TombRaiderHooks::musicPlayLoop, 0xE9);
+            patchAddr(0x437AF0, "A1 0C B3 45 00", TombRaiderHooks::musicPlayLoop, 0xE9);
         } else {
-            patchAddr(0x4380C0, "A1 4C B9 45 00",
-                TombRaiderHooks::musicPlayLoop, 0xE9);
+            patchAddr(0x4380C0, "A1 4C B9 45 00", TombRaiderHooks::musicPlayLoop, 0xE9);
         }
 
         // also pass 0 to the CD play sub when loading a level so the background
@@ -390,8 +373,7 @@ void TombRaiderPatch::applySoundPatches()
 
         // fix level audio mapping to match the track list of the original game
         if (m_ub) {
-            patch(
-                0x456400, "03 00 03 00 04 00 04 00", "3B 00 3B 00 3C 00 3C 00");
+            patch(0x456400, "03 00 03 00 04 00 04 00", "3B 00 3B 00 3C 00 3C 00");
         }
     } else {
         // without soundtrack, there are only three tracks left for UB,
@@ -400,13 +382,8 @@ void TombRaiderPatch::applySoundPatches()
     }
 }
 
-void TombRaiderPatch::applyLogicPatches()
+void TombRaiderPatch::applyKeyboardPatches()
 {
-    // This changes the first drive letter to search for the Tomb Raider CD from
-    // 'C' to 'A', which allows the game to find CDs placed in the drives A: or
-    // B: in systems with no floppy drives.
-    patch(m_ub ? 0x41BF50 : 0x41C020, "B0 43", "B0 41");
-
     // This patch fixes a bug in the global key press handling, which normally
     // interrupts the demo mode and the credit sceens immediately after any key
     // has ever been pressed while the game is running.
@@ -431,6 +408,14 @@ void TombRaiderPatch::applyLogicPatches()
     } else {
         patchAddr(0x42EF35, "E8 86 8C 00 00", TombRaiderHooks::getPressedKey, 0xE8);
     }
+}
+
+void TombRaiderPatch::applyLogicPatches()
+{
+    // This changes the first drive letter to search for the Tomb Raider CD from
+    // 'C' to 'A', which allows the game to find CDs placed in the drives A: or
+    // B: in systems with no floppy drives.
+    patch(m_ub ? 0x41BF50 : 0x41C020, "B0 43", "B0 41");
 
     // fix infinite loop before starting the credits
     patch(m_ub ? 0x41CC88 : 0x41CD58, "74", "EB");
@@ -460,7 +445,8 @@ void TombRaiderPatch::applyLogicPatches()
         }
 
         // fix format string: "%c:\%s" -> "%s"
-        patch(m_ub ? 0x453730 : 0x453890, "25 63 3A 5C 25 73",
+        patch(m_ub ? 0x453730 : 0x453890,
+            "25 63 3A 5C 25 73",
             "25 73 00 00 00 00");
 
         if (m_ub) {
@@ -503,11 +489,9 @@ void TombRaiderPatch::applyLogicPatches()
     // This patch fixes the function call that normally leads to a stub for some
     // reason.
     if (m_ub) {
-        patchAddr(0x437F9E, "E8 2D 1F FF FF", reinterpret_cast<void*>(0x41CC80),
-            0xE8);
+        patchAddr(0x437F9E, "E8 2D 1F FF FF", reinterpret_cast<void*>(0x41CC80), 0xE8);
     } else {
-        patchAddr(0x43856E, "E8 BD F9 FF FF", reinterpret_cast<void*>(0x41CD50),
-            0xE8);
+        patchAddr(0x43856E, "E8 BD F9 FF FF", reinterpret_cast<void*>(0x41CD50), 0xE8);
     }
 
     // Random fun patches, discovered from various experiments.
@@ -538,10 +522,8 @@ void TombRaiderPatch::applyLocalePatches()
     std::wstring localePath = basePath + L"\\patches\\locale\\";
 
     // load locale file
-    std::string locale =
-        m_config.getString("localization_locale", "en_GB");
-    std::wstring langPath =
-        localePath + StringUtils::utf8ToWide(locale) + L".txt";
+    std::string locale = m_config.getString("localization_locale", "en_GB");
+    std::wstring langPath = localePath + StringUtils::utf8ToWide(locale) + L".txt";
     std::ifstream langStream(langPath);
 
     if (!langStream.good()) {
@@ -609,12 +591,13 @@ void TombRaiderPatch::applyLocalePatches()
 
             // remaining values are pointers, which need to be patched
             replacement.clear();
-            replacement << reinterpret_cast<int32_t>(
-                &stringMap[stringIndex][0]);
+            replacement << reinterpret_cast<int32_t>(&stringMap[stringIndex][0]);
 
             patch(value, expected, replacement);
         }
     }
 }
+
+// clang-format on
 
 } // namespace glrage
