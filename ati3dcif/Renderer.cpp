@@ -69,7 +69,7 @@ Renderer::Renderer()
     // better
     // than having a negative zNear in the ortho matrix, which seems to mess up
     // depth testing
-    glm::mat4 modelView = glm::scale(glm::mat4(), glm::vec3(1, 1, -1));
+    auto modelView = glm::scale(glm::mat4(), glm::vec3(1, 1, -1));
     m_program.uniformMatrix4fv(
         "matModelView", 1, GL_FALSE, glm::value_ptr(modelView));
 
@@ -101,9 +101,9 @@ void Renderer::renderBegin(C3D_HRC hRC)
 
     // CIF always uses an orthographic view, the application deals with the
     // perspective when required
-    float width = static_cast<float>(m_context.getDisplayWidth());
-    float height = static_cast<float>(m_context.getDisplayHeight());
-    glm::mat4 projection = glm::ortho<float>(0, width, height, 0, -1e6, 1e6);
+    auto width = static_cast<float>(m_context.getDisplayWidth());
+    auto height = static_cast<float>(m_context.getDisplayHeight());
+    auto projection = glm::ortho<float>(0, width, height, 0, -1e6, 1e6);
     m_program.uniformMatrix4fv(
         "matProjection", 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -177,7 +177,7 @@ void Renderer::texturePaletteCreate(
     std::vector<C3D_PALETTENTRY> palette(palettePtr, palettePtr + 256);
 
     // create new palette handle
-    C3D_HTXPAL handle = reinterpret_cast<C3D_HTXPAL>(m_paletteID++);
+    auto handle = reinterpret_cast<C3D_HTXPAL>(m_paletteID++);
 
     // store palette
     m_palettes[handle] = palette;
@@ -278,11 +278,11 @@ void Renderer::tmapSelectImpl(C3D_HTX handle)
     }
 
     // get texture object and bind it
-    std::shared_ptr<Texture> texture = it->second;
+    auto texture = it->second;
     texture->bind();
 
     // send chroma key color to shader
-    C3D_COLOR ck = texture->chromaKey();
+    auto ck = texture->chromaKey();
     m_program.uniform3f(
         "chromaKey", ck.r / 255.0f, ck.g / 255.0f, ck.b / 255.0f);
 }
@@ -298,7 +298,7 @@ void Renderer::tmapLight(StateVar::Value& value)
 
 void Renderer::tmapFilter(StateVar::Value& value)
 {
-    C3D_ETEXFILTER filter = value.etexfilter;
+    auto filter = value.etexfilter;
     m_sampler.parameteri(
         GL_TEXTURE_MAG_FILTER, GLCIF_TEXTURE_MAG_FILTER[filter]);
     m_sampler.parameteri(
@@ -334,7 +334,7 @@ void Renderer::zCmpFunc(StateVar::Value& value)
 
 void Renderer::zMode(StateVar::Value& value)
 {
-    C3D_EZMODE mode = value.ezmode;
+    auto mode = value.ezmode;
     glDepthMask(GLCIF_DEPTH_MASK[mode]);
 
     if (mode > C3D_EZMODE_TESTON) {

@@ -136,16 +136,16 @@ HRESULT WINAPI DirectDraw::GetCaps(
 {
     LOG_TRACE("");
 
-    LPDDCAPS ps[2] = {lpDDDriverCaps, lpDDHELCaps};
-    for (uint32_t i = 0; i < 2; i++) {
-        LPDDCAPS p = ps[i];
-        if (!p) {
+    LPDDCAPS caps[2] = {lpDDDriverCaps, lpDDHELCaps};
+    for (uint32_t i = 0; i < sizeof(caps); i++) {
+        auto cap = caps[i];
+        if (!cap) {
             continue;
         }
 
-        p->dwZBufferBitDepths = DDBD_16 | DDBD_32;
-        p->dwVidMemTotal = p->dwVidMemFree = 4 << 20;
-        p->ddsCaps.dwCaps =
+        cap->dwZBufferBitDepths = DDBD_16 | DDBD_32;
+        cap->dwVidMemTotal = cap->dwVidMemFree = 4 << 20;
+        cap->ddsCaps.dwCaps =
             DDSCAPS_COMPLEX | DDSCAPS_FLIP | DDSCAPS_TEXTURE | DDSCAPS_ZBUFFER;
     }
 

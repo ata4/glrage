@@ -173,8 +173,7 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
             dstRect.bottom = lpDestRect->bottom;
         }
 
-        DirectDrawSurface* src =
-            static_cast<DirectDrawSurface*>(lpDDSrcSurface);
+        auto src = static_cast<DirectDrawSurface*>(lpDDSrcSurface);
 
         int32_t depth = m_desc.ddpfPixelFormat.dwRGBBitCount / 8;
 
@@ -713,7 +712,7 @@ void DirectDrawSurface::rgba5551AdjustBrightness(bool brighten)
     }
 
     // living on the edge...
-    uint16_t* buf = reinterpret_cast<uint16_t*>(&m_buffer[0]);
+    auto buf = reinterpret_cast<uint16_t*>(&m_buffer[0]);
     int32_t size = m_desc.dwWidth * m_desc.dwHeight;
 
     for (int32_t i = 0; i < size; i++) {

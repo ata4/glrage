@@ -187,7 +187,7 @@ void DebugUtils::dumpBuffer(
     uint32_t dataSize = imageSize * 3;
     uint32_t headerSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
-    uint16_t* src = reinterpret_cast<uint16_t*>(buffer);
+    auto src = reinterpret_cast<uint16_t*>(buffer);
     std::vector<uint8_t> dst(dataSize);
 
     for (uint32_t i = 0; i < imageSize; i++) {

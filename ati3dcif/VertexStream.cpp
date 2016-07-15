@@ -29,7 +29,7 @@ void VertexStream::addPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
     // otherwise
     switch (m_vertexType) {
         case C3D_EV_VTCF: {
-            C3D_VTCF* vStripVtcf = reinterpret_cast<C3D_VTCF*>(vertStrip);
+            auto vStripVtcf = reinterpret_cast<C3D_VTCF*>(vertStrip);
 
             if (m_primType == C3D_EPRIM_QUAD) {
                 // TODO: triangulate quads
@@ -59,7 +59,7 @@ void VertexStream::addPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
         case C3D_EV_VTCF: {
             // copy vertices to vertex vector buffer, then to the vertex buffer
             // (OpenGL can't handle arrays of pointers)
-            C3D_VTCF** vListVtcf = reinterpret_cast<C3D_VTCF**>(vertList);
+            auto vListVtcf = reinterpret_cast<C3D_VTCF**>(vertList);
 
             if (m_primType == C3D_EPRIM_QUAD) {
                 // triangulate quads
