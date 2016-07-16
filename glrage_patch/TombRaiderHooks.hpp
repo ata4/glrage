@@ -15,14 +15,16 @@ class TombRaiderHooks
 public:
     static void init(bool ub);
     static int32_t soundInit();
-    static void soundSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume);
-    static void soundSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
+    static void soundBufferSetVolume(
+        LPDIRECTSOUNDBUFFER buffer, int32_t volume);
+    static void soundBufferSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan);
     static LPDIRECTSOUNDBUFFER soundPlayOneShot(
         int32_t soundID, int32_t volume, int16_t pitch, uint16_t pan);
     static LPDIRECTSOUNDBUFFER soundPlayLoop(int32_t soundID, int32_t volume,
         int16_t pitch, uint16_t pan, int32_t a5, int32_t a6, int32_t a7);
     static void soundStopAll();
     static void soundUpdateVolume();
+    static void soundSetVolume(uint8_t volume);
     static BOOL musicPlayRemap(int16_t trackID);
     static BOOL musicPlayLoop();
     static BOOL musicPlay(int16_t trackID);

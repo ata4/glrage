@@ -336,7 +336,14 @@ void TombRaiderHooks::soundUpdateVolume()
     LOG_TRACE("");
 
     musicSetVolume(25 * (*m_tombCDVolume) + 5);
-    m_tombSoundSetVolume(6 * (*m_tombSFXVolume) + 3);
+    soundSetVolume(6 * (*m_tombSFXVolume) + 3);
+}
+
+void TombRaiderHooks::soundSetVolume(uint8_t volume)
+{
+    LOG_TRACE("");
+
+    m_tombSoundSetVolume(volume);
 }
 
 LRESULT
@@ -554,14 +561,14 @@ BOOL TombRaiderHooks::musicSetVolume(int16_t volume)
     return TRUE;
 }
 
-void TombRaiderHooks::soundSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume)
+void TombRaiderHooks::soundBufferSetVolume(LPDIRECTSOUNDBUFFER buffer, int32_t volume)
 {
     if (buffer) {
         buffer->SetVolume(convertVolumeToDecibel(volume));
     }
 }
 
-void TombRaiderHooks::soundSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan)
+void TombRaiderHooks::soundBufferSetPan(LPDIRECTSOUNDBUFFER buffer, int32_t pan)
 {
     if (buffer) {
         buffer->SetPan(convertPanToDecibel(pan));

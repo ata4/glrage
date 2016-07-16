@@ -291,15 +291,15 @@ void TombRaiderPatch::applySoundPatches()
     // panning issue.
     if (m_ub) {
         patchAddr(0x437B59, "E8 42 22 FE FF", TombRaiderHooks::soundInit, 0xE8);
-        patchAddr(0x4386CA, "E8 01 18 FF FF", TombRaiderHooks::soundSetVolume, 0xE8);
-        patchAddr(0x4386EA, "E8 E1 17 FF FF", TombRaiderHooks::soundSetPan, 0xE8);
+        patchAddr(0x4386CA, "E8 01 18 FF FF", TombRaiderHooks::soundBufferSetVolume, 0xE8);
+        patchAddr(0x4386EA, "E8 E1 17 FF FF", TombRaiderHooks::soundBufferSetPan, 0xE8);
         patchAddr(0x4385F2, "E8 29 F2 FF FF", TombRaiderHooks::soundPlayOneShot, 0xE8);
         patchAddr(0x438648, "E8 A3 F2 FF FF", TombRaiderHooks::soundPlayLoop, 0xE8);
         patchAddr(0x438680, "A1 74 60 45 00", TombRaiderHooks::soundStopAll, 0xE9);
     } else {
         patchAddr(0x438129, "E8 62 1D FE FF", TombRaiderHooks::soundInit, 0xE8);
-        patchAddr(0x438D0A, "E8 21 F2 FF FF", TombRaiderHooks::soundSetVolume, 0xE8);
-        patchAddr(0x438D2A, "E8 01 F2 FF FF", TombRaiderHooks::soundSetPan, 0xE8);
+        patchAddr(0x438D0A, "E8 21 F2 FF FF", TombRaiderHooks::soundBufferSetVolume, 0xE8);
+        patchAddr(0x438D2A, "E8 01 F2 FF FF", TombRaiderHooks::soundBufferSetPan, 0xE8);
         patchAddr(0x438C32, "E8 D9 F1 FF FF", TombRaiderHooks::soundPlayOneShot, 0xE8);
         patchAddr(0x438C88, "E8 33 EF FF FF", TombRaiderHooks::soundPlayLoop, 0xE8);
         patchAddr(0x438CC0, "A1 88 66 45 00", TombRaiderHooks::soundStopAll, 0xE9);
