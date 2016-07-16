@@ -137,7 +137,7 @@ HRESULT WINAPI DirectDraw::GetCaps(
     LOG_TRACE("");
 
     LPDDCAPS caps[2] = {lpDDDriverCaps, lpDDHELCaps};
-    for (uint32_t i = 0; i < sizeof(caps); i++) {
+    for (uint32_t i = 0; i < 2; i++) {
         auto cap = caps[i];
         if (!cap) {
             continue;
