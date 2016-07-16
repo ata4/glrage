@@ -160,7 +160,7 @@ void TombRaiderHooks::init(bool ub)
     m_tombSampleTable = reinterpret_cast<TombRaiderAudioSample***>(ub ? 0x45B314 : 0x45B954);
     m_tombSoundInit1 = reinterpret_cast<BOOL*>(ub ? 0x459CF4 : 0x45A31C);
     m_tombSoundInit2 = reinterpret_cast<BOOL*>(ub ? 0x459CF8 : 0x45A320);
-    m_tombSFXVolume = reinterpret_cast<uint8_t*>(ub ? 0x455D38 : 0x456334);
+    m_tombSFXVolume = reinterpret_cast<uint8_t*>(ub ? 0x455D38 : 0x456330);
     m_tombDecibelLut = reinterpret_cast<int32_t*>(ub ? 0x45E9E0 : 0x45F1E0);
     m_tombCDTrackID = reinterpret_cast<int32_t*>(ub ? 0x4534F4 : 0x4534DC);
     m_tombCDTrackIDLoop = reinterpret_cast<int32_t*>(ub ? 0x45B330 : 0x45B97C);
