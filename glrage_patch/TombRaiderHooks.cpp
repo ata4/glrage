@@ -373,7 +373,9 @@ TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
     keyStates[325] = pressed;
     m_lastScanCode = scanCode;
 
-    return TRUE;
+    if (wParam != VK_RETURN) {
+        return TRUE;
+    }
 
 next:
     return CallNextHookEx(*m_tombHhk, nCode, wParam, lParam);
