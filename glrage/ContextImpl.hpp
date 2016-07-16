@@ -77,6 +77,9 @@ private:
     // fullscreen flag
     bool m_fullscreen = false;
 
+    // fullscreen override mode
+    int32_t m_fullscreenMode = 0;
+
     // rendering flag
     bool m_render = false;
 

@@ -48,12 +48,12 @@ ContextImpl::ContextImpl()
     m_pfd.iLayerType = PFD_MAIN_PLANE;
 
     // get screen dimensions
-    bool fullscreen_virtual =
-        m_config.getBool("context.fullscreen_virtual", false);
+    bool virtualScreen = m_config.getBool("context.fullscreen_virtual", false);
+    m_fullscreenMode = m_config.getInt("context.fullscreen_mode", 0);
     m_screenWidth =
-        GetSystemMetrics(fullscreen_virtual ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
+        GetSystemMetrics(virtualScreen ? SM_CXVIRTUALSCREEN : SM_CXSCREEN);
     m_screenHeight =
-        GetSystemMetrics(fullscreen_virtual ? SM_CYVIRTUALSCREEN : SM_CYSCREEN);
+        GetSystemMetrics(virtualScreen ? SM_CYVIRTUALSCREEN : SM_CYSCREEN);
 }
 
 void ContextImpl::init()
@@ -246,6 +246,15 @@ bool ContextImpl::isFullscreen()
 void ContextImpl::setFullscreen(bool fullscreen)
 {
     m_fullscreen = fullscreen;
+
+    switch (m_fullscreenMode) {
+        case 1:
+            m_fullscreen = true;
+            break;
+        case 2:
+            m_fullscreen = false;
+            break;
+    }
 
     if (!m_hwnd) {
         return;
