@@ -3,36 +3,41 @@
 #include <cstdio>
 #include <string>
 
-static const size_t bufferMax = 1024;
+static const size_t bufferSize = 1024;
 
-std::string Logger::m_buffer1;
-std::string Logger::m_buffer2;
-
-void Logger::log(void* returnAddress, const std::string& function,
-        std::string format, ...)
+void Logger::printf(const char* format, ...)
 {
-    int size;
+    char output[bufferSize];
+    va_list list;
+    va_start(list, format);
+    vsnprintf_s(output, sizeof(output), _TRUNCATE, &format[0], list);
+    va_end(list);
 
-    if (format.empty()) {
-        m_buffer2.resize(bufferMax);
-        size = sprintf_s(&m_buffer2[0], m_buffer2.capacity(), "%p %s\n",
-            returnAddress, function.c_str());
-        m_buffer2.resize(size);
-    } else {
-        m_buffer1.resize(bufferMax);
-        va_list list;
-        va_start(list, format);
-        size = vsnprintf_s(
-            &m_buffer1[0], m_buffer1.capacity(), _TRUNCATE, &format[0], list);
-        va_end(list);
-        m_buffer1.resize(size);
+    OutputDebugStringA(output);
+}
 
-        m_buffer2.resize(bufferMax);
-        size = sprintf_s(&m_buffer2[0], m_buffer2.capacity(), "%p %s: %s\n",
-            returnAddress, function.c_str(), m_buffer1.c_str());
-        m_buffer2.resize(size);
+void Logger::printf(const std::string& msg)
+{
+    printf(msg.c_str());
+}
+
+void Logger::tracef(void* returnAddress, const char* function, const char* format, ...)
+{
+    if (strlen(format) == 0) {
+        printf("%p %s\n", returnAddress, function);
+        return;
     }
-    
 
-    OutputDebugStringA(m_buffer2.c_str());
+    char output[bufferSize];
+    va_list list;
+    va_start(list, format);
+    vsnprintf_s(output, sizeof(output), _TRUNCATE, format, list);
+    va_end(list);
+
+    printf("%p %s: %s\n", returnAddress, function, output);
+}
+
+void Logger::tracef(void* returnAddress, const char* function, const std::string& msg)
+{
+    tracef(returnAddress, function, msg.c_str());
 }

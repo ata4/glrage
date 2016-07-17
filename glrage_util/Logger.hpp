@@ -5,10 +5,10 @@
 
 #include <string>
 
-#define LOG_INFO(...) Logger::log(_ReturnAddress(), __FUNCTION__, __VA_ARGS__)
+#define LOG_INFO(...) Logger::printf(__VA_ARGS__)
 
 #ifdef LOG_TRACE_ENABLED
-#define LOG_TRACE(...) Logger::log(_ReturnAddress(), __FUNCTION__, __VA_ARGS__)
+#define LOG_TRACE(...) Logger::tracef(_ReturnAddress(), __FUNCTION__, __VA_ARGS__)
 #else
 #define LOG_TRACE(...)
 #endif
@@ -16,10 +16,8 @@
 class Logger
 {
 public:
-    static void log(void* returnAddress, const std::string& function,
-        std::string format, ...);
-
-private:
-    static std::string m_buffer1;
-    static std::string m_buffer2;
+    static void printf(const char* format, ...);
+    static void printf(const std::string& msg);
+    static void tracef(void* returnAddress, const char* function, const char* format, ...);
+    static void tracef(void* returnAddress, const char* function, const std::string& msg);
 };
