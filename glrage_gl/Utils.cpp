@@ -2,6 +2,7 @@
 #include "gl_core_3_3.h"
 
 #include <glrage_util/Logger.hpp>
+#include <glrage_util/ErrorUtils.hpp>
 
 namespace glrage {
 namespace gl {
@@ -33,6 +34,9 @@ const char* Utils::getErrorString(GLenum err)
 void Utils::checkError(char* section)
 {
     for (GLenum err; (err = glGetError()) != GL_NO_ERROR;) {
+#ifdef _DEBUG
+        ErrorUtils::warning("glGetError", getErrorString(err));
+#endif
         LOG_INFO("glGetError: %s (%s)", getErrorString(err), section);
     }
 }

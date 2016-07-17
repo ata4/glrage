@@ -610,7 +610,7 @@ HRESULT WINAPI DirectDrawSurface::Blt(LPRECT lpDestRect,
     LPDIRECTDRAWSURFACE2 lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwFlags,
     LPDDBLTFX lpDDBltFx)
 {
-    LOG_TRACE("DirectDrawSurface2::Blt");
+    LOG_TRACE("");
     return DDERR_UNSUPPORTED;
 }
 

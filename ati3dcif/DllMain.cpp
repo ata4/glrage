@@ -25,10 +25,9 @@ HandleException()
     } catch (const Error& ex) {
 #ifdef _DEBUG
         ErrorUtils::warning(ex);
-#else
+#endif
         LOG_INFO("CIF error: %s (0x%x %s)", ex.what(), ex.getErrorCode(),
             ex.getErrorName());
-#endif
         return ex.getErrorCode();
     } catch (const std::runtime_error& ex) {
         ErrorUtils::warning(ex);
@@ -40,8 +39,8 @@ HandleException()
 }
 
 // export macro for CIF implementation
-#define EXPORT(function_name, return_type, parameters)      \
-function_name##_t function_name##_lib = function_name;      \
+#define EXPORT(function_name, return_type, parameters)                         \
+function_name##_t function_name##_lib = function_name;                         \
 return_type WINAPI function_name parameters
 
 extern "C" {
@@ -238,7 +237,7 @@ EXPORT(ATI3DCIF_ContextDestroy, C3D_EC, (C3D_HRC hRC))
 EXPORT(ATI3DCIF_ContextSetState, C3D_EC,
     (C3D_HRC hRC, C3D_ERSID eRStateID, C3D_PRSDATA pRStateData))
 {
-#ifdef DEBUG_TRACE
+#ifdef LOG_TRACE_ENABLED
     std::string stateDataStr =
         cif::Utils::dumpRenderStateData(eRStateID, pRStateData);
     LOG_TRACE("0x%p, %s, %s", hRC, cif::C3D_ERSID_NAMES[eRStateID],

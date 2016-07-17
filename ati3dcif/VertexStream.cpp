@@ -120,14 +120,12 @@ void VertexStream::renderPending()
     gl::Utils::checkError(__FUNCTION__);
 }
 
-C3D_EVERTEX
-VertexStream::vertexType()
+C3D_EVERTEX VertexStream::vertexType()
 {
     return m_vertexType;
 }
 
-C3D_EPRIM
-VertexStream::primType()
+C3D_EPRIM VertexStream::primType()
 {
     return m_primType;
 }
