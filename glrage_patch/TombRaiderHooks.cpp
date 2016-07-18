@@ -352,7 +352,7 @@ TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
     LOG_TRACE("%d, %d, %d", nCode, wParam, lParam);
 
     if (nCode < 0) {
-        goto next;
+        return CallNextHookEx(*m_tombHhk, nCode, wParam, lParam);
     }
 
     uint32_t keyData = static_cast<uint32_t>(lParam);
@@ -373,19 +373,13 @@ TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
 
     uint8_t* keyStates = *m_tombKeyStates;
     if (!keyStates) {
-        goto next;
+        return CallNextHookEx(*m_tombHhk, nCode, wParam, lParam);
     }
 
     keyStates[scanCode] = pressed;
     keyStates[325] = pressed;
     m_lastScanCode = scanCode;
-
-    if (wParam != VK_RETURN) {
-        return TRUE;
-    }
-
-next:
-    return CallNextHookEx(*m_tombHhk, nCode, wParam, lParam);
+    return 0;
 }
 
 int32_t TombRaiderHooks::getPressedKey()
