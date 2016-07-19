@@ -379,7 +379,8 @@ TombRaiderHooks::keyboardProc(int32_t nCode, WPARAM wParam, LPARAM lParam)
     keyStates[scanCode] = pressed;
     keyStates[325] = pressed;
     m_lastScanCode = scanCode;
-    return 0;
+
+    return wParam == VK_MENU;
 }
 
 int32_t TombRaiderHooks::getPressedKey()
