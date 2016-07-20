@@ -35,12 +35,12 @@ public:
         *this << data;
     }
 
-    void Chunk::clear()
+    void clear()
     {
         m_data.clear();
     }
 
-    const std::vector<uint8_t>& Chunk::data() const
+    const std::vector<uint8_t>& data() const
     {
         return m_data;
     }
