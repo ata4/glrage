@@ -313,22 +313,53 @@ void TombRaiderPatch::applySoundPatches()
     }
 
     // CD audio patches.
+
+    // Patch bad mapping function in UB that remaps the music volume from 0-10
+    // to 5-255 instead of 0-65536, which is the value range for auxSetVolume.
     if (m_ub) {
-        // Patch bad mapping function in UB that remaps the music volume from 0-10
-        // to 5-255 instead of 0-65536, which is the value range for auxSetVolume.
         patchAddr(0x438A70, "0F BF 44 24 04", TombRaiderHooks::musicSetVolume, 0xE9);
-    } else {
-        // Add missing music volume update calls in original TR1.
-        patchAddr(0x410B7C, "E8 AF 73 02 00", TombRaiderHooks::musicSetVolume, 0xE8);
-        patchAddr(0x410BB3, "E8 78 73 02 00", TombRaiderHooks::musicSetVolume, 0xE8);
-        patchAddr(0x41D190, "E8 9B AD 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
-        patchAddr(0x41D318, "E8 13 AC 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
-        patchAddr(0x41E81A, "E8 11 97 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
-        patchAddr(0x41F83C, "E8 EF 86 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
-        patchAddr(0x41F8A4, "E8 87 86 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+    }
+
+    // Patch missing music volume updates when changing the volume in the
+    // options and when reading atiset.dat.
+    if (!m_ub) {
         patchAddr(0x42E941, "E8 EA 95 00 00", TombRaiderHooks::musicSetVolume, 0xE8);
         patchAddr(0x42E94D, "E8 DE 95 00 00", TombRaiderHooks::musicSetVolume, 0xE8);
         patchAddr(0x438508, "E8 23 FA FF FF", TombRaiderHooks::musicSetVolume, 0xE8);
+    }
+
+    // Add missing music volume controls in original TR1 or disable existing ones
+    // in UB.
+    bool musicMuteUnderwater = m_config.getBool("patch.music_mute_underwater", true);
+    bool musicMuteMenu = m_config.getBool("patch.music_mute_menu", true);
+
+    if (m_ub) {
+        if (!musicMuteUnderwater) {
+            patchNop(0x410B8C, "E8 DF 7E 02 00");
+            patchNop(0x410BC3, "E8 A8 7E 02 00");
+        }
+
+        if (!musicMuteMenu) {
+            patchNop(0x41E49A, "E8 D1 A5 01 00");
+            patchNop(0x41F488, "E8 E3 95 01 00");
+            patchNop(0x41F4F0, "E8 7B 95 01 00");
+        }
+    } else {
+        if (musicMuteUnderwater) {
+            patchAddr(0x410B7C, "E8 AF 73 02 00", TombRaiderHooks::musicSetVolume, 0xE8);
+            patchAddr(0x410BB3, "E8 78 73 02 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        }
+
+        if (musicMuteMenu) {
+            patchAddr(0x41E81A, "E8 11 97 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+            patchAddr(0x41F83C, "E8 EF 86 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+            patchAddr(0x41F8A4, "E8 87 86 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        }
+
+        // Update volume when loading a level or when starting demo mode.
+        // Somewhat redundant, but it doesn't harm.
+        patchAddr(0x41D190, "E8 9B AD 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
+        patchAddr(0x41D318, "E8 13 AC 01 00", TombRaiderHooks::musicSetVolume, 0xE8);
     }
 
     // Hook low-level CD play function to fix a volume bug.
