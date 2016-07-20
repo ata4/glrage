@@ -438,7 +438,7 @@ void TombRaiderPatch::applyKeyboardPatches()
     // TombRaiderHooks::keyboardProc
     patch(m_ub ? 0x42EC81 : 0x42F151, "75 0A", "EB 34");
     patch(m_ub ? 0x41E0FB : 0x41E44B, "07", "6D");
-    patch(m_ub ? 0x41E183 : 0x41E4D4, "07", "6D");
+    patch(m_ub ? 0x41E184 : 0x41E4D4, "07", "6D");
 
     // custom key bindings are only implemented for joystick buttons, this
     // patch implements the function stub to return the previously pressed key
