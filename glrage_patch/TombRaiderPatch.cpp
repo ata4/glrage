@@ -330,8 +330,8 @@ void TombRaiderPatch::applySoundPatches()
 
     // Add missing music volume controls in original TR1 or disable existing ones
     // in UB.
-    bool musicMuteUnderwater = m_config.getBool("patch.music_mute_underwater", true);
-    bool musicMuteMenu = m_config.getBool("patch.music_mute_menu", true);
+    bool musicMuteUnderwater = m_config.getBool("patch.music_mute_underwater", false);
+    bool musicMuteMenu = m_config.getBool("patch.music_mute_menu", false);
 
     if (m_ub) {
         if (!musicMuteUnderwater) {
