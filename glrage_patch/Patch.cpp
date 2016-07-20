@@ -2,6 +2,7 @@
 
 #include <glrage_util/Logger.hpp>
 #include <glrage_util/StringUtils.hpp>
+#include <glrage_util/ErrorUtils.hpp>
 
 namespace glrage {
 
@@ -71,6 +72,9 @@ end:
     }
 
     if (!result) {
+#ifdef _DEBUG
+        ErrorUtils::warning("Patch failed! See debug output for details.");
+#endif
         LOG_INFO("Patch at 0x%x with %d bytes failed!", addr, size);
         LOG_INFO("Expected: " + StringUtils::bytesToHex(expectedData));
         LOG_INFO("Actual:   " + StringUtils::bytesToHex(actualData));
@@ -115,6 +119,9 @@ end:
     }
 
     if (!result) {
+#ifdef _DEBUG
+        ErrorUtils::warning("Patch failed! See debug output for details.");
+#endif
         LOG_INFO("Patch at 0x%x with %d bytes failed!", addr, size);
         LOG_INFO("Patch:    " + StringUtils::bytesToHex(replacementData));
     }
