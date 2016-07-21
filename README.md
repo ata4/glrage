@@ -65,6 +65,7 @@ With the wrapper installed, following key combinations are available:
 * Increased vertex color brightness to match DOS and PSX versions. ([Screenshot 1](http://i.imgur.com/S7GP9hH.jpg) / [Screenshot 2](http://i.imgur.com/xqJflAi.jpg))
 * Changed water color from grey-blue to turquoise, similar to the PSX version. ([Screenshot](http://i.imgur.com/NpYRg9j.jpg))
 * Increased rendering distance. ([Screenshot](http://i.imgur.com/CUnIoIY.jpg), disabled on default)
+* Music auto-muting if the menu is open or when Lara is underwater. (disabled on default)
 * No-CD mode. (enabled on default)
 * Customizable field of view.
 * Full soundtrack mode, combining PC ambient tracks with PSX music tracks. (disabled on default)
