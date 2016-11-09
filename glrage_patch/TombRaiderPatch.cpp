@@ -561,7 +561,7 @@ void TombRaiderPatch::applyLocalePatches()
     std::wstring localePath = basePath + L"\\patches\\locale\\";
 
     // load locale file
-    std::string locale = m_config.getString("localization_locale", "en_GB");
+    std::string locale = m_config.getString("patch.localization_locale", "en_GB");
     std::wstring langPath = localePath + StringUtils::utf8ToWide(locale) + L".txt";
     std::ifstream langStream(langPath);
 
