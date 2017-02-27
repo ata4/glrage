@@ -285,6 +285,7 @@ void Renderer::tmapSelectImpl(C3D_HTX handle)
     auto ck = texture->chromaKey();
     m_program.uniform3f(
         "chromaKey", ck.r / 255.0f, ck.g / 255.0f, ck.b / 255.0f);
+    m_program.uniform1i("keyOnAlpha", texture->keyOnAlpha());
 }
 
 void Renderer::tmapRestore() {

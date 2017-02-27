@@ -63,6 +63,7 @@ std::map<std::string, std::string>& Texture::getTextureKeys()
 void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
 {
     m_chromaKey = tmap->clrTexChromaKey;
+    m_keyOnAlpha = false;
 
     // convert and generate texture for each level
     uint32_t width = 1 << tmap->u32MaxMapXSizeLg2;
@@ -143,6 +144,7 @@ void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
                     // This texture has a replacement image on disc.
                     // Use it for all levels, even if mimmaps are available
                     levels = 1;
+                    m_keyOnAlpha = true;
 
                     width = image.GetWidth();
                     height = image.GetHeight();
@@ -227,6 +229,11 @@ void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
 C3D_COLOR& Texture::chromaKey()
 {
     return m_chromaKey;
+}
+
+bool Texture::keyOnAlpha()
+{
+    return m_keyOnAlpha;
 }
 
 } // namespace cif

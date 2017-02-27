@@ -30,6 +30,7 @@ layout(location = 0) out vec4 fragColor;
 uniform sampler2D tex0;
 uniform vec4 solidColor;
 uniform vec3 chromaKey;
+uniform bool keyOnAlpha;
 uniform int shadeMode;
 uniform bool tmapEn;
 uniform int tmapLight;
@@ -59,7 +60,7 @@ void main(void) {
     // texturing
     if (tmapEn) {
         // chroma keying
-        if (texOp == C3D_ETEXOP_CHROMAKEY) {
+        if (texOp == C3D_ETEXOP_CHROMAKEY && !keyOnAlpha) {
             // fetch raw texel for fragment
             ivec2 size = textureSize2D(tex0, 0);
             int tx = int((vertTexCoords.x / vertTexCoords.z) * size.x) % size.x;
@@ -75,6 +76,9 @@ void main(void) {
 
         // texture mapping
         vec4 texColor = texture(tex0, vertTexCoords.xy / vertTexCoords.z);
+        if (texColor.a < 0.5) {
+            discard;
+        }
         
         // texture lighting
         switch (tmapLight) {
