@@ -15,7 +15,8 @@ It also supports non-destructive memory patching, which allows bug fixes and enh
 ## Tomb Raider (including Unfinished Business/Gold)
 
 The original patch for the ATI Rage Pro was released in a pretty unfinished state and contains a mixture of old DOS version bugs, Windows port bugs and new bugs introduced by ATI.
-Therefore, a lot of patches are required to fully restore the original Tomb Raider features and aesthetics.
+Therefore, a lot of patches are required to fully restore the original Tomb Raider features and aesthetics. Also the game textures can be overridden with texture packs to greatly
+improve the look of the game.
 
 ### Installation instructions
 
@@ -114,7 +115,7 @@ Wipeout runs mostly stable, but there are some graphical glitches right now.
 
 # Compiling
 
-You'll need Visual Studio 2015 to compile the source files. Additionally, you will also need the ATI3DCIF.H header file from the [ATi 3D Rage Pro SDK 4.1](http://www.vogonsdrivers.com/getfile.php?fileid=497) and put it in `ragesdk/include`.
+You'll need Visual Studio 2015 to compile the source files. Additionally, you will also need the ATI3DCIF.H header file from the [ATi 3D Rage Pro SDK 4.1](http://www.vogonsdrivers.com/getfile.php?fileid=497) and put it in `ragesdk/include`. And you will need openssl. You can find it precompiled for VS 2015 here: https://www.npcglib.org/~stathis/blog/precompiled-openssl/. Place it in the top level directory and change it's name to remove the version info (i.e. rename it to openssl).
 
 # License
 
