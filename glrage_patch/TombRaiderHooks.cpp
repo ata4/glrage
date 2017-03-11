@@ -72,6 +72,9 @@ static int32_t* m_tombNumAudioSamples = nullptr;
 // Audio sample pointer table.
 static TombRaiderAudioSample*** m_tombSampleTable = nullptr;
 
+// Table of in-game video file paths
+static char **m_tombFMVPaths = nullptr;
+
 // Sound init booleans. There are two for some reason and both are set to 1 at
 // the same location.
 static BOOL* m_tombSoundInit1 = nullptr;
@@ -158,6 +161,7 @@ void TombRaiderHooks::init(bool ub)
     m_tombKeyStates = reinterpret_cast<uint8_t**>(ub ? 0x45B348 : 0x45B998);
     m_tombNumAudioSamples = reinterpret_cast<int32_t*>(ub ? 0x45B324 : 0x45B96C);
     m_tombSampleTable = reinterpret_cast<TombRaiderAudioSample***>(ub ? 0x45B314 : 0x45B954);
+    m_tombFMVPaths = reinterpret_cast < char **>(0x453AC0);
     m_tombSoundInit1 = reinterpret_cast<BOOL*>(ub ? 0x459CF4 : 0x45A31C);
     m_tombSoundInit2 = reinterpret_cast<BOOL*>(ub ? 0x459CF8 : 0x45A320);
     m_tombSFXVolume = reinterpret_cast<uint8_t*>(ub ? 0x455D38 : 0x456330);
@@ -436,6 +440,12 @@ int16_t TombRaiderHooks::setFOV(int16_t fov)
 
     // call original setFOV function that expects a horizontal FOV
     return m_tombSetFOV(fov);
+}
+
+BOOL TombRaiderHooks::playFMV(int32_t fmvIndex)
+{
+    LOG_INFO("Play %s", m_tombFMVPaths[fmvIndex]);
+    return TRUE;
 }
 
 BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID)

@@ -34,6 +34,7 @@ void TombRaiderPatch::apply()
     // optional patches
     applyGraphicPatches();
     applySoundPatches();
+    applyFMVPatches();
     applyKeyboardPatches();
     applyLogicPatches();
 }
@@ -433,6 +434,12 @@ void TombRaiderPatch::applySoundPatches()
     } else {
         patchAddr(0x438576, "E8 B5 F9 FF FF", TombRaiderHooks::soundUpdateVolume, 0xE8);
     }
+}
+
+void TombRaiderPatch::applyFMVPatches()
+{
+    if (!m_ub)
+        patchAddr(0x41CDF0, "83 EC 0C 56 57", TombRaiderHooks::playFMV, 0xE9);
 }
 
 void TombRaiderPatch::applyKeyboardPatches()
