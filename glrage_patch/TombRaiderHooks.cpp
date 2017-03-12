@@ -3,6 +3,10 @@
 #include <glrage_util/Logger.hpp>
 
 #include <cmath>
+//#include <vector>
+
+#include <glrage/MoviePlayer.hpp>
+#include <glrage/GLRage.hpp>
 
 namespace glrage {
 
@@ -444,7 +448,33 @@ int16_t TombRaiderHooks::setFOV(int16_t fov)
 
 BOOL TombRaiderHooks::playFMV(int32_t fmvIndex)
 {
-    LOG_INFO("Play %s", m_tombFMVPaths[fmvIndex]);
+    Context& m_context(GLRage::getContext());
+    std::string path(m_tombFMVPaths[fmvIndex]);
+    std::string newPath = path.substr(0, path.find_last_of('.')) + ".avi";
+    LOG_TRACE("Play FMV: %s", newPath.c_str());
+    MoviePlayer *moviePlayer = MoviePlayer::GetPlayer();
+    HRESULT hr = moviePlayer->Create(m_context.getHWnd());
+    if (FAILED(hr))
+        goto exit;
+    hr = moviePlayer->Play(newPath.c_str());
+    if (FAILED(hr))
+        goto exit;
+    moviePlayer->WaitForPlayback();
+
+exit:
+    delete moviePlayer;
+
+    if (FAILED(hr) && hr != 0x80040216)
+    {
+        std::string str;
+        if (hr == 0x80040265)
+            str = "Try installing the codec pack from https://www.codecguide.com/";
+        else
+            str = StringUtils::format("0x%08x", hr);
+
+        MessageBox(m_context.getHWnd(), std::wstring(str.begin(), str.end()).c_str(), L"Movie playback failed", MB_OK);
+    }
+
     return TRUE;
 }
 

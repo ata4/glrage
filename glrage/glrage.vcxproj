@@ -69,7 +69,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_USE_MATH_DEFINES;GLR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_AFXDLL;_USE_MATH_DEFINES;GLR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -81,7 +81,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>opengl32.lib;Shlwapi.lib;version.lib;winmm.lib;glrage_gl.lib;glrage_patch.lib;glrage_util.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Shlwapi.lib;version.lib;winmm.lib;strmiids.lib;glrage_gl.lib;glrage_patch.lib;glrage_util.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y $(ProjectDir)glrage.ini $(SolutionDir)build\$(Configuration)\</Command>
@@ -95,12 +95,16 @@
     <ClInclude Include="ContextImpl.hpp" />
     <ClInclude Include="GameID.hpp" />
     <ClInclude Include="GLRage.hpp" />
+    <ClInclude Include="MoviePlayer.hpp" />
+    <ClInclude Include="MoviePlayerImpl.hpp" />
     <ClInclude Include="Screenshot.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ContextImpl.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="GLRage.cpp" />
+    <ClCompile Include="MoviePlayer.cpp" />
+    <ClCompile Include="MoviePlayerImpl.cpp" />
     <ClCompile Include="Screenshot.cpp" />
   </ItemGroup>
   <ItemGroup>
