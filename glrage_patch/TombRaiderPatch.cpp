@@ -439,7 +439,12 @@ void TombRaiderPatch::applySoundPatches()
 void TombRaiderPatch::applyFMVPatches()
 {
     if (!m_ub)
-        patchAddr(0x41CDF0, "83 EC 0C 56 57", TombRaiderHooks::playFMV, 0xE9);
+    {
+        patchAddr(0x43858B, "E8 60 48 FE FF", TombRaiderHooks::playFMV, 0xE8);
+        patchAddr(0x43859A, "E8 51 48 FE FF", TombRaiderHooks::playFMV, 0xE8);
+        patchAddr(0x4385A4, "E8 47 48 FE FF", TombRaiderHooks::playFMV, 0xE8);
+        patchAddr(0x41D073, "E8 78 FD FF FF", TombRaiderHooks::playFMV, 0xE8);
+    }
 }
 
 void TombRaiderPatch::applyKeyboardPatches()

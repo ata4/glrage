@@ -1,3 +1,4 @@
+#include <shlwapi.h>
 #include "TombRaiderHooks.hpp"
 
 #include <glrage_util/Logger.hpp>
@@ -21,6 +22,7 @@ typedef void* TombRaiderCreateOverlayText(
     int16_t x, int16_t y, int16_t a3, const char* text);
 typedef int16_t TombRaiderSetFOV(int16_t fov);
 typedef BOOL TombRaiderSoundSetVolume(uint8_t volume);
+typedef BOOL TombRaiderPlayRplFile(int32_t fmvIndex, int32_t unknown);
 
 /** Tomb Raider structs **/
 
@@ -64,6 +66,9 @@ static TombRaiderRenderCollectedItem* m_tombRenderCollectedItem = nullptr;
 
 // changes the global sound effect volume
 static TombRaiderSoundSetVolume* m_tombSoundSetVolume = nullptr;
+
+// Call back into game exe to play standard FMV file
+static TombRaiderPlayRplFile* m_tombPlayRplFile = nullptr;
 
 /** Tomb Raider var pointers **/
 
@@ -160,6 +165,7 @@ void TombRaiderHooks::init(bool ub)
     m_tombSetFOV = reinterpret_cast<TombRaiderSetFOV*>(0x4026D0);
     m_tombRenderCollectedItem = reinterpret_cast<TombRaiderRenderCollectedItem*>(ub ? 0x435800 : 0x435D80);
     m_tombSoundSetVolume = reinterpret_cast<TombRaiderSoundSetVolume*>(ub ? 0x42AFF0 : 0x42B410);
+    m_tombPlayRplFile = reinterpret_cast<TombRaiderPlayRplFile*>(0x41CDF0);
 
     // var pointers
     m_tombKeyStates = reinterpret_cast<uint8_t**>(ub ? 0x45B348 : 0x45B998);
@@ -446,17 +452,27 @@ int16_t TombRaiderHooks::setFOV(int16_t fov)
     return m_tombSetFOV(fov);
 }
 
-BOOL TombRaiderHooks::playFMV(int32_t fmvIndex)
+BOOL TombRaiderHooks::playFMV(int32_t fmvIndex, int32_t unknown)
 {
-    Context& m_context(GLRage::getContext());
     std::string path(m_tombFMVPaths[fmvIndex]);
     std::string newPath = path.substr(0, path.find_last_of('.')) + ".avi";
-    LOG_TRACE("Play FMV: %s", newPath.c_str());
+    if (::PathFileExists(std::wstring(newPath.begin(), newPath.end()).c_str()))
+        playAviFile(newPath.c_str());
+    else if (::PathFileExists(std::wstring(path.begin(), path.end()).c_str()))
+        m_tombPlayRplFile(fmvIndex, unknown);
+
+    return TRUE;
+}
+
+void TombRaiderHooks::playAviFile(const char *path)
+{
+    LOG_TRACE("Play FMV: %s", path);
+    Context& m_context(GLRage::getContext());
     MoviePlayer *moviePlayer = MoviePlayer::GetPlayer();
     HRESULT hr = moviePlayer->Create(m_context.getHWnd());
     if (FAILED(hr))
         goto exit;
-    hr = moviePlayer->Play(newPath.c_str());
+    hr = moviePlayer->Play(path);
     if (FAILED(hr))
         goto exit;
     moviePlayer->WaitForPlayback();
@@ -474,8 +490,6 @@ exit:
 
         MessageBox(m_context.getHWnd(), std::wstring(str.begin(), str.end()).c_str(), L"Movie playback failed", MB_OK);
     }
-
-    return TRUE;
 }
 
 BOOL TombRaiderHooks::musicPlayRemap(int16_t trackID)

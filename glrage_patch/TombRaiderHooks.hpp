@@ -39,7 +39,8 @@ public:
     static void* createFPSText(
         int16_t x, int16_t y, int16_t a3, const char* text);
     static int16_t setFOV(int16_t fov);
-    static BOOL playFMV(int32_t fmvIndex);
+    static BOOL playFMV(int32_t fmvIndex, int32_t unknown);
+    static void playAviFile(const char *path);
 
     // other vars
     static bool m_musicAlwaysLoop;
