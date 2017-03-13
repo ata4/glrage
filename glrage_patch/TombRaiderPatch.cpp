@@ -438,8 +438,7 @@ void TombRaiderPatch::applySoundPatches()
 
 void TombRaiderPatch::applyFMVPatches()
 {
-    if (!m_ub)
-    {
+    if (m_config.getBool("patch.fmv_override", true) && !m_ub) {
         patchAddr(0x43858B, "E8 60 48 FE FF", TombRaiderHooks::playFMV, 0xE8);
         patchAddr(0x43859A, "E8 51 48 FE FF", TombRaiderHooks::playFMV, 0xE8);
         patchAddr(0x4385A4, "E8 47 48 FE FF", TombRaiderHooks::playFMV, 0xE8);
