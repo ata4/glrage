@@ -279,8 +279,9 @@ void ContextImpl::setFullscreen(bool fullscreen)
     int32_t width;
     int32_t height;
 
+    bool fullscreen_hack = m_config.getBool("context.fullscreen_hack", false);
     if (m_fullscreen) {
-        width = m_screenWidth;
+        width = m_screenWidth + (fullscreen_hack?1:0);
         height = m_screenHeight;
     } else {
         width = m_width;
