@@ -14,7 +14,12 @@ Renderer::Renderer()
 {
     // configure buffer
     m_surfaceBuffer.bind();
-    m_surfaceBuffer.data(0, nullptr, GL_STATIC_DRAW);
+    GLfloat verts[] = { 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+                        0.0, 1.0, 1.0, 0.0, 1.0, 1.0 };
+    m_surfaceBuffer.data(sizeof(verts), verts, GL_STATIC_DRAW);
+
+    m_surfaceFormat.bind();
+    m_surfaceFormat.attribute(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     // configure sampler
     std::string filterMethod =
@@ -118,7 +123,7 @@ void Renderer::render()
         glDisable(GL_DEPTH_TEST);
     }
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     if (!texture2d) {
         glDisable(GL_TEXTURE_2D);
