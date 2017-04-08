@@ -86,21 +86,30 @@ bool MoviePlayerImpl::IsPlaying()
 void MoviePlayerImpl::WaitForPlayback()
 {
     HANDLE event;
+    MSG msg;
     GetEvent(&event);
     bool playing = true;
+
+    // Ignore any already pressed keys
+    while (::PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+    {
+        if (::GetMessage(&msg, NULL, 0, 0))
+        {
+            ::TranslateMessage(&msg);
+            ::DispatchMessage(&msg);
+        }
+    }
     
     while (playing)
     {
-        MSG msg;
         MsgWaitForMultipleObjects(1, &event, false, INFINITE, QS_ALLINPUT);
-
         while (::PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
             if (::GetMessage(&msg, NULL, 0, 0))
             {
                 ::TranslateMessage(&msg);
                 ::DispatchMessage(&msg);
-                if (msg.message == WM_KEYUP)
+                if (msg.message == WM_KEYDOWN)
                 {
                     switch (msg.wParam)
                     {
