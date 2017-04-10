@@ -286,5 +286,8 @@ glrage/gitversion.h
 # 3D Rage SDK (proprietary)
 ragesdk/
 
+# openssl library
+openssl/
+
 # Other
 private/
