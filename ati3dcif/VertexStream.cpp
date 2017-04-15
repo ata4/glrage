@@ -23,6 +23,11 @@ VertexStream::VertexStream()
     gl::Utils::checkError(__FUNCTION__);
 }
 
+void VertexStream::setDelayer(std::function<BOOL(C3D_VTCF *)> delayer)
+{
+    m_delayer = delayer;
+}
+
 void VertexStream::addPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
 {
     // note: strips are converted to lists, since they can't be properly batched
@@ -33,13 +38,17 @@ void VertexStream::addPrimStrip(C3D_VSTRIP vertStrip, C3D_UINT32 numVert)
 
             if (m_primType == C3D_EPRIM_QUAD) {
                 // TODO: triangulate quads
-            } else {
+            } else if (numVert <= 2) {
                 for (C3D_UINT32 i = 0; i < numVert; i++) {
-                    if (i > 2) {
+                    m_vtcBuffer.push_back(vStripVtcf[i]);
+                }
+            } else {
+                for (C3D_UINT32 i = 2; i < numVert; i++) {
+                    if (!m_delayer(&vStripVtcf[i - 2])) {
                         m_vtcBuffer.push_back(vStripVtcf[i - 2]);
                         m_vtcBuffer.push_back(vStripVtcf[i - 1]);
+                        m_vtcBuffer.push_back(vStripVtcf[i]);
                     }
-                    m_vtcBuffer.push_back(vStripVtcf[i]);
                 }
             }
 
@@ -88,18 +97,13 @@ void VertexStream::addPrimList(C3D_VLIST vertList, C3D_UINT32 numVert)
     }
 }
 
-void VertexStream::renderPending()
+void VertexStream::renderPrims(std::vector<C3D_VTCF> prims)
 {
-    // only render if there's something to render
-    if (m_vtcBuffer.empty()) {
-        return;
-    }
-
     // bind vertex format
     m_vtcFormat.bind();
 
     // resize GPU buffer if required
-    size_t vertexBufferSize = sizeof(C3D_VTCF) * m_vtcBuffer.size();
+    size_t vertexBufferSize = sizeof(C3D_VTCF) * prims.size();
     if (vertexBufferSize > m_vertexBufferSize) {
         LOG_INFO("Vertex buffer resize: %d -> %d", m_vertexBufferSize,
             vertexBufferSize);
@@ -108,16 +112,26 @@ void VertexStream::renderPending()
     }
 
     // upload vertices
-    m_vertexBuffer.subData(0, vertexBufferSize, &m_vtcBuffer[0]);
+    m_vertexBuffer.subData(0, vertexBufferSize, &prims[0]);
 
     // draw vertices
-    glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, m_vtcBuffer.size());
-
-    // mark buffer as empty
-    m_vtcBuffer.clear();
+    glDrawArrays(GLCIF_PRIM_MODES[m_primType], 0, prims.size());
 
     // check for errors
     gl::Utils::checkError(__FUNCTION__);
+}
+
+void VertexStream::renderPending()
+{
+    // only render if there's something to render
+    if (m_vtcBuffer.empty()) {
+        return;
+    }
+
+    renderPrims(m_vtcBuffer);
+
+    // mark buffer as empty
+    m_vtcBuffer.clear();
 }
 
 C3D_EVERTEX VertexStream::vertexType()

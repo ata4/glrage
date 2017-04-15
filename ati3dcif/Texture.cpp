@@ -64,6 +64,7 @@ void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
 {
     m_chromaKey = tmap->clrTexChromaKey;
     m_keyOnAlpha = false;
+    m_is_translucent = false;
 
     // convert and generate texture for each level
     uint32_t width = 1 << tmap->u32MaxMapXSizeLg2;
@@ -145,9 +146,11 @@ void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
                     // Use it for all levels, even if mimmaps are available
                     levels = 1;
                     m_keyOnAlpha = true;
-
                     width = image.GetWidth();
                     height = image.GetHeight();
+                    bool use_map = (width == TRANS_TEX_DIM && height == TRANS_TEX_DIM);
+                    if (use_map)
+                        m_translucency_map.assign(TRANS_MAP_DIM * TRANS_MAP_DIM, 0);
                     int pitch = image.GetPitch();
                     uint8_t *bits = reinterpret_cast<uint8_t *>(image.GetBits());
                     dst.resize(abs(pitch) * height);
@@ -156,6 +159,14 @@ void Texture::load(C3D_PTMAP tmap, std::vector<C3D_PALETTENTRY>& palette)
                     {
                         for (size_t x = 0; x < width; x++)
                         {
+                            if (use_map && bits[4 * x + 3] != 255)
+                            {
+                                uint32_t map_x = x / TRANS_MAP_FACTOR;
+                                uint32_t map_y = y / TRANS_MAP_FACTOR;
+                                m_translucency_map[map_y * TRANS_MAP_DIM + map_x] = 1;
+                                if (bits[4 * x + 3] != 0)
+                                    m_is_translucent = true;
+                            }
                             dstp[4 * x + 0] = bits[4 * x + 2];
                             dstp[4 * x + 1] = bits[4 * x + 1];
                             dstp[4 * x + 2] = bits[4 * x + 0];
@@ -234,6 +245,16 @@ C3D_COLOR& Texture::chromaKey()
 bool Texture::keyOnAlpha()
 {
     return m_keyOnAlpha;
+}
+
+bool Texture::isTranslucent()
+{
+    return m_is_translucent;
+}
+
+std::vector<uint8_t>& Texture::translucencyMap()
+{
+    return m_translucency_map;
 }
 
 } // namespace cif

@@ -76,7 +76,7 @@ void main(void) {
 
         // texture mapping
         vec4 texColor = texture(tex0, vertTexCoords.xy / vertTexCoords.z);
-        if (texColor.a < 0.5) {
+        if (texColor.a == 0.0) {
             discard;
         }
         
@@ -87,7 +87,7 @@ void main(void) {
                 break;
 
             case C3D_ETL_MODULATE:
-                fragColor *= texColor;
+                fragColor = vec4(fragColor.rgb * texColor.rgb, texColor.a);
                 break;
 
             case C3D_ETL_ALPHA_DECAL:

@@ -38,6 +38,9 @@
     <ClCompile Include="StateVar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TransDelay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ati3dcif.hpp">
@@ -62,6 +65,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="StateVar.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TransDelay.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ati3dcif.hpp"
+#include "TransDelay.hpp"
 
 #include <glrage_gl/VertexArray.hpp>
 #include <glrage_gl/Buffer.hpp>
@@ -30,6 +31,8 @@ public:
     C3D_EPRIM primType();
     void primType(C3D_EPRIM primType);
     void bind();
+    void renderPrims(std::vector<C3D_VTCF> prims);
+    void setDelayer(std::function<BOOL(C3D_VTCF *)> delayer);
 
 private:
     C3D_EVERTEX m_vertexType;
@@ -38,6 +41,7 @@ private:
     gl::Buffer m_vertexBuffer;
     gl::VertexArray m_vtcFormat;
     std::vector<C3D_VTCF> m_vtcBuffer;
+    std::function<BOOL(C3D_VTCF *)> m_delayer;
 };
 
 } // namespace cif

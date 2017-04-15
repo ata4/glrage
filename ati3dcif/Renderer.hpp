@@ -3,6 +3,7 @@
 #include "State.hpp"
 #include "Texture.hpp"
 #include "VertexStream.hpp"
+#include "TransDelay.hpp"
 
 #include <glrage/GLRage.hpp>
 #include <glrage_gl/Program.hpp>
@@ -118,6 +119,7 @@ private:
     gl::Sampler m_sampler;
     VertexStream m_vertexStream;
     State m_state;
+    TransDelay m_transDelay;
 };
 
 } // namespace cif

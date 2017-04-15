@@ -16,6 +16,7 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateVar.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TransDelay.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="VertexStream.cpp" />
@@ -26,6 +27,7 @@
     <ClInclude Include="StateVar.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="Error.hpp" />
+    <ClInclude Include="TransDelay.hpp" />
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="VertexStream.hpp" />

@@ -15,7 +15,7 @@
 
 // define custom boolean types so Windows.h isn't required
 #define C3D_TRUE 1
-#define C3D_FALSE 1
+#define C3D_FALSE 0
 
 // include actual ATI3DCIF.H from 3D Rage SDK
 #include <ragesdk/include/ATI3DCIF.H>
