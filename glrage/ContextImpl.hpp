@@ -64,6 +64,7 @@ private:
 
     // OpenGL context handle
     HGLRC m_hglrc = nullptr;
+    HGLRC m_hglrc_core = nullptr;
 
     // Attached process ID
     DWORD m_pid = 0;

@@ -71,6 +71,23 @@ extern "C" {
 /* Extension Variables*/
 
 extern int wgl_ext_EXT_swap_control;
+extern int wgl_ext_ARB_create_context;
+extern int wgl_ext_ARB_create_context_profile;
+
+/* Extension: ARB_create_context*/
+#define WGL_CONTEXT_DEBUG_BIT_ARB        0x00000001
+#define WGL_CONTEXT_FLAGS_ARB            0x2094
+#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x00000002
+#define WGL_CONTEXT_LAYER_PLANE_ARB      0x2093
+#define WGL_CONTEXT_MAJOR_VERSION_ARB    0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB    0x2092
+#define WGL_ERROR_INVALID_VERSION_ARB    0x2095
+
+/* Extension: ARB_create_context_profile*/
+#define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
+#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+#define WGL_CONTEXT_PROFILE_MASK_ARB     0x9126
+#define WGL_ERROR_INVALID_PROFILE_ARB    0x2096
 
 
 /* Extension: EXT_swap_control*/
@@ -78,6 +95,10 @@ extern int (CODEGEN_FUNCPTR *_ptrc_wglGetSwapIntervalEXT)(void);
 #define wglGetSwapIntervalEXT _ptrc_wglGetSwapIntervalEXT
 extern BOOL (CODEGEN_FUNCPTR *_ptrc_wglSwapIntervalEXT)(int interval);
 #define wglSwapIntervalEXT _ptrc_wglSwapIntervalEXT
+
+/* Extension: ARB_create_context*/
+extern HGLRC (CODEGEN_FUNCPTR *_ptrc_wglCreateContextAttribsARB)(HDC hDC, HGLRC hShareContext, const int * attribList);
+#define wglCreateContextAttribsARB _ptrc_wglCreateContextAttribsARB
 
 void wgl_CheckExtensions(HDC hdc);
 #ifdef __cplusplus

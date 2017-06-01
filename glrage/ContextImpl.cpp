@@ -86,10 +86,26 @@ void ContextImpl::init()
             "Can't set pixel format", ErrorUtils::getWindowsErrorString());
     }
 
+    // create legacy context, required for wglGetProcAddress to work properly
     m_hglrc = wglCreateContext(m_hdc);
     if (!m_hglrc || !wglMakeCurrent(m_hdc, m_hglrc)) {
         ErrorUtils::error(
             "Can't create OpenGL context", ErrorUtils::getWindowsErrorString());
+    }
+
+    // attributes for a 3.3 core profile without all the legacy stuff
+    GLint attribs[] = {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        0
+    };
+
+    // create the actual context
+    m_hglrc_core = wglCreateContextAttribsARB(m_hdc, m_hglrc, attribs);
+    if (!m_hglrc_core || !wglMakeCurrent(m_hdc, m_hglrc_core)) {
+        ErrorUtils::error("Can't create OpenGL 3.3 core context",
+            ErrorUtils::getWindowsErrorString());
     }
 
     glClearColor(0, 0, 0, 0);
@@ -136,7 +152,7 @@ void ContextImpl::attach(HWND hwnd)
     }
 
     // set context on new window
-    if (!m_hglrc || !wglMakeCurrent(m_hdc, m_hglrc)) {
+    if (!m_hglrc_core || !wglMakeCurrent(m_hdc, m_hglrc_core)) {
         ErrorUtils::error("Can't attach window to OpenGL context",
             ErrorUtils::getWindowsErrorString());
     }
@@ -168,6 +184,9 @@ void ContextImpl::detach()
 
     wglDeleteContext(m_hglrc);
     m_hglrc = nullptr;
+
+    wglDeleteContext(m_hglrc_core);
+    m_hglrc_core = nullptr;
 
     auto windowProc = reinterpret_cast<LONG_PTR>(m_windowProc);
     SetWindowLongPtr(m_hwnd, GWLP_WNDPROC, windowProc);

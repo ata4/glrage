@@ -86,6 +86,8 @@ static PROC WinGetProcAddress(const char *name)
 #endif
 
 int wgl_ext_EXT_swap_control = 0;
+int wgl_ext_ARB_create_context = 0;
+int wgl_ext_ARB_create_context_profile = 0;
 
 /* Extension: EXT_swap_control*/
 typedef int (CODEGEN_FUNCPTR *PFN_PTRC_WGLGETSWAPINTERVALEXTPROC)(void);
@@ -93,10 +95,17 @@ static int CODEGEN_FUNCPTR Switch_GetSwapIntervalEXT(void);
 typedef BOOL (CODEGEN_FUNCPTR *PFN_PTRC_WGLSWAPINTERVALEXTPROC)(int);
 static BOOL CODEGEN_FUNCPTR Switch_SwapIntervalEXT(int interval);
 
+/* Extension: ARB_create_context*/
+typedef HGLRC (CODEGEN_FUNCPTR *PFN_PTRC_WGLCREATECONTEXTATTRIBSARBPROC)(HDC, HGLRC, const int *);
+static HGLRC CODEGEN_FUNCPTR Switch_CreateContextAttribsARB(HDC hDC, HGLRC hShareContext, const int * attribList);
+
 
 /* Extension: EXT_swap_control*/
 PFN_PTRC_WGLGETSWAPINTERVALEXTPROC _ptrc_wglGetSwapIntervalEXT = Switch_GetSwapIntervalEXT;
 PFN_PTRC_WGLSWAPINTERVALEXTPROC _ptrc_wglSwapIntervalEXT = Switch_SwapIntervalEXT;
+
+/* Extension: ARB_create_context*/
+PFN_PTRC_WGLCREATECONTEXTATTRIBSARBPROC _ptrc_wglCreateContextAttribsARB = Switch_CreateContextAttribsARB;
 
 
 /* Extension: EXT_swap_control*/
@@ -113,10 +122,20 @@ static BOOL CODEGEN_FUNCPTR Switch_SwapIntervalEXT(int interval)
 }
 
 
+/* Extension: ARB_create_context*/
+static HGLRC CODEGEN_FUNCPTR Switch_CreateContextAttribsARB(HDC hDC, HGLRC hShareContext, const int * attribList)
+{
+	_ptrc_wglCreateContextAttribsARB = (PFN_PTRC_WGLCREATECONTEXTATTRIBSARBPROC)IntGetProcAddress("wglCreateContextAttribsARB");
+	return _ptrc_wglCreateContextAttribsARB(hDC, hShareContext, attribList);
+}
+
+
 
 static void ClearExtensionVariables(void)
 {
 	wgl_ext_EXT_swap_control = 0;
+	wgl_ext_ARB_create_context = 0;
+	wgl_ext_ARB_create_context_profile = 0;
 }
 
 typedef struct wgl_MapTable_s
@@ -125,11 +144,16 @@ typedef struct wgl_MapTable_s
 	int *extVariable;
 }wgl_MapTable;
 
-static wgl_MapTable g_mappingTable[1]; /*This is intensionally left uninitialized.*/
+static wgl_MapTable g_mappingTable[3] = 
+{
+	{"WGL_EXT_swap_control", &wgl_ext_EXT_swap_control},
+	{"WGL_ARB_create_context", &wgl_ext_ARB_create_context},
+	{"WGL_ARB_create_context_profile", &wgl_ext_ARB_create_context_profile},
+};
 
 static void LoadExtByName(const char *extensionName)
 {
-	wgl_MapTable *tableEnd = &g_mappingTable[1];
+	wgl_MapTable *tableEnd = &g_mappingTable[3];
 	wgl_MapTable *entry = &g_mappingTable[0];
 	for(; entry != tableEnd; ++entry)
 	{
