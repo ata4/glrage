@@ -7,12 +7,7 @@ namespace glrage {
 namespace ddraw {
 
 Renderer::Renderer()
-    : m_surfaceBuffer(GL_ARRAY_BUFFER)
 {
-    // configure buffer
-    m_surfaceBuffer.bind();
-    m_surfaceBuffer.data(0, nullptr, GL_STATIC_DRAW);
-
     // configure sampler
     std::string filterMethod =
         m_config.getString("directdraw.filter_method", "linear");
@@ -59,7 +54,6 @@ void Renderer::upload(DDSURFACEDESC& desc, std::vector<uint8_t>& data)
 void Renderer::render()
 {
     m_program.bind();
-    m_surfaceBuffer.bind();
     m_surfaceFormat.bind();
     m_surfaceTexture.bind();
     m_sampler.bind(0);
