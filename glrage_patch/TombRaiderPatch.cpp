@@ -433,6 +433,11 @@ void TombRaiderPatch::applySoundPatches()
     } else {
         patchAddr(0x438576, "E8 B5 F9 FF FF", TombRaiderHooks::soundUpdateVolume, 0xE8);
     }
+
+	// Disable an instruction in UB that removes the volume settings from the in-game menu
+	if (m_ub) {
+		patchNop(0x41F655, "66 89 15 0C 5A 45 00");
+	}
 }
 
 void TombRaiderPatch::applyKeyboardPatches()
