@@ -1,5 +1,4 @@
 #version 330 core
-#extension GL_EXT_gpu_shader4: enable
 
 // ATI3DCIF enums
 
@@ -61,7 +60,7 @@ void main(void) {
         // chroma keying
         if (texOp == C3D_ETEXOP_CHROMAKEY) {
             // fetch raw texel for fragment
-            ivec2 size = textureSize2D(tex0, 0);
+            ivec2 size = textureSize(tex0, 0);
             int tx = int((vertTexCoords.x / vertTexCoords.z) * size.x) % size.x;
             int ty = int((vertTexCoords.y / vertTexCoords.z) * size.y) % size.y;
             vec4 texel = texelFetch(tex0, ivec2(tx, ty), 0);
